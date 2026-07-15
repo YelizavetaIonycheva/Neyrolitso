@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
+
+	<PreferenceCategory
+	    android:title="@string/pref_preferences_title">
+
+		<PreferenceScreen
+			android:title="@string/pref_ip_address_title"
+			android:key="@string/pref_ip_address_key"
+			android:icon="@drawable/ic_ip_address"
+			android:persistent="false">
+
+			<PreferenceCategory
+				android:title="@string/pref_ip_address_title">
+
+				<EditTextPreference
+					android:title="@string/pref_ip_skzi_title"
+					android:key="@string/pref_ip_skzi_key"
+					android:persistent="false"/>
+
+				<EditTextPreference
+					android:title="@string/pref_ip_mon_title"
+					android:key="@string/pref_ip_mon_key"
+					android:persistent="false"/>
+
+				<EditTextPreference
+					android:title="@string/pref_ip_ats_title"
+					android:key="@string/pref_ip_ats_key"
+					android:persistent="false"/>
+
+				<EditTextPreference
+					android:title="@string/pref_domain_name_title"
+					android:key="@string/pref_domain_name_key"
+					android:defaultValue="impulse.ru"
+					android:persistent="false"/>
+
+				<EditTextPreference
+					android:title="@string/pref_ip_dns_title"
+					android:key="@string/pref_ip_dns_key"
+					android:persistent="false"/>
+
+				<EditTextPreference
+					android:title="@string/pref_ip_dns_second_title"
+					android:key="@string/pref_ip_dns_second_key"
+					android:persistent="false"/>
+
+			</PreferenceCategory>
+
+		</PreferenceScreen>
+
+		<PreferenceScreen
+			android:title="@string/pref_vpn_info_title"
+			android:key="@string/pref_vpn_info_key"
+			android:icon="@drawable/ic_vpn_key"
+			android:persistent="false">
+
+			<PreferenceCategory
+				android:title="@string/pref_skzi_title"
+				android:key="@string/pref_skzi_key">
+
+				<SwitchPreferenceCompat
+					android:title="@string/pref_connect_skzi_title"
+					android:key="@string/pref_connect_skzi_key"/>
+
+				<Preference
+					android:title="@string/pref_connect_skzi_time_error"
+					android:key="@string/pref_connect_skzi_time_error_key"
+					app:isPreferenceVisible="false"
+					android:persistent="false"/>
+
+				<MultiSelectListPreference
+					android:title="@string/pref_work_with_vpn_title"
+					android:key="@string/pref_work_with_vpn_key"
+					android:persistent="false"/>
+
+			</PreferenceCategory>
+
+			<PreferenceCategory
+				android:title="@string/pref_key_compl_title"
+				android:key="@string/pref_key_compl_key">
+
+				<PreferenceScreen
+					android:title="@string/key_working_settings_title"
+					android:key="@string/pref_key_working_compl_key">
+
+					<PreferenceCategory
+						android:title="@string/key_working_settings_title">
+
+						<Preference
+							android:key="@string/pref_key_w_name_komplect_key"
+							android:title="@string/key_name_komplect_title"
+							android:persistent="false"/>
+
+						<Preference
+							android:key="@string/pref_key_w_num_serial_key"
+							android:title="@string/key_num_serial_title"
+							android:persistent="false"/>
+
+						<Preference
+							android:key="@string/pref_key_w_num_komplect_key"
+							android:title="@string/key_num_komplect_title"
+							android:persistent="false"/>
+
+						<Preference
+							android:key="@string/pref_key_w_date_begin_key"
+							android:title="@string/key_date_begin_title"
+							android:persistent="false"/>
+
+						<Preference
+							android:key="@string/pref_key_w_date_end_key"
+							android:title="@string/key_date_end_title"
+							android:persistent="false"/>
+					</PreferenceCategory>
+				</PreferenceScreen>
+
+			</PreferenceCategory>
+
+		</PreferenceScreen>
+
+		<PreferenceScreen
+			android:title="@string/biometry_settings"
+			android:key="@string/pref_biometry_settings_key"
+			android:icon="@drawable/ic_face"
+			android:persistent="false">
+
+			<PreferenceCategory
+				android:key="@string/pref_biometry_settings_cat_key"
+				android:title="@string/biometry_settings">
+
+				<Preference
+					android:key="pref_delete_biometry"
+					android:title="@string/new_biometry_title"
+					android:persistent="false"/>
+
+				<Preference
+					android:key="pref_create_biometry"
+					android:title="@string/create_biometry_title"
+					android:persistent="false"/>
+
+				<Preference
+					android:key="pref_update_biometry"
+					android:title="@string/update_biometry_title"
+					android:persistent="false"/>
+
+				<Preference
+					android:key="pref_export_biometry"
+					android:title="@string/export_biometry_title"
+					android:persistent="false"/>
+
+				<Preference
+					android:key="pref_import_biometry"
+					android:title="@string/import_biometry_title"
+					android:persistent="false"/>
+			</PreferenceCategory>
+
+		</PreferenceScreen>
+
+		<PreferenceScreen
+			android:title="@string/pref_gps_title"
+			android:key="@string/pref_gps_key"
+			android:icon="@drawable/ic_share_location"
+			android:persistent="false">
+
+			<PreferenceCategory
+				android:title="@string/pref_gps_title">
+
+				<CheckBoxPreference
+					android:title="@string/pref_send_gps_title"
+					android:key="@string/pref_send_gps_key"
+					android:persistent="false"/>
+
+				<EditTextPreference
+					android:title="@string/pref_ip_db_title"
+					android:key="@string/pref_ip_db_key"
+					android:persistent="false"/>
+
+				<ListPreference
+					android:title="@string/pref_gps_time_title"
+					android:key="@string/pref_gps_time_key"
+					android:entries="@array/gps_time_entries"
+					android:entryValues="@array/gps_time_entry_values"
+					android:persistent="false"/>
+			</PreferenceCategory>
+		</PreferenceScreen>
+
+<!--		<PreferenceScreen
+			android:title="@string/pref_codecs_title"
+			android:key="@string/pref_codecs_key"
+			android:icon="@drawable/ic_audiotrack"
+			android:persistent="false"
+			app:isPreferenceVisible="false">
+
+			<PreferenceCategory
+				android:title="@string/pref_audio_codecs"
+				android:key="@string/pref_audio_codecs_key"
+				android:persistent="false"/>
+
+			<PreferenceCategory
+				android:title="@string/pref_video_codecs"
+				android:key="@string/pref_video_codecs_key"
+				android:persistent="false"/>
+
+		</PreferenceScreen>-->
+
+		<PreferenceScreen
+			android:title="@string/pref_media_title"
+			android:key="@string/pref_media_key"
+			android:icon="@drawable/ic_media"
+			android:persistent="false">
+
+			<PreferenceCategory
+				android:title="@string/pref_audio_title"
+				app:isPreferenceVisible="true">
+
+				<CheckBoxPreference
+					android:title="@string/pref_echo_cancellation"
+					android:key="@string/pref_echo_cancellation_key"
+					android:summary="@string/pref_echo_cancellation_summary"
+					android:persistent="false"/>
+
+				<Preference
+					android:title="@string/pref_echo_canceller_calibration"
+					android:key="@string/pref_echo_canceller_calibration_key"
+					android:persistent="false"/>
+
+				<Preference
+					android:title="@string/pref_echo_tester"
+					android:key="@string/pref_echo_tester_key"
+					android:persistent="false"/>
+
+			</PreferenceCategory>
+
+			<PreferenceCategory
+				android:title="@string/pref_video_title">
+
+<!--				<ListPreference
+					android:title="@string/pref_video_preset"
+					android:key="@string/pref_video_preset_key"
+					android:shouldDisableView="true"
+					android:entries="@array/video_preset_entries"
+					android:entryValues="@array/video_preset_entries"
+					android:persistent="false"
+					app:isPreferenceVisible="false"/>-->
+
+				<ListPreference
+					android:title="@string/pref_preferred_video_size"
+					android:key="@string/pref_preferred_video_size_key"
+					android:shouldDisableView="true"
+					android:persistent="false"/>
+
+<!--				<ListPreference
+					android:title="@string/pref_preferred_fps"
+					android:key="@string/pref_preferred_video_fps_key"
+					android:shouldDisableView="true"
+					android:persistent="false"
+					app:isPreferenceVisible="false"/>-->
+
+<!--				<EditTextPreference
+					android:title="@string/pref_bandwidth_limit"
+					android:key="@string/pref_bandwidth_limit_key"
+					android:shouldDisableView="true"
+					android:persistent="false"
+					app:isPreferenceVisible="false"/>-->
+
+				<CheckBoxPreference
+					android:title="@string/pref_overlay"
+					android:key="@string/pref_overlay_key"
+					android:shouldDisableView="true"
+					android:summary="@string/pref_overlay_summary"
+					android:persistent="false"/>
+
+			</PreferenceCategory>
+
+		</PreferenceScreen>
+
+		<PreferenceScreen
+		    android:title="@string/pref_advanced_title"
+		    android:key="@string/pref_advanced_key"
+			android:icon="@drawable/ic_more">
+
+		    <PreferenceCategory
+				android:title="@string/pref_advanced_title">
+
+				<Preference
+					android:title="@string/pref_export_logs_title"
+					android:key="@string/pref_export_logs_key"
+					android:persistent="false"
+					android:icon="@drawable/ic_book"/>
+
+				<Preference
+					android:title="@string/pref_update_po_title"
+					android:key="@string/pref_update_po_key"
+					android:persistent="false"
+					android:icon="@drawable/ic_update"/>
+
+				<Preference
+					android:title="@string/pref_reset_config_title"
+					android:key="@string/pref_reset_spomp_key"
+					android:persistent="false"
+					android:icon="@drawable/ic_delete"/>
+
+				<Preference
+					android:title="@string/pref_change_regime_title"
+					android:key="@string/pref_change_regime_key"
+					android:persistent="false"
+					android:icon="@drawable/ic_change"/>
+
+				<Preference
+					android:title="@string/pref_background_work_title"
+					android:key="@string/pref_background_work_key"
+					android:persistent="false"
+					android:icon="@drawable/ic_battery"/>
+
+				<Preference
+					android:title="@string/pref_export_settings_title"
+					android:key="@string/pref_export_settings_key"
+					android:persistent="false"
+					android:icon="@drawable/ic_file_upload"/>
+
+				<Preference
+					android:title="@string/pref_import_settings_title"
+					android:key="@string/pref_import_settings_key"
+					android:persistent="false"
+					android:icon="@drawable/ic_file_download"/>
+			</PreferenceCategory>
+
+		</PreferenceScreen>
+
+	</PreferenceCategory>
+
+</PreferenceScreen>

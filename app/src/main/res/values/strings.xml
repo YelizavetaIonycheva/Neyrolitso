@@ -1,0 +1,598 @@
+<resources>
+    <string name="app_name">Импульс GPS</string>
+    <string name="create_safe">Создать</string>
+
+    <string name="scan_qrcode_info">Или отсканируйте QR-код лицензии</string>
+    <string name="select_qrcode_file_info">Для регистрации приложения выберите файл-архив конфигурации</string>
+    <string name="scan">Сканировать</string>
+    <string name="select">Выбрать</string>
+    <string name="dialog_reg_license_title">Данные лицензии</string>
+	
+
+
+
+    <string name="tab1">ЧАТЫ</string>
+    <string name="tab2">ЗВОНОК</string>
+    <string name="tab3">КОНТАКТЫ</string>
+    <string name="tab4">ИСТОРИЯ</string>
+
+    <string name="add_new_chat">Новый чат</string>
+
+    <string name="hint_full_name">Полное имя</string>
+    <string name="hint_sip_number">Номер</string>
+    <string name="label_new_contact">Создать контакт</string>
+    <string name="label_change_contact">Изменить контакт</string>
+    <string name="label_select_contact">Выбор контакта</string>
+    <string name="label_create_group">Создание рассылки</string>
+    <string name="label_change_group">Редактирование рассылки</string>
+    <string name="hint_create_group">Наименование</string>
+
+    <string name="delete_contact_title">Удалить контакт ?</string>
+    <string name="not_found_contact">Для отправки сообщений добавьте пользователя в контакты</string>
+
+    <string name="button_synchr_contacts">С сервера</string>
+    <string name="button_new_contact">Новый контакт</string>
+    <string name="button_new_contact_from_phone">С телефонной книги</string>
+    <string name="label_result_sync_contacts">Синхронизация контактов</string>
+
+    <string name="password">Пароль</string>
+    <string name="repeat_password">Повтор пароля</string>
+    <string name="conf_file">Файл конфигурации</string>
+    <string name="key_file">Файл с ключом</string>
+    <string name="enter">Вход</string>
+    <string name="next">Далее</string>
+    <string name="stop">Стоп</string>
+    <string name="err_empty_password">Пароль не введен</string>
+    <string name="err_lenght_password">Короткий пароль</string>
+    <string name="err_not_match_password">Пароли не совпадают</string>
+    <string name="err_file_not_select">Файл не выбран</string>
+    <string name="err_file_cfg_not_found">Файл конфигурации не найден</string>
+    <string name="err_file_key_reg_not_found">Файл ключа не найден</string>
+
+    <string name="search_config_files">Поиск файлов конфигурации</string>
+    <string name="permission_error">Для чтения файлов SD приложению необходимо предоставить разрешение</string>
+    <string name="search_config_file_error">Файл конфигурации не найден</string>
+    <string name="search_key_file_error">Файл с ключами не найден</string>
+    <string name="init_config">Проверка файла конфигурации</string>
+    <string name="init_config_error">Ошибка файла конфигурации</string>
+    <string name="init_key">Проверка ключевой информации</string>
+    <string name="init_key_error">Ошибка ключевой информации</string>
+    <string name="save_config">Сохранение конфигурации</string>
+    <string name="save_config_error">Ошибка сохранения конфигурации</string>
+    <string name="save_key">Сохранение ключевого документа</string>
+    <string name="save_key_error">Ошибка сохранения ключевого документа</string>
+    <string name="load_config">Загрузка конфигурации</string>
+    <string name="load_config_error">Ошибка загрузки конфигурации</string>
+    <string name="pass_error">Неверный пароль</string>
+    <string name="load_key">Загрузка ключевого документа</string>
+    <string name="load_key_error">Ошибка загрузки ключевого документа</string>
+    <string name="connecting_with_skzi">Соединение с СКЗИ</string>
+    <string name="get_work_key">Получение ключевого блокнота</string>
+    <string name="get_work_key_error">Ошибка загрузки действующего КБ</string>
+    <string name="start_spo">Запуск</string>
+
+    <plurals name="info_num_add_contacts">
+        <item quantity="zero">Добавлено %1$d контактов</item>
+        <item quantity="one">Добавлен %1$d контакт</item>
+        <item quantity="few">Добавлено %1$d контакта</item>
+        <item quantity="many">Добавлено %1$d контактов</item>
+    </plurals>
+
+    <plurals name="info_num_change_contacts">
+        <item quantity="zero">Изменено %1$d контактов</item>
+        <item quantity="one">Изменен %1$d контакт</item>
+        <item quantity="few">Изменено %1$d контакта</item>
+        <item quantity="many">Изменено %1$d контактов</item>
+    </plurals>
+
+    <plurals name="info_num_unread_messages">
+        <item quantity="one">%1$d непрочитанное сообщение</item>
+        <item quantity="few">%1$d непрочитанных сообщения</item>
+        <item quantity="many">%1$d непрочитанных сообщений</item>
+    </plurals>
+
+    <string name="in_call">Входящий вызов</string>
+    <string name="out_call">Исходящий вызов</string>
+    <string name="miss_call">Пропущенный вызов</string>
+
+
+    <string name="info_open_file_title">Открытие файла</string>
+    <string name="info_open_file">Выбранный файл будет расшифрован\n(результат записывается в каталог SPO_MP_Files)</string>
+    <string name="info_open_file_chek_title">Больше не показывать</string>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!--  Сообщения из AlertDialog  -->
+    <string name="dialog_select_file">Выберите файл</string>
+    <string name="dialog_select_dir">Укажите каталог</string>
+    <string name="dialog_export_images">Экспорт изображений</string>
+    <string name="dialog_select_config_file">Выберите файл конфигурации</string>
+    <string name="dialog_select_key_file">Выберите ключевой файл</string>
+    <string name="dialog_select_qr_file">Выберите файл qr-кода</string>
+    <string name="dialog_enter_pass">Введите пароль</string>
+    <string name="dialog_select_zip_file">Выберите архив конфигурации</string>
+    <string name="dialog_wait">Пожалуйста подождите</string>
+
+
+    <!--  Settings Fragment  -->
+        <!-- IP Адреса -->
+    <string name="pref_ip_address_title">IP Адреса</string>
+    <string name="pref_ip_skzi_title">WAN СКМ</string>
+    <string name="pref_ip_mon_title">Сервер мониторинга ключей</string>
+    <string name="pref_ip_ats_title">АТС</string>
+    <string name="pref_domain_name_title">Доменное имя сервера</string>
+    <string name="pref_ip_dns_title">DNS</string>
+    <string name="pref_ip_dns_second_title">DNS дополнительный</string>
+
+        <!-- VPN Соединение -->
+    <string name="pref_vpn_info_title">VPN соединение</string>
+            <!-- СКЗИ -->
+    <string name="pref_skzi_title">СКЗИ</string>
+    <string name="pref_connect_skzi_title">Соединение с СКЗИ</string>
+    <string name="pref_connect_skzi_time_error">Ошибка синхронизации времени</string>
+    <string name="pref_work_with_vpn_title">Работают через VPN</string>
+            <!-- Комплекты ключей -->
+    <string name="pref_key_compl_title">Комплекты ключей</string>
+    <string name="key_working_settings_title">Комплект ключей (действующий)</string>
+    <string name="key_next_settings_title">Комплект ключей (очередной)</string>
+    <string name="key_num_komplect_title">Номер комплекта</string>
+    <string name="key_name_komplect_title">Наименование комплекта</string>
+    <string name="key_num_serial_title">Номер серии</string>
+    <string name="key_num_of_keys_title">Количество ключей</string>
+    <string name="key_date_begin_title">Дата начала действия комплекта</string>
+    <string name="key_date_end_title">Дата конца действия комплекта</string>
+
+        <!-- Биометрия -->
+    <string name="biometry_settings">Биометрия</string>
+    <string name="new_biometry_title">Удалить биометрический контейнер</string>
+    <string name="create_biometry_title">Создать биометрический контейнер</string>
+    <string name="update_biometry_title">Переобучить биометрический контейнер</string>
+    <string name="info_biometry_title">Информация о стойкости нейросетевого биометрического контейнера</string>
+    <string name="export_biometry_title">Экспорт биометрического контейнера</string>
+    <string name="import_biometry_title">Импорт биометрического контейнера</string>
+    <string name="info_create_biometry">Будет создан биометрический контейнер, обученный формированию из лица пользователя пароля доступа.\nДля более качественного обучения рекомендуется снимать лицо под разными углами</string>
+    <string name="info_update_biometry">Биометрический контейнер будет переобучен.\nДля более качественного обучения рекомендуется снимать лицо под разными углами</string>
+    <string name="info_export_biometry">Биометрический контейнер будет зашифрован на пароле аутентификации и записан в файл \"ImpulseBiom.bc\" в указанный каталог </string>
+    <string name="info_import_biometry">Выберите файл биометрического контейнера и введите пароль на котором он был зашифрован</string>
+    <string name="info_biometry">Информация о стойкости нейросетевого биометрического контейнера</string>
+    <string name="error_biometry_timeout">Превышено время распознования лица пользователя</string>
+    <string name="error_biometry">Ошибка распознавания</string>
+    <string name="error_biometry_data">Получены некорректные данные</string>
+    <string name="biometry_result_ok">Биометрический контейнер создан</string>
+        <!-- Медиа -->
+    <string name="pref_media_title">Медиа</string>
+            <!-- Аудио -->
+    <string name="pref_audio_title">Аудио</string>
+    <string name="pref_echo_cancellation">Эхоподавление</string>
+    <string name="pref_echo_cancellation_summary">Устраняет эхо, слышимое другой стороной</string>
+    <string name="pref_echo_canceller_calibration">Калибровка эхоподавления</string>
+    <string name="pref_echo_tester">Тест эхо</string>
+    <string name="ec_calibrating">Калибровка…</string>
+    <string name="ec_calibrated">Откалибровано в %s мс</string>
+    <string name="no_echo">Нет эха</string>
+    <string name="failed">не удалось</string>
+            <!-- Видео -->
+    <string name="pref_video_title">Видео</string>
+    <string name="pref_preferred_video_size">Предпочитаемый размер видео</string>
+    <string name="pref_overlay">Наложение видео</string>
+    <string name="pref_overlay_summary">Отображать видеовызов наложением на стороннем приложении</string>
+
+        <!-- Дополнительно -->
+    <string name="pref_advanced_title">Дополнительно</string>
+    <string name="pref_export_logs_title">Просмотр журнала работы с СКЗИ</string>
+    <string name="pref_update_po_title">Обновление ПО</string>
+    <string name="pref_reset_config_title">Сброс приложения</string>
+    <string name="reset_config_info">"Сброс приложения приведет к удалению конфигурационной и ключевой информации. Приложение будет закрыто"</string>
+    <string name="pref_change_regime_title">Смена режима работы</string>
+    <string name="change_regime_info">Работа текущего режима работы будет завершена. Будет необходимо повторно пройти аутентификацию</string>
+    <string name="pref_background_work_title">Контроль фоновой активности</string>
+    <string name="pref_export_settings_title">Экспорт настроек</string>
+    <string name="info_export_settings">Настройки будут записаны в файл \"Impulse.prefs\" в указанном каталоге</string>
+    <string name="error_export_settings">Ошибка экспорта настроек</string>
+    <string name="end_export_settings">"Настройки экспортированы"</string>
+    <string name="pref_import_settings_title">Импорт настроек</string>
+    <string name="info_import_settings">Настройки будут прочитаны из указанного файла и применены </string>
+    <string name="error_import_settings">Ошибка импорта настроек</string>
+    <string name="error_import_settings_wrong_regime">Ошибка, настройки для другого режима работы</string>
+    <string name="end_import_settings">"Настройки загружены"</string>
+
+
+
+    <!--Advanced settings-->
+
+    <string name="vpn_not_connecting">Соединение не установлено</string>
+    <string name="vpn_connecting">Установка соединения...</string>
+    <string name="vpn_connected">Соединение установлено</string>
+    <string name="vpn_disconnected">Соединение разорвано!</string>
+    <string name="vpn_server_disconnected">Сервер разорвал соединение</string>
+    <string name="vpn_server_not_available">Сервер недоступен</string>
+    <string name="vpn_faild_connect_to_server">Ошибка подключения к серверу</string>
+    <string name="vpn_wifi_mobdata_not_active">Wi-Fi или Мобильные данные отключены</string>
+    <string name="start_connecting">Запустить</string>
+    <string name="stop_connecting">Остановить</string>
+    <string name="start_time_dif_info">Рассинхронизация времени\nВремя сервера</string>
+    <string name="kompl_number">Номер комплекта:</string>
+    <string name="serial_number">Номер серии:</string>
+    <string name="show_pass">Показать пароль</string>
+    <string name="wan_ip">WAN IP:</string>
+    <string name="lan_ip">LAN IP:</string>
+    <string name="speed_in">Прием (kB/s):</string>
+    <string name="speed_out">Передача (kB/s):</string>
+
+    <string name="network_address">Сетевые адреса</string>
+    <string name="address_VPN">IP адрес СКЗИ</string>
+    <string name="address_DNS">IP адрес DNS</string>
+    <string name="address_KEY">IP адрес сервера мониторинга</string>
+    <string name="user_password">Пароль</string>
+    <string name="user_address">Адрес ресурса</string>
+    <string name="other_settings">Общее</string>
+    <string name="show_ip">Показывать параметры подключения</string>
+    <string name="auto_start_VPN">Соединение при запуске</string>
+    <string name="battery_saving">Энергосбережение</string>
+
+    <string name="keys_settings">Комплекты ключей</string>
+    <string name="delete_keys">Стереть ключи</string>
+
+    <string name="content_title_notification_vpn_service">Служба VPN соединения</string>
+    <string name="content_title_notification_vpn_service2">Служба VPN соединения2</string>
+    <string name="notification_service_channel_vpn_id">ikev2_vpn_notification_service_id</string>
+    <string name="vpn_service_name">Служба VPN соединения</string>
+
+    <!-- VPN info -->
+    <string name="vpn_configuration_error_info">"Ошибка установки соединения. Проверьте настройки соединения"</string>
+    <string name="connection_quality">Качество:</string>
+    <string name="connection_quality_non"> </string>
+    <string name="connection_quality_high">Высокое</string>
+    <string name="connection_quality_middle">Среднее</string>
+    <string name="connection_quality_low">Низкое</string>
+
+
+
+
+    <string name="file_export_prefs">Impulse.prefs</string>
+
+
+
+    <!-- LINPHONE  -->
+    <string name="notification_reply_label">Ответ</string>
+    <string name="notification_call_hangup_label">Отбой</string>
+    <string name="notification_call_answer_label">Ответ</string>
+    <string name="notification_replied_label">Отправил ответ: %s</string>
+    <string name="incall_notif_incoming">Входящий вызов</string>
+    <string name="incall_notif_outgoing">Исходящий вызов</string>
+    <!--Custom-->
+    <string name="service_name">Служба Импульс</string>
+    <string name="notification_registered">Зарегистрирован</string>
+    <string name="notification_register_in_progress">Выполняется регистрация</string>
+    <string name="notification_register_failure">Зарегистрироваться не удалось</string>
+    <!--Common-->
+    <string name="username">Имя пользователя</string>
+    <string name="userid">Идентификатор пользователя (необязательно)</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="display_name">Отображаемое имя</string>
+    <string name="domain">Домен</string>
+    <string name="email">Электронная почта</string>
+    <string name="delete">Удалить</string>
+    <string name="retry">Повторить</string>
+    <string name="cancel">Отменить</string>
+    <string name="accept">Принять</string>
+    <string name="export">Экспорт</string>
+    <string name="import_str">Импорт</string>
+    <string name="continue_text">Продолжить</string>
+    <string name="about">О программе</string>
+    <string name="deny">Отклонить</string>
+    <string name="no_account">Нет настроенных аккаунтов</string>
+    <string name="search">Поиск</string>
+    <string name="outgoing">Исходящий</string>
+    <string name="incoming">Входящий</string>
+    <string name="missed">Пропущенный</string>
+    <string name="settings">Настройки</string>
+    <string name="connect">Подключение</string>
+    <string name="decline">Отклонить</string>
+    <string name="conference">Конференция</string>
+    <string name="link">Ссылка</string>
+    <string name="later">Позже</string>
+    <string name="no">Нет</string>
+    <string name="ok">OK</string>
+    <string name="yes">Да</string>
+    <!--Launch screen-->
+    <string name="app_description">SIP-клиент</string>
+
+    <!--Status Bar-->
+    <string name="status_connected">Зарегистрирован</string>
+    <string name="status_not_connected">Не зарегистрирован</string>
+    <string name="status_in_progress">Выполняется регистрация</string>
+    <string name="status_error">Регистрация не удалась</string>
+    <string name="voicemail_unread"> непрочитанных сообщений</string>
+    <!--Side Menu-->
+    <string name="menu_assistant">Ассистент</string>
+    <string name="menu_settings">Настройки</string>
+    <string name="quit">Выход</string>
+    <!--Call-->
+    <string name="incoming_call">входящий вызов</string>
+    <string name="outgoing_call">исходящий вызов</string>
+    <string name="add_video_dialog">Ваш собеседник хотел бы включить видео</string>
+    <string name="no_current_call">Нет активного вызова</string>
+    <string name="call_paused_by_remote">Ваш собеседник поставил вызов на удержание</string>
+    <string name="couldnt_accept_call">Произошла ошибка во время принятия вызова</string>
+
+    <string name="call_stats_audio">Аудио</string>
+    <string name="call_stats_video">Видео</string>
+    <string name="call_stats_codec">Кодек:</string>
+    <string name="call_stats_ip">Семейство IP:</string>
+    <string name="call_stats_upload">Пропускная способность передачи:</string>
+    <string name="call_stats_download">Пропускная способность приема:</string>
+    <string name="call_stats_estimated_download">Предполагаемая пропускная способность на прием:</string>
+    <string name="call_stats_ice">ICE-соединение:</string>
+    <string name="call_stats_video_resolution_sent">Разрешение передаваемого видео:</string>
+    <string name="call_stats_video_resolution_received">Разрешение принимаемого видео:</string>
+    <string name="call_stats_video_fps_sent">fps передаваемого видео:</string>
+    <string name="call_stats_video_fps_received">fps принимаемого видео:</string>
+    <string name="call_stats_sender_loss_rate">Коэффициент потерь отправителя:</string>
+    <string name="call_stats_receiver_loss_rate">Коэффициент потерь приемника:</string>
+    <string name="call_stats_jitter_buffer">Буфер джиттера:</string>
+    <string name="call_stats_encoder_name">Кодер:</string>
+    <string name="call_stats_decoder_name">Декодер</string>
+    <string name="call">Вызов</string>
+    <!--About-->
+    <string name="menu_send_log">Отправить журнал</string>
+    <string name="menu_reset_log">Сброс журнала</string>
+    <!--Service-->
+    <string name="incall_notif_active">Установлено аудиосоединение</string>
+    <string name="incall_notif_paused">Вызов на удержании</string>
+    <string name="incall_notif_video">Установлено видеосоединение</string>
+    <string name="notification_started">Запущен</string>
+    <string name="unread_messages">%i непрочитанных сообщений</string>
+    <string name="missed_calls_notif_title">Пропущенный вызов</string>
+    <string name="missed_calls_notif_body">%i пропущенных вызовов</string>
+    <!--Errors-->
+    <string name="skipable_error_service_not_ready">Предупреждение: служба не готова</string>
+    <string name="error">Ошибка</string>
+    <string name="warning_wrong_destination_address">Невозможно создать адрес назначения из %s</string>
+    <string name="error_unknown">Неизвестная ошибка</string>
+    <string name="error_call_declined">Вызов отклонен</string>
+    <string name="error_user_busy">Абонент занят</string>
+    <string name="error_user_not_found">Абонент не найден</string>
+    <string name="error_incompatible_media">Несовместимые параметры потока</string>
+    <string name="error_low_bandwidth">У вашего собеседника низкая пропускная способность, видео не может быть запущено</string>
+    <string name="error_network_unreachable">Сеть недоступна</string>
+    <string name="error_bad_credentials">Неверные учетные данные</string>
+    <string name="error_unauthorized">Неавторизован</string>
+    <string name="error_io_error">Ошибка сети</string>
+    <string name="download_image_failed">Загрузка не удалась. Проверьте сетевое подключение или повторите попытку позже.</string>
+    <string name="remote_provisioning_failure">Не удалось загрузить или применить профиль удаленного конфигурирования...</string>
+    <string name="remote_provisioning_again_title">Удаленное конфигурирование</string>
+    <string name="remote_provisioning_again_message">Вы хотите изменить URI конфигурирования?</string>
+    <!--Account Settings-->
+    <string name="pref_sipaccount">SIP-аккаунт</string>
+    <string name="pref_manage_title">Управление</string>
+    <string name="pref_disable_account">Отключить</string>
+    <string name="pref_proxy">Прокси</string>
+    <string name="pref_domain">Домен</string>
+    <string name="pref_passwd">Пароль</string>
+    <string name="pref_username">Имя пользователя</string>
+    <string name="pref_enable_outbound_proxy">Исходящий прокси</string>
+    <string name="pref_help_proxy">Имя прокси-сервера SIP или ip адрес (необязательно)</string>
+    <string name="pref_help_outbound_proxy">Маршрутизация всех вызовов через SIP-прокси</string>
+    <string name="pref_help_username">Например: 1001 если ваш адрес 1001@sip.example.org</string>
+    <string name="pref_help_domain">sip.example.org если ваш адрес 1001@sip.example.org</string>
+    <string name="pref_help_password">Необходимо повторно ввести пароль, если вы измените имя пользователя и/или домен</string>
+    <string name="pref_expire_title">Истекает</string>
+    <string name="pref_avpf">AVPF</string>
+    <string name="pref_avpf_rr_interval"> AVPF регулярный интервал RTCP в секундах (от 1 до 5)</string>
+    <string name="pref_escape_plus">Заменить + на 00</string>
+    <string name="pref_link_account">Связать свою учетную запись</string>
+    <string name="pref_auth_userid">Имя для аутентификации</string>
+    <string name="pref_help_auth_userid">Введите имя для аутентификации (необязательно)</string>
+    <string name="pref_display_name">Отображаемое имя</string>
+    <string name="pref_help_display_name">Введите отображаемое имя (необязательно)</string>
+    <string name="pref_prefix">Префикс</string>
+    <string name="pref_transport">Транспорт</string>
+
+    <string name="pref_vpnAccount_disable">Обычный Аккаунт</string>
+
+    <string name="pref_transport_udp">UDP</string>
+    <string name="pref_transport_tcp">TCP</string>
+    <string name="pref_transport_tls">TLS</string>
+    <string name="pref_delete_account">Удалить аккаунт</string>
+    <string name="pref_change_password">Изменить пароль</string>
+    <string name="pref_default_account">Использовать по умолчанию</string>
+    <string name="pref_password_changed">Пароль изменен</string>
+    <!--Settings-->
+    <string name="pref_sip_accounts">Учетная запись SIP</string>
+    <string name="default_account_flag">Учетная запись по умолчанию</string>
+    <string name="pref_add_account">Добавить учетную запись</string>
+    <string name="pref_tunnel">Туннель</string>
+    <string name="pref_tunnel_host">Сервер</string>
+    <string name="pref_tunnel_port">Порт</string>
+    <string name="pref_tunnel_mode">Режим</string>
+    <!--do not change order without changing corresponding entry_values in non_localizable_strings.xml-->
+    <string-array name="tunnel_mode_entries">
+        <item>выключено</item>
+        <item>только 3G</item>
+        <item>всегда</item>
+        <item>авто</item>
+    </string-array>
+    <string name="pref_none">Нет</string>
+    <string name="pref_preferences_title">Настройки</string>
+    <string name="pref_video_enable_title">Включить видео</string>
+
+    <!--Audio settings-->
+
+    <string name="pref_codecs_title">Кодеки</string>
+    <string name="pref_audio_codecs">Аудио кодеки</string>
+    <string name="pref_video_codecs">Видео кодеки</string>
+
+
+    <!--SKZI settings-->
+
+
+    <string name="pref_send_gps_title">Отправлять координаты</string>
+    <string name="pref_gps_time_title">Частота отправки координат (c)</string>
+    <string name="pref_ip_db_title">СУБД для записи координат</string>
+    <string name="pref_sip_num_title">SIP-номер</string>
+    <string name="pref_pass_title">Пароль</string>
+    <string name="pref_num_skzi_title">Криптономер СКЗИ</string>
+    <string name="pref_type_data_to_md_title">Данные регистрации</string>
+
+
+
+
+
+
+    <!--Content description-->
+    <string name="content_description_back">Назад</string>
+    <string name="content_description_dialer">Номеронабиратель</string>
+    <string name="content_description_menu">Меню</string>
+    <string name="content_description_toggle_micro">Переключить микрофон</string>
+    <string name="content_description_toggle_speaker">Переключить динамик</string>
+    <string name="content_description_decline">Отклонить</string>
+    <string name="content_description_hang_up">Завершить вызов</string>
+    <string name="content_description_accept">Принять</string>
+    <string name="content_description_edit">Редактировать</string>
+    <string name="content_description_edit_list">Редактировать список</string>
+    <string name="content_description_valid">Действительный</string>
+    <string name="content_description_add_contact">Добавить в контакты</string>
+    <string name="content_description_new_contact">Новый контакт</string>
+    <string name="content_description_call">Вызов</string>
+    <string name="content_description_backspace">Возврат</string>
+    <string name="content_description_chat">Чат</string>
+    <string name="content_description_dial_back">Перезвонить</string>
+    <string name="content_description_dialer_back">Вернуться к номеронабирателю</string>
+    <string name="content_description_contact_picture">Изображение контакта</string>
+    <string name="content_description_send_message">Отправить сообщение</string>
+    <string name="content_description_detail">Подробнее</string>
+    <string name="content_description_delete">Удалить</string>
+    <string name="content_description_add">Добавить вызов</string>
+    <string name="content_description_new_discussion">Новая дискуссия</string>
+    <string name="content_description_search">Поиск</string>
+    <string name="content_description_search_contact">Поиск контакта</string>
+    <string name="content_description_search_country">Поиск страны</string>
+    <string name="content_description_all_contacts">Все контакты</string>
+    <string name="content_description_linphone_contacts">Контакты Linphone</string>
+    <string name="content_description_call_direction">Направление вызова</string>
+    <string name="content_description_all_calls">Все вызовы</string>
+    <string name="content_description_missed_calls">Пропущенные вызовы</string>
+    <string name="content_description_switch_video">Переключить видео</string>
+    <string name="content_description_add_call">Добавить вызов</string>
+    <string name="content_description_pause">Пауза</string>
+    <string name="content_description_numpad">Цифровая клавиатура</string>
+    <string name="content_description_history">Кнопка истории</string>
+    <string name="content_description_chat_button">Кнопка чата</string>
+    <string name="content_description_contacts">Кнопка контактов</string>
+    <string name="content_description_call_quality">Качество вызова</string>
+    <string name="content_description_encryption">Шифрование</string>
+    <string name="content_description_vpn_status">VPN статус</string>
+    <string name="content_description_switch_camera">Переключить камеру</string>
+    <string name="content_description_cancel_button">Кнопка отмены</string>
+    <string name="content_description_message_status">Статус сообщения</string>
+    <string name="content_description_conference">Конференция</string>
+    <string name="content_description_username_field">Поле имени пользователя</string>
+    <string name="content_description_activation_code_field">Поле имени пользователя</string>
+    <string name="content_description_phone_number_field">Поле номера телефона</string>
+    <string name="content_description_display_field">Поле отображаемого имени</string>
+    <string name="content_description_domain_field">Поле домена</string>
+    <string name="content_description_url_field">Поле удаленного конфигурирования</string>
+    <string name="content_description_confirm_password_field">Поле подтверждения пароля</string>
+    <string name="content_description_email_field">Поле электронной почты</string>
+    <string name="content_description_default_account">Учетная запись по умолчанию</string>
+    <string name="content_description_deselect_all">Отменить выбор</string>
+    <string name="content_description_select_all">Выбрать все</string>
+    <string name="content_description_delete_selection">Удалить выбранное</string>
+    <string name="content_description_contact_first_name">Имя</string>
+    <string name="content_description_contact_last_name">Фамилия</string>
+    <string name="content_description_contact_organization">Организация</string>
+    <string name="content_description_back_call">Вернуться к вызову</string>
+    <string name="content_description_send_file">Отправить файл</string>
+    <string name="content_description_incoming_file">Входящий файл</string>
+    <string name="content_description_incoming_message">Принято сообщение</string>
+    <string name="content_description_message">Сообщение</string>
+    <string name="content_description_unread_chat_message">Непрочитанное сообщение чата</string>
+    <string name="content_description_transfer">Перевод</string>
+    <string name="content_description_earpiece">Наушник</string>
+    <string name="content_description_bluetooth">Bluetooth</string>
+    <string name="content_description_call_options">Параметры вызова</string>
+    <string name="content_description_audio_route">Аудио маршрут</string>
+    <string name="content_description_exit_conference">Выйти из конференции</string>
+    <string name="content_title_notification_service">Служба Импульс</string>
+    <string name="content_title_notification_call">Звонки</string>
+    <string name="content_title_notification">Уведомления</string>
+    <string name="content_title_notification_spo_message">Сообщения</string>
+    <string name="content_title_notification_vpn">VPN Соединение</string>
+
+    <string name="error_opening_file">Ошибка открытия файла.</string>
+    <string name="title_side_menu_settings">Настройки</string>
+    <string name="title_side_menu_exit">Выход</string>
+    <string name="title_side_menu_web">Личный кабинет</string>
+
+
+
+
+
+    <string name="button_back">Назад</string>
+    <string name="button_clear_log">Очистить</string>
+    <string name="bad_ip_skzi_address">Некоректный адрес СКЗИ</string>
+    <string name="over_size_file">Превышен размер файла. Максимум 100 МБ</string>
+    <string name="please_wait">Пожалуйста подождите</string>
+
+    <string name="update_po_title">Обновление ПО</string>
+    <string name="current_version_po_title">Текущая версия ПО:</string>
+    <string name="server_version_po_title">Версия ПО на сервере:</string>
+    <string name="not_available_version_po_title">Нет новых версий ПО</string>
+    <string name="progress_check_update_po">Проверка обновлений...</string>
+    <string name="progress_download_file_po">Скачивание файла ПО</string>
+
+    <string name="check_update">Проверить</string>
+    <string name="download">Скачать</string>
+    <string name="sort_history_by_callback">Входящие</string>
+    <string name="sort_history_by_missed">Пропущенные</string>
+    <string name="sort_history_by_made">Исходящие</string>
+    <string name="sort_history_by_all">Все</string>
+    <string name="image_picker_title">Выбрать источник</string>
+    <string name="pref_gps_title">GPS</string>
+    <string name="error_not_enter_web_domain">Не настроен адрес</string>
+    <string name="error_no_activity_found">Нет приложения для открытия этого файла</string>
+    <string name="file_not_found">Файл не найден</string>
+    <string name="registration_info">Укажите пароль доступа</string>
+    <string name="select_regime">Выберите режим работы</string>
+    <string name="name_regime_1">Портал</string>
+    <string name="name_regime_2">Точка-Точка</string>
+    <string name="enter_config">Ввод конфигурации</string>
+    <string name="select_key_dir">Укажате каталог с ключом</string>
+    <string name="select_config_info">Введите конфигурационные данные</string>
+    <string name="enter_number_key">Введите номер комплекта</string>
+    <string name="err_dir_not_select">Каталог не указан</string>
+    <string name="err_compl_not_select">Комплект не указан</string>
+    <string name="err_key_file_not_found">Комплект не найден</string>
+    <string name="err_read_file_config">Ошибка чтения файла</string>
+    <string name="err_key_save">Ошибка сохранения ключа</string>
+    <string name="reg_license_key_title">Регистрация приложения</string>
+    <string name="empty_chat_list">Список чатов пуст</string>
+    <string name="empty_contact_list">Список контактов пуст</string>
+    <string name="empty_history_list">Журнал звонков пуст</string>
+    <string name="notification_mark_as_read_label">Пометить как прочитанное</string>
+
+    <string name="my_number">Мой номер: %1$s</string>
+    <string name="biometry_train_info">Привязать биометрические данные ?</string>
+
+    <string name="err_file_key_not_found">Ключевой файл не найден</string>
+    <string name="file_version_po_title">Версия скаченного ПО:</string>
+    <string name="update">Обновить</string>
+
+
+</resources>

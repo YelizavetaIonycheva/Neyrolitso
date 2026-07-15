@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools">
+
+	<RelativeLayout
+		android:id="@+id/topLayout"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+		<fragment
+			android:id="@+id/status"
+			android:name="org.linphone.StatusFragment"
+			tools:layout="@layout/status"
+			android:layout_width="match_parent"
+			android:layout_height="40dp"/>
+
+		<RelativeLayout
+			android:id="@+id/contact_detail"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_below="@id/status"
+			android:paddingTop="32dp">
+
+			<RelativeLayout
+				android:id="@+id/avatar_layout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_alignParentTop="true"
+				android:layout_margin="4dp"
+				android:gravity="center">
+
+				<ImageView
+					android:id="@+id/contactPicture"
+					android:src="@drawable/ic_avatar_one"
+					android:layout_width="200dp"
+					android:layout_height="wrap_content"
+					android:adjustViewBounds="true"
+					android:layout_alignParentTop="true"/>
+
+			</RelativeLayout>
+
+			<TextView
+				android:id="@+id/contactName"
+				style="@style/font5"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_below="@id/avatar_layout"
+				android:layout_centerHorizontal="true"
+				android:layout_marginTop="5dp"
+				android:gravity="center_vertical|center_horizontal"
+				tools:text="Иванов Иван Иванович"/>
+
+			<TextView
+				android:id="@+id/contactNumber"
+				style="@style/font2"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_below="@id/contactName"
+				android:layout_centerHorizontal="true"
+				android:layout_gravity="center_vertical|center_horizontal"
+				tools:text="1001"/>
+
+			<TextView
+				android:id="@+id/info"
+				style="@style/font2"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_below="@id/contactNumber"
+				android:layout_centerHorizontal="true"
+				android:layout_gravity="center_vertical|center_horizontal"
+				android:text="Исходящий вызов"/>
+		</RelativeLayout>
+
+		<com.google.android.material.floatingactionbutton.FloatingActionButton
+			android:id="@+id/hang_up"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentBottom="true"
+			android:layout_centerHorizontal="true"
+			android:layout_marginBottom="40dp"
+			app:backgroundTint="@color/colorAttention"
+			app:srcCompat="@drawable/ic_call_end"
+			app:tint="@android:color/white" />
+
+		<com.google.android.material.floatingactionbutton.FloatingActionButton
+			android:id="@+id/micro"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentStart="true"
+			android:layout_alignParentBottom="true"
+			android:layout_marginStart="48dp"
+			android:layout_marginBottom="40dp"
+			app:backgroundTint="?attr/colorPrimaryLite"
+			app:fabSize="mini"
+			app:srcCompat="@drawable/ic_mic"
+			app:tint="@android:color/white" />
+
+		<com.google.android.material.floatingactionbutton.FloatingActionButton
+			android:id="@+id/speaker"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			app:backgroundTint="?attr/colorPrimaryLite"
+			app:srcCompat="@drawable/ic_volume_off"
+			app:tint="@android:color/white"
+			app:fabSize="mini"
+			android:layout_alignParentEnd="true"
+			android:layout_alignParentBottom="true"
+			android:layout_marginBottom="40dp"
+			android:layout_marginEnd="48dp" />
+
+	</RelativeLayout>
+
+</layout>

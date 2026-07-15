@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:id="@+id/status"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="?attr/colorPrimary">
+
+        <RelativeLayout
+            android:id="@+id/statusBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/btnMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_centerInParent="true"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:src="@drawable/ic_menu"
+                app:tint="@android:color/white" />
+
+            <ImageView
+                android:id="@+id/callQuality"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="0dp"
+                android:padding="10dp"
+                android:src="@drawable/call_quality_indicator_0"
+                android:visibility="gone"/>
+
+            <ImageView
+                android:id="@+id/statusLed"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginStart="8dp"
+                android:layout_toEndOf="@id/btnMenu"
+                android:adjustViewBounds="true"
+                android:src="@drawable/led_disconnected" />
+
+            <TextView
+                android:id="@+id/statusText"
+                style="@style/font16"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/statusLed"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                tools:visibility="visible"
+                android:paddingEnd="4dp"
+                android:text="@string/status_not_connected"/>
+
+            <ImageView
+                android:id="@+id/voicemail"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/voicemail_count"
+                android:src="@drawable/ic_voicemail"
+                android:visibility="gone"
+                tools:visibility="gone"
+                app:tint="@android:color/white" />
+
+
+            <TextView
+                android:id="@+id/voicemail_count"
+                style="@style/font16"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/gpsStatus"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="4dp"
+                android:layout_centerVertical="true"
+                android:gravity="center_vertical"
+                tools:text="10"
+                tools:visibility="gone"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/gpsStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/content_description_vpn_status"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
+                android:src="@drawable/ic_gps_off"
+                tools:visibility="visible"
+                android:layout_toStartOf="@id/vpnStatus"
+                android:visibility="gone"
+                app:tint="@android:color/white"/>
+
+            <!--<LinearLayout
+                android:id="@+id/speed"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_toStartOf="@+id/vpnStatus"
+                android:layout_centerVertical="true"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/speedIn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/font1"
+                    tools:text="10.12"/>
+
+                <TextView
+                    android:id="@+id/speedOut"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/font1"
+                    tools:text="10.12"/>
+            </LinearLayout>-->
+
+            <ImageView
+                android:id="@+id/vpnStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:adjustViewBounds="true"
+                android:paddingStart="2dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="4dp"
+                android:src="@drawable/ic_vpn_quality_high"
+                app:tint="@android:color/white"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</layout>

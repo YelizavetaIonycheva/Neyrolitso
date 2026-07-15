@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/selectAll"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:background="@drawable/btn_ripple_gray_shape"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone">
+
+            <CheckBox
+                android:id="@+id/checkBox"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:clickable="false"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="Выбрать все"
+                android:textAllCaps="true"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+
+        </RelativeLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/historyList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/selectAll"/>
+
+        <TextView
+            android:id="@+id/textEmptyHistoryList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="@string/empty_history_list"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:visibility="gone"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnAction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            app:backgroundTint="?android:attr/colorAccent"
+            app:icon="@drawable/ic_close"
+            app:tint="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/historyList"
+            app:layout_constraintEnd_toEndOf="@+id/historyList"
+            android:visibility="gone"/>
+
+        <com.github.clans.fab.FloatingActionMenu
+            android:id="@+id/btnMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="14dp"
+            android:layout_marginBottom="14dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:menu_colorNormal="?attr/colorSecondary"
+            app:menu_colorPressed="?attr/colorSecondaryLight"
+            app:menu_colorRipple="#99FFFFFF"
+            app:menu_labels_style="@style/labelsStyle"
+            app:menu_icon="@drawable/ic_filter_list">
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/btnSortByMissed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_phone_missed"
+                app:fab_size="mini"
+                app:fab_colorNormal="?attr/colorSecondary"
+                app:fab_colorPressed="?attr/colorSecondaryLight"
+                app:fab_label="@string/sort_history_by_missed"/>
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/btnSortByReceived"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_phone_callback"
+                app:fab_size="mini"
+                app:fab_colorNormal="?attr/colorSecondary"
+                app:fab_colorPressed="?attr/colorSecondaryLight"
+                app:fab_label="@string/sort_history_by_callback"/>
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/btnSortByMade"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_phone_forwarded"
+                app:fab_size="mini"
+                app:fab_colorNormal="?attr/colorSecondary"
+                app:fab_colorPressed="?attr/colorSecondaryLight"
+                app:fab_label="@string/sort_history_by_made"/>
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/btnSortByAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_clear_all"
+                app:fab_size="mini"
+                app:fab_colorNormal="?attr/colorSecondary"
+                app:fab_colorPressed="?attr/colorSecondaryLight"
+                app:fab_label="@string/sort_history_by_all"/>
+
+        </com.github.clans.fab.FloatingActionMenu>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

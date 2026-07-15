@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Тема режима Точка-Точка -->
+    <style name="AppThemeTT" parent="Theme.MaterialComponents.Light.NoActionBar"
+        xmlns:tools="http://schemas.android.com/tools">
+        <item name="colorPrimary">@color/colorPrimary_t</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark_t</item>
+        <item name="colorPrimaryLite">@color/colorPrimaryLite_t</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryLite_t</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary_t</item>
+        <item name="colorSecondary">@color/colorSecondary_t</item>
+        <item name="colorSecondaryDark">@color/colorSecondaryDark_t</item>
+        <item name="colorSecondaryLight">@color/colorSecondaryLight_t</item>
+        <item name="colorSecondaryVariant">@color/colorSecondaryDark_t</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary_t</item>
+        <item name="textColorPrimary">@color/textColorPrimary_t</item>
+        <item name="textColorPrimaryDark">@color/colorTextPrimaryDark_t</item>
+        <item name="android:textColorSecondary">@color/textColorSecondary_t</item>
+        <item name="textColorSecondary">@color/textColorSecondary_p</item>
+        <item name="android:colorBackground">@color/colorBackground_t</item>
+        <item name="colorOnBackground">@color/colorOnBackground_t</item>
+        <item name="colorSurface">@color/colorSurface_t</item>
+        <item name="colorOnSurface">@color/colorOnSurface_t</item>
+        <item name="colorAccent">@color/colorAccent_t</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+    </style>
+
+    <!-- Тема режима Портал -->
+    <style name="AppThemeP" parent="Theme.MaterialComponents.Light.NoActionBar"
+        xmlns:tools="http://schemas.android.com/tools">
+        <item name="colorPrimary">@color/colorPrimary_p</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark_p</item>
+        <item name="colorPrimaryLite">@color/colorPrimaryLite_p</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryLite_p</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary_p</item>
+        <item name="colorSecondary">@color/colorSecondary_p</item>
+        <item name="colorSecondaryDark">@color/colorSecondaryDark_p</item>
+        <item name="colorSecondaryLight">@color/colorSecondaryLight_p</item>
+        <item name="colorSecondaryVariant">@color/colorSecondaryDark_p</item>
+        <item name="android:textColorPrimary">@color/textColorPrimary_p</item>
+        <item name="textColorPrimary">@color/textColorPrimary_p</item>
+        <item name="textColorPrimaryDark">@color/textColorPrimaryDark_p</item>
+        <item name="android:textColorSecondary">@color/textColorSecondary_p</item>
+        <item name="textColorSecondary">@color/textColorSecondary_p</item>
+        <item name="android:colorBackground">@color/colorBackground_p</item>
+        <item name="colorOnBackground">@color/colorOnBackground_p</item>
+        <item name="colorSurface">@color/colorSurface_p</item>
+        <item name="colorOnSurface">@color/colorOnSurface_p</item>
+        <item name="colorAccent">@color/colorAccent_p</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+    </style>
+
+    <style name="textNameChatRoom" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/colorTextNameChatRoom</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="textDateChat" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/colorTextDateChat</item>
+    </style>
+
+    <style name="textMessageChat" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/colorTextDateChat</item>
+    </style>
+
+    <style name="fontLabelChat" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">@color/colorTextNameChat</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="fontDividerChat" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">@color/colorTextChatDateDivider</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="fontChatMessage" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">@color/colorTextChatMessage</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="fontLoadingInfo" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">@color/colorTextNameChat</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="fontLabel" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">?attr/textColorPrimary</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="fontInfo" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">?attr/textColorSecondary</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="fontInfoLarge" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">?attr/textColorSecondary</item>
+        <item name="android:textSize">28sp</item>
+    </style>
+
+    <style name="TextInfo" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">?attr/textColorSecondary</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TextInfo.Bold" parent="TextInfo">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+
+
+    <style name="fontLabelLarge" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">?attr/textColorPrimaryDark</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="fontInfoProgress" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">?attr/textColorPrimary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="fontInfoProgressLarge" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">?attr/textColorPrimary</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <!--  Linphone  -->
+
+
+    <style name="FullScreen" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">?attr/textColorPrimary</item>
+        <item name="colorPrimaryDark">?attr/textColorPrimaryDark</item>
+        <item name="android:fastScrollTextColor">@android:color/white</item>
+    </style>
+
+    <style name="font1" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">8sp</item>
+    </style>
+
+    <style name="font2" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">?attr/textColorPrimaryDark</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="font3" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="font5" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">?attr/textColorPrimaryDark</item>
+        <item name="android:textSize">28sp</item>
+    </style>
+
+    <style name="font5_large" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">?attr/textColorPrimaryDark</item>
+        <item name="android:textSize">40sp</item>
+    </style>
+
+    <style name="font6" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">?attr/textColorPrimaryDark</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="font7" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="font10" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@color/colorB</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="font13" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@color/colorB</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="font14" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">?attr/textColorPrimaryDark</item>
+        <item name="android:textSize">21sp</item>
+    </style>
+
+    <style name="font15" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">?attr/textColorPrimaryDark</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="font16" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="font17" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">?attr/textColorPrimaryDark</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+
+    <style name="button_style" parent="Widget.MaterialComponents.Button.OutlinedButton.Icon">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?attr/textColorPrimary</item>
+        <item name="backgroundTint">@android:color/white</item>
+        <item name="strokeColor">?attr/colorSecondary</item>
+        <item name="iconTint">?attr/colorSecondary</item>
+    </style>
+
+    <style name="DtmfNumber" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">28sp</item>
+    </style>
+
+    <style name="NumpadButtonDtmf" parent="Widget.AppCompat.ImageButton">
+        <item name="tint">@android:color/white</item>
+        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:background">@drawable/numpad_background</item>
+    </style>
+
+    <style name="MyTabLayout" parent="@style/Widget.MaterialComponents.TabLayout.Colored">
+        <item name="tabGravity">fill</item>
+        <item name="tabMaxWidth">0dp</item>
+    </style>
+
+    <style name="labelsStyle">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/toggle_label_fab</item>
+        <item name="android:elevation">5dp</item>
+    </style>
+</resources>
