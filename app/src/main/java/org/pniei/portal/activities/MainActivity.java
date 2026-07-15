@@ -1,6 +1,7 @@
 package org.pniei.portal.activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -14,10 +15,22 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Lifecycle;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
@@ -44,40 +57,22 @@ import org.linphone.core.LinphoneFriend;
 import org.linphone.core.LinphoneProxyConfig;
 import org.linphone.core.Reason;
 import org.pniei.portal.R;
-import org.pniei.portal.services.GPSService;
 import org.pniei.portal.database.DBUtils;
 import org.pniei.portal.database.SpoContact;
 import org.pniei.portal.fragments.ChatListFragment;
 import org.pniei.portal.fragments.ContactsListFragment;
 import org.pniei.portal.fragments.HistoryListFragment;
 import org.pniei.portal.listener.SpoListenerManager;
-import org.pniei.portal.services.MonitoringService;
 import org.pniei.portal.services.SpoMessagesService;
 import org.pniei.portal.utils.MIUIUtils;
 import org.pniei.portal.utils.PrefsUtils;
 import org.pniei.portal.utils.Utils;
-import org.pniei.portal.vpn.VpnClient;
 import org.pniei.portal.web.CustomTabActivityHelper;
 import org.pniei.portal.web.WebviewActivity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.Lifecycle;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
-import androidx.viewpager2.widget.ViewPager2;
-
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener ,CustomTabActivityHelper.CustomTabFallback{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CustomTabActivityHelper.CustomTabFallback {
     private static final String TAG = "MainActivity";
     private ActivityResultLauncher<Intent> requestOverlayResultLauncher;
     private ActivityResultLauncher<Intent> calResultLauncher;
@@ -85,12 +80,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int PERMISSIONS_RECORD_AUDIO_ECHO_CANCELLER = 209;
     private static final int PERMISSIONS_READ_EXTERNAL_STORAGE_DEVICE_RINGTONE = 210;
     private static final int PERMISSIONS_RECORD_AUDIO_ECHO_TESTER = 211;
-    private static final int PERMISSIONS_ACCESS_FINE_LOCATION = 212;
 
+    @SuppressLint("StaticFieldLeak")
     private static MainActivity instance;
     private StatusFragment statusFragment;
     private DrawerLayout sideMenu;
-    private ImageView menu;
     private LinphoneCoreListenerBase mListener;
 
     public static boolean isInstanciated() {
@@ -103,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         throw new RuntimeException("MainActivity not instantiated yet");
     }
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Utils.initTheme(this);
@@ -112,23 +107,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         initTabLayout();
 
-        if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_P) {
-            // Запуск службы VPN и Смены ключей
-            ArrayList<String> dnsAddress = new ArrayList<>();
-            dnsAddress.add(PrefsUtils.ins().getIpDnsP());
-
-            if (PrefsUtils.ins().isVpnEnable()) {
-                if (!VpnClient.startVpnService(this)) {
-                    // Toast с сообщением о некорректных IP адресах
-                    Toast.makeText(this, R.string.bad_ip_skzi_address, Toast.LENGTH_SHORT);
-                } else {
-                    MonitoringService.startMonitoringService(this);
-                }
-            }
-        }
-
-        sideMenu = (DrawerLayout) findViewById(R.id.drawer_layout);
-        menu = (ImageView) findViewById(R.id.btnMenu);
+        sideMenu = findViewById(R.id.drawer_layout);
+        ImageView menu = findViewById(R.id.btnMenu);
         menu.setOnClickListener(view -> {
             if (sideMenu.isDrawerOpen(GravityCompat.START)) {
                 sideMenu.closeDrawer(GravityCompat.START);
@@ -137,42 +117,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        mListener = new LinphoneCoreListenerBase(){
+        mListener = new LinphoneCoreListenerBase() {
             @Override
             public void registrationState(LinphoneCore lc, LinphoneProxyConfig proxy, LinphoneCore.RegistrationState state, String smessage) {
                 LinphoneAuthInfo authInfo = lc.findAuthInfo(proxy.getIdentity(), proxy.getRealm(), proxy.getDomain());
                 if (state.equals(LinphoneCore.RegistrationState.RegistrationCleared)) {
-                    if (lc != null) {
-                        if (authInfo != null)
-                            lc.removeAuthInfo(authInfo);
-                    }
+                    if (authInfo != null)
+                        lc.removeAuthInfo(authInfo);
                 }
 
-                if(state.equals(LinphoneCore.RegistrationState.RegistrationFailed)) {
+                if (state.equals(LinphoneCore.RegistrationState.RegistrationFailed)) {
                     if (proxy.getError() == Reason.BadCredentials) {
                         displayCustomToast(getString(R.string.error_bad_credentials), Toast.LENGTH_LONG);
                     }
-                    /*if (proxy.getError() == Reason.Unauthorized) {
-                        displayCustomToast(getString(R.string.error_unauthorized), Toast.LENGTH_LONG);
-                    }
-                    if (proxy.getError() == Reason.IOError) {
-                        displayCustomToast(getString(R.string.error_io_error), Toast.LENGTH_LONG);
-                    }*/
                 }
             }
 
             @Override
             public void callState(LinphoneCore lc, LinphoneCall call, LinphoneCall.State state, String message) {
-                /*if (state == LinphoneCall.State.IncomingReceived) {
-                    startActivity(new Intent(MainActivity.instance(), CallIncomingActivity.class));
-                } else */if (state == LinphoneCall.State.OutgoingInit || state == LinphoneCall.State.OutgoingProgress) {
+                if (state == LinphoneCall.State.OutgoingInit || state == LinphoneCall.State.OutgoingProgress) {
                     startActivity(new Intent(MainActivity.instance(), CallOutgoingActivity.class));
                 } else if (state == LinphoneCall.State.CallEnd || state == LinphoneCall.State.Error || state == LinphoneCall.State.CallReleased) {
                     resetClassicMenuLayoutAndGoBackToCallIfStillRunning();
                 }
             }
         };
-        ArrayList<String> permissionsList = new ArrayList<String>();
+
+        ArrayList<String> permissionsList = new ArrayList<>();
 
         int recordAudio = getPackageManager().checkPermission(Manifest.permission.RECORD_AUDIO, getPackageName());
         int camera = getPackageManager().checkPermission(Manifest.permission.CAMERA, getPackageName());
@@ -192,43 +163,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             permissionsList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
         }
 
-        if (permissionsList.size() > 0) {
+        if (!permissionsList.isEmpty()) {
             String[] permissions = new String[permissionsList.size()];
             int requestCode = 0;
             permissions = permissionsList.toArray(permissions);
-            if (permissions.equals("READ_EXTERNAL_STORAGE")) {
-                requestCode = PERMISSIONS_READ_EXTERNAL_STORAGE_DEVICE_RINGTONE;
-            }
             ActivityCompat.requestPermissions(this, permissions, requestCode);
         }
-        //checkAndRequestReadExternalStoragePermissionForDeviceRingtone();
 
         if (!MIUIUtils.canDrawOverlayViews(this) && MIUIUtils.isXiaomi()) {
             new MaterialAlertDialogBuilder(this)
-                    .setTitle("Запрос разрешения")
-                    .setMessage("Для работы приложения необходимо предоставить разрешения: " +
-                            "\n\"Всплывающие окна\"" +
-                            "\n\"Отображать всплывающие окона, когда запущено в фоновом режиме\"" +
-                            "\n\"Экран блокировки\"")
+                    .setTitle("Внимание")
+                    .setMessage("Для работы приложения необходимо разрешение на отображение поверх других приложений.\n" +
+                            "Пожалуйста, включите его в настройках.")
                     .setNegativeButton("Отмена", (dialog, which) -> {
-
                     })
-                    .setPositiveButton("Предоставить", (dialog, which) -> {
-                        MIUIUtils.onDisplayPopupPermission(this);
-                    })
+                    .setPositiveButton("Разрешить", (dialog, which) -> MIUIUtils.onDisplayPopupPermission(this))
                     .show();
         }
         registerForRequestOverlayResult();
         registerForCallResult();
-
-         if (PrefsUtils.ins().isSendGPS()) {
-            if(getPackageManager().checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getPackageName()) == PackageManager.PERMISSION_GRANTED) {
-                GPSService.startGPSService(MainActivity.this);
-            } else {
-                checkAndRequestAccessFineLocationPermission();
-            }
-        }
-        
     }
 
     public void createAccount(String username, String userid, String password, String displayname, String ha1, String prefix, String domain, LinphoneAddress.TransportType transport) {
@@ -265,10 +218,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void initSideMenu() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation);
+        NavigationView navigationView = findViewById(R.id.navigation);
         navigationView.setNavigationItemSelectedListener(this);
-        TextView myNumber = (TextView) navigationView.getHeaderView(0).findViewById(R.id.myNumber);
-        myNumber.setText(getString(R.string.my_number, (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_P ? PrefsUtils.ins().getPhoneP() : PrefsUtils.ins().getPhoneTT()))); //"Мой номер: " + (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_P ? PrefsUtils.ins().getPhoneP() : PrefsUtils.ins().getPhoneTT()));
+        TextView myNumber = navigationView.getHeaderView(0).findViewById(R.id.myNumber);
+        myNumber.setText(getString(R.string.my_number,
+                (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_P ?
+                        PrefsUtils.ins().getPhoneP() : PrefsUtils.ins().getPhoneTT())));
     }
 
     private void initTabLayout() {
@@ -277,9 +232,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         TabLayout tabLayout = findViewById(R.id.tabLayout);
         TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
-                case 0: tab.setIcon(R.drawable.ic_tab_chat); break;
-                case 1: tab.setIcon(R.drawable.ic_tab_contacts); break;
-                case 2: tab.setIcon(R.drawable.ic_tab_history); break;
+                case 0:
+                    tab.setIcon(R.drawable.ic_tab_chat);
+                    break;
+                case 1:
+                    tab.setIcon(R.drawable.ic_tab_contacts);
+                    break;
+                case 2:
+                    tab.setIcon(R.drawable.ic_tab_history);
+                    break;
             }
         });
         tabLayoutMediator.attach();
@@ -292,7 +253,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super(fm, lc);
         }
 
-        @NonNull
         @Override
         public Fragment createFragment(int position) {
             Fragment fragment = null;
@@ -346,20 +306,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         checkAndRequestPermission(Manifest.permission.RECORD_AUDIO, PERMISSIONS_RECORD_AUDIO_ECHO_TESTER);
     }
 
-    
-    public void checkAndRequestAccessFineLocationPermission() {
-        if ((getPackageManager().checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getPackageName()) != PackageManager.PERMISSION_GRANTED) ||
-                (getPackageManager().checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, getPackageName()) != PackageManager.PERMISSION_GRANTED)) {
-            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSIONS_ACCESS_FINE_LOCATION);
-        }
-    }
-
     public void displayCustomToast(final String message, final int duration) {
         LayoutInflater inflater = getLayoutInflater();
-        View layout = inflater.inflate(R.layout.toast, (ViewGroup) findViewById(R.id.toastRoot));
+        View layout = inflater.inflate(R.layout.toast, findViewById(R.id.toastRoot));
 
-        TextView toastText = (TextView) layout.findViewById(R.id.toastMessage);
+        TextView toastText = layout.findViewById(R.id.toastMessage);
         toastText.setText(message);
 
         final Toast toast = new Toast(getApplicationContext());
@@ -376,18 +327,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void checkAndRequestPermission(String permission, int result) {
         int permissionGranted = getPackageManager().checkPermission(permission, getPackageName());
         if (permissionGranted != PackageManager.PERMISSION_GRANTED) {
-            //ActivityCompat.shouldShowRequestPermissionRationale(this, permission);
-            ActivityCompat.requestPermissions(this, new String[] { permission }, result);
+            ActivityCompat.requestPermissions(this, new String[]{permission}, result);
         }
     }
 
     public void quit(boolean isSaveDB) {
         stopService(new Intent(Intent.ACTION_MAIN).setClass(this, LinphoneService.class));
-
-        if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_P) {
-            VpnClient.stopVpnService(this);
-            MonitoringService.stopMonitoringService(this);
-        }
 
         SpoMessagesService.stop(this);
         if (isSaveDB) {
@@ -397,7 +342,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         PrefsUtils.ins().setAuth(false);
         finishAffinity();
     }
-
 
     public void resetClassicMenuLayoutAndGoBackToCallIfStillRunning() {
         if (LinphoneManager.isInstanciated() && LinphoneManager.getLc().getCallsNb() > 0) {
@@ -417,13 +361,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         calResultLauncher.launch(intent);
     }
-
-    /*private void openWeb(String strUrl) {
-        Uri url = Uri.parse(strUrl);
-        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-        CustomTabsIntent customTabsIntent = builder.build();
-        CustomTabActivityHelper.openCustomTab(this, customTabsIntent, url, this);
-    }*/
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -451,33 +388,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (permissions.length <= 0)
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, @NonNull int[] grantResults) {
+        if (permissions.length == 0)
             return;
 
-        switch (requestCode) {
-            case PERMISSIONS_READ_EXTERNAL_STORAGE_DEVICE_RINGTONE:
-                if (permissions[0].compareTo(Manifest.permission.READ_EXTERNAL_STORAGE) != 0)
-                    break;
-                boolean enableRingtone = (grantResults[0] == PackageManager.PERMISSION_GRANTED);
-                LinphonePreferences.instance().enableDeviceRingtone(enableRingtone);
-                LinphoneManager.getInstance().enableDeviceRingtone(enableRingtone);
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == VpnClient.REQUST_VPN && resultCode == RESULT_OK) {
-            if (!VpnClient.startVpnService(this)) {
-                // Toast с сообщением о некорректных IP адресах
-                Toast.makeText(this, R.string.bad_ip_skzi_address, Toast.LENGTH_SHORT);
-            } else {
-                MonitoringService.startMonitoringService(this);
-            }
+        if (requestCode == PERMISSIONS_READ_EXTERNAL_STORAGE_DEVICE_RINGTONE) {
+            if (permissions[0].compareTo(Manifest.permission.READ_EXTERNAL_STORAGE) != 0)
+                return;
+            boolean enableRingtone = (grantResults[0] == PackageManager.PERMISSION_GRANTED);
+            LinphonePreferences.instance().enableDeviceRingtone(enableRingtone);
+            LinphoneManager.getInstance().enableDeviceRingtone(enableRingtone);
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
@@ -502,8 +424,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
         if (lc != null) {
-            // Автоматическое создание аккаунта
-            if(LinphonePreferences.instance().getAccountCount() == 0) {
+            if (LinphonePreferences.instance().getAccountCount() == 0) {
                 if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
                     createAccount(PrefsUtils.ins().getPhoneTT(), "", "1234", "", null, null, PrefsUtils.ins().getIpAtsTT(), LinphoneAddress.TransportType.LinphoneTransportUdp);
                 } else {
@@ -512,16 +433,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 try {
                     lc.createLinphoneFriendList();
-                    List<SpoContact> contacts = Arrays.asList(DBUtils.getContactList());
+                    SpoContact[] contacts = DBUtils.getContactList();
 
-                    LinphoneFriend [] lfs = lc.getFriendList();
-                    if (lfs.length > 0) {
-                        for (LinphoneFriend lf : lfs) {
-                            lc.removeFriend(lf);
-                        }
+                    LinphoneFriend[] lfs = lc.getFriendList();
+                    for (LinphoneFriend lf : lfs) {
+                        lc.removeFriend(lf);
                     }
 
-                    for(SpoContact contact : contacts) {
+                    for (SpoContact contact : contacts) {
                         LinphoneFriend lf = lc.createFriend();
                         if (lf != null) {
                             if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
@@ -529,7 +448,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             } else {
                                 lf.addAddress(LinphoneCoreFactory.instance().createLinphoneAddress("sip:" + contact.getSipNumber() + "@" + PrefsUtils.ins().getIpAtsP()));
                             }
-                            //lf.addPhoneNumber(contact.getSipNumber());
                             lc.addFriend(lf);
                         }
                     }
@@ -603,7 +521,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void registerForRequestOverlayResult() {
         requestOverlayResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                result -> {});
+                result -> {
+                });
     }
 
     public void registerForCallResult() {

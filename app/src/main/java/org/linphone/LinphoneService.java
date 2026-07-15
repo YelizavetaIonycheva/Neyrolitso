@@ -138,7 +138,7 @@ public final class LinphoneService extends Service {
 
 				if (state == State.CallEnd || state == State.CallReleased || state == State.Error) {
 					if (LinphoneManager.isInstanciated() && LinphoneManager.getLc() != null && LinphoneManager.getLc().getCallsNb() == 0) {
-						if (MainActivity.isInstanciated() && MainActivity.instance().getStatusFragment() != null) {
+						if (MainActivity.isInstantiated() && MainActivity.instance().getStatusFragment() != null) {
 							removeSasNotification();
 						}
 					}

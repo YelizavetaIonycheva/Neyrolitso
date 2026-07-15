@@ -9,6 +9,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,33 +25,24 @@ import org.pniei.portal.database.SpoContact;
 import org.pniei.portal.database.SpoFile;
 import org.pniei.portal.listener.SpoListenerManager;
 import org.pniei.portal.notification.SpoNotificationsManager;
-import org.pniei.portal.utils.CryptUtils;
 import org.pniei.portal.utils.IsRunThread;
 import org.pniei.portal.utils.NetworkRequestUtils;
 import org.pniei.portal.utils.PrefsUtils;
 import org.pniei.portal.utils.Utils;
-import org.pniei.portal.vpn.VpnClient;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.DatagramChannel;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import androidx.annotation.Nullable;
 
 public class SpoMessagesService extends Service {
     private static final String TAG = "SpoMessagesService";
@@ -79,10 +72,7 @@ public class SpoMessagesService extends Service {
 
     private boolean isStarting = false;
     private int TIME_DELAY_REQUEST_MESSAGE = 15;
-    private final int TIME_DELAY_REQUEST_KEY = 300;
-    private final int TIME_DELAY_CRYPT_DB = 60;
     private ScheduledExecutorService processRequestMessage = null;
-    private ScheduledExecutorService processRequestKey = null;
     private ScheduledExecutorService processCryptDB = null;
     private ExecutorService processSendingTextMessages = null;
     private ExecutorService processSendingFileMessages = null;
@@ -94,7 +84,7 @@ public class SpoMessagesService extends Service {
     private String signatureUser = null;
     private SpoNotificationsManager mSpoNotificationsManager;
 
-    private class Pair<F, S> {
+    private static class Pair<F, S> {
         private F first;
         private S second;
 
@@ -109,7 +99,7 @@ public class SpoMessagesService extends Service {
 
         public S getSecond() {
             return second;
-    }
+        }
 
         public void setFirst(F first) {
             this.first = first;
@@ -124,7 +114,7 @@ public class SpoMessagesService extends Service {
         return mContext;
     }
 
-    public static SpoMessagesService instance()  {
+    public static SpoMessagesService instance() {
         return instance;
     }
 
@@ -141,7 +131,7 @@ public class SpoMessagesService extends Service {
         mSpoNotificationsManager = SpoNotificationsManager.ins(this);
         SpoNotificationsManager.CreateChannel(this);
         mSpoNotificationsManager.startForeground(this);
-        if(PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
+        if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
             DBUtils.setDataBasePath(mContext.getFilesDir().getAbsolutePath() + "/" + DBUtils.DB_FILE_TT, PrefsUtils.ins().getHashPass());
         } else {
             DBUtils.setDataBasePath(mContext.getFilesDir().getAbsolutePath() + "/" + DBUtils.DB_FILE_P, PrefsUtils.ins().getHashPass());
@@ -152,28 +142,31 @@ public class SpoMessagesService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
-            switch (intent.getAction()) {
-                case ACTION_SEND_MESSAGE : {
+            String action = intent.getAction();
+            if (action == null) return START_STICKY;
+
+            switch (action) {
+                case ACTION_SEND_MESSAGE: {
                     sendMessage(intent.getLongExtra(MESSAGE_ID_KEY, -1));
                     break;
                 }
-                case ACTION_RESEND_MESSAGE : {
+                case ACTION_RESEND_MESSAGE: {
                     resendMessage((ArrayList<Long>) intent.getSerializableExtra(MESSAGE_ID_KEY));
                     break;
                 }
-                case ACTION_SEND_FILE : {
+                case ACTION_SEND_FILE: {
                     sendFile(intent.getLongExtra(FILE_ID_KEY, 0));
                     break;
                 }
-                case ACTION_DOWNLOAD_FILE : {
+                case ACTION_DOWNLOAD_FILE: {
                     downloadFile(intent.getLongExtra(FILE_ID_KEY, 0));
                     break;
                 }
-                case ACTION_ADD_CONTACT : {
+                case ACTION_ADD_CONTACT: {
                     addContact((SpoContact) intent.getSerializableExtra(CONTACT_KEY));
                     break;
                 }
-                case ACTION_CHANGE_CONTACT : {
+                case ACTION_CHANGE_CONTACT: {
                     changeContact((SpoContact) intent.getSerializableExtra(CONTACT_KEY));
                     break;
                 }
@@ -181,44 +174,42 @@ public class SpoMessagesService extends Service {
                     deleteContact((SpoContact) intent.getSerializableExtra(CONTACT_KEY));
                     break;
                 }
-                case ACTION_SYNC_CONTACT : {
+                case ACTION_SYNC_CONTACT: {
                     syncContact();
                     break;
                 }
-                case ACTION_START_SENDING : {
+                case ACTION_START_SENDING: {
                     startMessageSending();
                     break;
                 }
-                case ACTION_STOP_SENDING_MESSAGE : {
+                case ACTION_STOP_SENDING_MESSAGE: {
                     stopMessageSending(intent.getLongExtra(MESSAGE_ID_KEY, -1));
                     break;
                 }
-                case ACTION_STOP_SENDING_FILE : {
+                case ACTION_STOP_SENDING_FILE: {
                     stopFileSending(intent.getLongExtra(FILE_ID_KEY, 0));
                     break;
                 }
-                case ACTION_SET_DELAY_REQUEST : {
+                case ACTION_SET_DELAY_REQUEST: {
                     setDelay(intent.getBooleanExtra(DELAY_KEY, false));
                     break;
                 }
-                case ACTION_START : {
+                case ACTION_START: {
                     Log.i(TAG, "onStartCommand ACTION_START");
                     idUser = intent.getStringExtra(ID_USER_KEY);
                     signatureUser = intent.getStringExtra(SIGNATURE_USER_KEY);
                     if (!isStarting) {
                         startRequestMessage();
-                        startRequestKey();
                         startCryptDBProcess();
                         startMessageSending();
                         isStarting = true;
                     }
                     break;
                 }
-                case ACTION_STOP : {
+                case ACTION_STOP: {
                     Log.i(TAG, "onStartCommand ACTION_STOP");
                     isStarting = false;
                     stopRequestMessage();
-                    stopRequestKey();
                     stopCryptDBProcess();
                     stopMessageSending();
                     mSpoNotificationsManager.stopForeground(this);
@@ -250,15 +241,16 @@ public class SpoMessagesService extends Service {
             } else {
                 TIME_DELAY_REQUEST_MESSAGE = 15;
             }
-            processRequestMessage.shutdown();
+            if (processRequestMessage != null) {
+                processRequestMessage.shutdown();
+            }
             processRequestMessage = Executors.newSingleThreadScheduledExecutor();
             startRequestMessage();
         }).start();
-
     }
 
     private void syncContact() {
-        Log.i(TAG, "addContact");
+        Log.i(TAG, "syncContact");
 
         Thread thread = new Thread(() -> {
             long startTime = System.currentTimeMillis();
@@ -301,9 +293,9 @@ public class SpoMessagesService extends Service {
                             }
                             DBUtils.saveDataBase();
 
-                            ///////////////
                             LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
-                            for(SpoContact contact : addContacts) {
+                            for (SpoContact contact : addContacts) {
+                                assert lc != null;
                                 LinphoneFriend lf = lc.createFriend();
                                 if (lf != null) {
                                     if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
@@ -315,7 +307,6 @@ public class SpoMessagesService extends Service {
                                 }
                             }
                             LinphoneManager.getInstance().subscribeFriendList(true);
-                            ///////////////
 
                             SpoListenerManager.callContactSync(true, null, addContacts, changedContacts);
                             return;
@@ -348,9 +339,10 @@ public class SpoMessagesService extends Service {
                         if (result.has("id") && result.has("error") && result.getInt("error") == 200) {
                             contact.setIdUser(result.getString("id"));
                             contact.setId(DBUtils.saveContact(contact));
-                            checkChatRoom(contact); // Если от пользователя с данным номером были сообщения, необходимо установить idUsers
+                            checkChatRoom(contact);
                             ///////////
                             LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
+                            assert lc != null;
                             LinphoneFriend lf = lc.createFriend();
                             if (lf != null) {
                                 if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
@@ -363,7 +355,7 @@ public class SpoMessagesService extends Service {
                             LinphoneManager.getInstance().subscribeFriendList(true);
                             ///////////
                             SpoListenerManager.callContactAdd(true, null);
-                        } else  {
+                        } else {
                             SpoListenerManager.callContactAdd(false, Utils.getError(result.getString("error")));
                         }
                         return;
@@ -383,10 +375,10 @@ public class SpoMessagesService extends Service {
         String idUser = "phone:" + contact.getSipNumber();
         SpoChatRoom chatRoom = DBUtils.getChatRoomForIdUser(idUser);
         if (chatRoom != null) {
-            List<SpoChatMessage> messages = Arrays.asList(DBUtils.getSpoChatMessagesRange(chatRoom.getId(), 0));
+            SpoChatMessage[] messages = DBUtils.getSpoChatMessagesRange(chatRoom.getId(), 0);
             List<String> idUsers = new ArrayList<>();
             idUsers.add(contact.getIdUser());
-            for (SpoChatMessage message: messages) {
+            for (SpoChatMessage message : messages) {
                 message.setIdUsers(idUsers);
                 DBUtils.updateMessage(message);
             }
@@ -442,22 +434,18 @@ public class SpoMessagesService extends Service {
                         if (result.has("error") && result.getInt("error") == 200) {
                             Log.i(TAG, "Контакт удален, id = " + contact.getIdUser());
 
-                            ///////////
                             LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
+                            assert lc != null;
                             LinphoneFriend[] lfs = lc.getFriendList();
-                            if (lfs.length > 0) {
-                                for (LinphoneFriend lf : lfs) {
-                                    if (lf.getAddress() != null && lf.getAddress().getUserName() != null && contact!= null && lf.getAddress().getUserName().equals(contact.getSipNumber())) {
-                                        lc.removeFriend(lf);
-                                        break;
-                                    }
+                            for (LinphoneFriend lf : lfs) {
+                                if (lf.getAddress() != null && lf.getAddress().getUserName() != null && lf.getAddress().getUserName().equals(contact.getSipNumber())) {
+                                    lc.removeFriend(lf);
+                                    break;
                                 }
                             }
-                            ///////////
-
                             DBUtils.deleteContact(contact);
                             SpoListenerManager.callContactDelete(true, null);
-                        } else  {
+                        } else {
                             SpoListenerManager.callContactDelete(false, Utils.getError(result.getString("error")));
                         }
                         return;
@@ -482,23 +470,14 @@ public class SpoMessagesService extends Service {
             processRequestMessage.shutdownNow();
     }
 
-    private void startRequestKey() {
-        processRequestKey  = Executors.newSingleThreadScheduledExecutor();
-        processRequestKey.scheduleWithFixedDelay(new RequestKeyRunnable(), 10, TIME_DELAY_REQUEST_KEY, TimeUnit.SECONDS);
-    }
-
-    private void stopRequestKey() {
-        if (processRequestKey != null)
-            processRequestKey.shutdownNow();
-    }
-
     private void startCryptDBProcess() {
         processCryptDB = Executors.newSingleThreadScheduledExecutor();
+        int TIME_DELAY_CRYPT_DB = 60;
         processCryptDB.scheduleWithFixedDelay(new CryptDBRunnable(), 60, TIME_DELAY_CRYPT_DB, TimeUnit.SECONDS);
     }
 
     private void stopCryptDBProcess() {
-        if (processCryptDB  != null)
+        if (processCryptDB != null)
             processCryptDB.shutdownNow();
     }
 
@@ -506,23 +485,21 @@ public class SpoMessagesService extends Service {
         processSendingTextMessages = Executors.newCachedThreadPool();
         processSendingFileMessages = Executors.newSingleThreadExecutor();
         List<SpoChatMessage> waitingMessages = Arrays.asList(DBUtils.getWaitingSpoChatMessages());
-        if (waitingMessages != null && waitingMessages.size() > 0) {
-            for (SpoChatMessage message: waitingMessages) {
+        if (!waitingMessages.isEmpty()) {
+            for (SpoChatMessage message : waitingMessages) {
                 if (message.getTypeContent() == SpoChatMessage.TEXT) {
                     Runnable task = new SendingTextMessageRunnable(message);
                     Pair<Runnable, SpoChatMessage> msg = new Pair<>(task, message);
                     mWaitingMessages.add(msg);
                     processSendingTextMessages.submit(task);
                 } else {
-                    List<SpoFile> files = Arrays.asList(DBUtils.getSpoFiles(message.getId()));
-                    if (files != null) {
-                        for (SpoFile file : files) {
-                            if (file.getStatus() == SpoFile.STATUS_SEND_RECEIVE) {
-                                Runnable task = new SendReceiveFileMessageRunnable(file);
-                                Pair<Runnable, SpoFile> msg = new Pair<>(task, file);
-                                mWaitingFiles.add(msg);
-                                processSendingFileMessages.submit(task);
-                            }
+                    SpoFile[] files = DBUtils.getSpoFiles(message.getId());
+                    for (SpoFile file : files) {
+                        if (file.getStatus() == SpoFile.STATUS_SEND_RECEIVE) {
+                            Runnable task = new SendReceiveFileMessageRunnable(file);
+                            Pair<Runnable, SpoFile> msg = new Pair<>(task, file);
+                            mWaitingFiles.add(msg);
+                            processSendingFileMessages.submit(task);
                         }
                     }
                 }
@@ -539,10 +516,10 @@ public class SpoMessagesService extends Service {
 
     private void stopMessageSending(long idMessage) {
         new Thread(() -> {
-            for(Pair<Runnable, SpoChatMessage> message : mWaitingMessages) {
-                if(message.getSecond().getId() == idMessage) {
+            for (Pair<Runnable, SpoChatMessage> message : mWaitingMessages) {
+                if (message.getSecond().getId() == idMessage) {
                     if (message.getSecond().getTypeContent() == SpoChatMessage.TEXT) {
-                        ((SendingTextMessageRunnable)message.getFirst()).stopSending();
+                        ((SendingTextMessageRunnable) message.getFirst()).stopSending();
                     } else {
                         for (SpoFile file : DBUtils.getSpoFiles(idMessage)) {
                             stopFileSending(file.getId());
@@ -556,9 +533,9 @@ public class SpoMessagesService extends Service {
 
     private void stopFileSending(long idFile) {
         new Thread(() -> {
-            for(Pair<Runnable, SpoFile> waitingFile : mWaitingFiles) {
-                if(waitingFile.getSecond().getId() == idFile) {
-                    ((SendReceiveFileMessageRunnable)waitingFile.getFirst()).stopSendReceive();
+            for (Pair<Runnable, SpoFile> waitingFile : mWaitingFiles) {
+                if (waitingFile.getSecond().getId() == idFile) {
+                    ((SendReceiveFileMessageRunnable) waitingFile.getFirst()).stopSendReceive();
                     break;
                 }
             }
@@ -571,7 +548,7 @@ public class SpoMessagesService extends Service {
                         mFile.setStatus(SpoFile.STATUS_ERROR);
                     }
                     DBUtils.updateFile(mFile);
-                    SpoListenerManager.callFileStateChanged(mFile); // Вызов колбэка
+                    SpoListenerManager.callFileStateChanged(mFile);
                 } else if (mFile.getStatus() == SpoFile.STATUS_ERROR) {
                     DBUtils.deleteFile(mFile);
                     endSendingFile(mFile);
@@ -582,8 +559,8 @@ public class SpoMessagesService extends Service {
     }
 
     private void successSendingMessage(SpoChatMessage message) {
-        for(Pair<Runnable, SpoChatMessage> waitMessage : mWaitingMessages) {
-            if(waitMessage.getSecond() == message) {
+        for (Pair<Runnable, SpoChatMessage> waitMessage : mWaitingMessages) {
+            if (waitMessage.getSecond() == message) {
                 mWaitingMessages.remove(waitMessage);
                 break;
             }
@@ -591,8 +568,8 @@ public class SpoMessagesService extends Service {
     }
 
     private void endSendingFile(SpoFile file) {
-        for(Pair<Runnable, SpoFile>  waitFile : mWaitingFiles) {
-            if(waitFile.getSecond() == file) {
+        for (Pair<Runnable, SpoFile> waitFile : mWaitingFiles) {
+            if (waitFile.getSecond() == file) {
                 mWaitingFiles.remove(waitFile);
                 break;
             }
@@ -601,14 +578,14 @@ public class SpoMessagesService extends Service {
         SpoChatMessage message = DBUtils.getChatMessageById(file.getIdMessage());
         List<SpoFile> files = Arrays.asList(DBUtils.getSpoFiles(message.getId()));
 
-        if (files.size() > 0) {
+        if (!files.isEmpty()) {
             for (SpoFile _file : files) {
                 if (_file.getStatus() == SpoFile.STATUS_SEND_RECEIVE || _file.getStatus() == SpoFile.STATUS_ERROR) {
                     isSendMessage = false;
                     break;
                 }
             }
-        } else if (message.getMessage() == null || message.getMessage().length() == 0) {
+        } else if (message.getMessage() == null || message.getMessage().isEmpty()) {
             isSendMessage = false;
             DBUtils.deleteMessage(message);
         }
@@ -622,9 +599,8 @@ public class SpoMessagesService extends Service {
     }
 
     private void resendMessage(ArrayList<Long> id) {
-            new Thread(() -> {
+        new Thread(() -> {
             for (long idMessage : id) {
-
                 SpoChatMessage message = DBUtils.getChatMessageById(idMessage);
                 message.setSpoFiles(new ArrayList<>(Arrays.asList(DBUtils.getSpoFiles(idMessage))));
                 Runnable task;
@@ -636,14 +612,12 @@ public class SpoMessagesService extends Service {
                     try {
                         processSendingTextMessages.submit(task).get();
                     } catch (ExecutionException | InterruptedException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
                     }
-
-
                 }
-                }
-            }).start();
-        }
+            }
+        }).start();
+    }
 
     private void sendMessage(final long id) {
         if (id != -1) {
@@ -690,7 +664,7 @@ public class SpoMessagesService extends Service {
         }).start();
     }
 
-    private void downloadFile (long idFile) {
+    private void downloadFile(long idFile) {
         new Thread(() -> {
             SpoFile file = DBUtils.getSpoFile(idFile);
             Runnable task;
@@ -708,18 +682,11 @@ public class SpoMessagesService extends Service {
     }
 
     private class RequestMessageRunnable implements Runnable {
-        private final String KEY_USER_ID = "id";
-        private final String KEY_TEXT = "text";
-        private final String KEY_FILE = "file";
-        private final String KEY_FILE_NAME = "fileName";
-        private final String KEY_FILE_LINK = "link";
-        private final String KEY_FILE_ID_SERVER = "idFile";
         private final String KEY_DATE = "dispatchTime";
-        private final String KEY_PHONE = "phone";
 
         @Override
         public void run() {
-            SpoChatMessage message = null, lastMessage = null;
+            SpoChatMessage message, lastMessage = null;
             JSONArray jsonArrayMessage = NetworkRequestUtils.getIncomingMessages(idUser, signatureUser);
 
             if (jsonArrayMessage != null) {
@@ -752,6 +719,8 @@ public class SpoMessagesService extends Service {
             ArrayList<SpoFile.FileInterface> filesInfo = null;
             String text = null;
 
+            String KEY_USER_ID = "id";
+            String KEY_PHONE = "phone";
             if (jsonMessage.has(KEY_USER_ID)) {
                 idUsers.add(jsonMessage.getString(KEY_USER_ID));
             } else if (jsonMessage.has(KEY_PHONE)) {
@@ -762,12 +731,16 @@ public class SpoMessagesService extends Service {
                 return null;
             }
 
+            String KEY_FILE = "file";
             if (jsonMessage.has(KEY_FILE)) {
                 filesInfo = new ArrayList<>();
                 JSONArray jsonFiles = jsonMessage.getJSONArray(KEY_FILE);
                 for (int i = 0; i < jsonFiles.length(); i++) {
                     JSONObject jsonFile = jsonFiles.getJSONObject(i);
                     SpoFile.FileInterface fileInfo;
+                    String KEY_FILE_NAME = "fileName";
+                    String KEY_FILE_LINK = "link";
+                    String KEY_FILE_ID_SERVER = "idFile";
                     if (jsonFile.has(KEY_FILE_ID_SERVER)) {
                         fileInfo = new SpoFile.FileInterface(jsonFile.getString(KEY_FILE_ID_SERVER), jsonFile.getString(KEY_FILE_NAME), jsonFile.getString(KEY_FILE_LINK));
                     } else {
@@ -777,12 +750,10 @@ public class SpoMessagesService extends Service {
                 }
             }
 
+            String KEY_TEXT = "text";
             if (jsonMessage.has(KEY_TEXT)) {
                 text = jsonMessage.getString(KEY_TEXT);
-
-                if (!text.equals("") && jsonMessage.has(KEY_USER_ID) && PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
-                    text = CryptUtils.decryptMessage(text, Integer.parseInt(idUsers.get(0)));
-                }
+                // Шифрование полностью удалено - текст передается как есть
             }
 
             SpoChatMessage message = SpoChatMessage.createIncomingMessage(idUsers, text, filesInfo);
@@ -794,7 +765,7 @@ public class SpoMessagesService extends Service {
                 chatRoom = new SpoChatRoom();
                 chatRoom.setIdUsers(message.getIdUsers());
                 String idUser = message.getIdUsers().get(0);
-                if(idUser.contains("phone:")) {
+                if (idUser.contains("phone:")) {
                     chatRoom.setNameChat(idUser.substring(6));
                 } else {
                     SpoContact contact = DBUtils.getContactForIdUser(message.getIdUsers().get(0));
@@ -802,7 +773,6 @@ public class SpoMessagesService extends Service {
                         chatRoom.setNameChat(contact.getFullName());
                     else
                         return null;
-                        //chatRoom.setNameChat("Несинхр-ный контакт");
                 }
                 chatRoom.setType(SpoChatRoom.ONE);
                 chatRoom.setTimeLastMessage(message.getDate());
@@ -815,9 +785,9 @@ public class SpoMessagesService extends Service {
             message.setId(DBUtils.saveMessage(message));
 
             if (message.getTypeContent() == SpoChatMessage.FILE) {
-                ArrayList<SpoFile> files =  message.getSpoFiles();
-                if (files != null && files.size() > 0) {
-                    for(SpoFile file : files) {
+                ArrayList<SpoFile> files = message.getSpoFiles();
+                if (files != null && !files.isEmpty()) {
+                    for (SpoFile file : files) {
                         file.setIdMessage(message.getId());
                         file.setId(DBUtils.saveFile(file));
                     }
@@ -829,228 +799,7 @@ public class SpoMessagesService extends Service {
         }
     }
 
-    private class RequestKeyRunnable implements Runnable {
-        private final String DATE = "Date";
-        private final String OPERATION  = "operation";
-        private final String SER        = "ser";
-        private final String COMPL      = "compl";
-        private final String NUM        = "num";
-        private final String T_BEG      = "t_beg";
-        private final String T_END      = "t_end";
-        private final String KEY        = "key";
-        private final String KD         = "kd";
-        private final String KS         = "ks";
-        private final String DATE_SERVER_FORMAT = "yyyy-MM-dd HH:mm:ss";
-
-        @Override
-        public void run() {
-            if (!timeKeyHanding())
-                return;
-
-            if (!getKeyHanding())
-                return;
-        }
-
-        private boolean timeKeyHanding() {
-            /*JSONObject jsonObject = NetworkRequestUtils.getServerDateTime();
-
-            if (jsonObject == null || !jsonObject.has(DATE)) return false;
-
-            try {
-                String timeServer = jsonObject.getString(DATE);
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_SERVER_FORMAT);
-                long time = simpleDateFormat.parse(timeServer).getTime();
-
-                ArrayList<VpnClient.KeyInf> nextKeys = VpnClient.ins().getNextKeys();
-
-                if (nextKeys == null || nextKeys.size() == 0) return true;
-
-                for (VpnClient.KeyInf key : nextKeys) {
-                    if (time >= key.dateBegin && time <= key.dateEnd) {
-                        VpnClient.stopVpnService(getApplicationContext());  // Остановка службы VPN
-                        if (checkConnectionOnKey(key)) {
-                            // Удалось установить соединение на очередном ключе
-                            nextKeys.remove(key);
-                            VpnClient.ins().setWorkKey(key);                                // Установка очередного ключа в качестве рабочего
-                            VpnClient.ins().saveKeyCompl(PrefsUtils.ins().getHashPassword(), getApplicationContext()); // Сохранение ключей
-                        }
-                        VpnClient.startVpnServiceWithContext(getApplicationContext());  // Запуск службы VPN
-                        return true;
-                    }
-                }
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }*/
-
-            return false;
-        }
-
-        private boolean getKeyHanding() {
-            //JSONObject jsonObject = NetworkRequestUtils.getKey("00000001", "001");
-            /*JSONObject jsonObject = NetworkRequestUtils.getState(VpnClient.ins().getConnectingKey().compl + "");
-
-            if (jsonObject == null
-                    || !jsonObject.has(OPERATION)
-                    || !jsonObject.has(SER)
-                    || !jsonObject.has(COMPL)) return false;
-            try {
-                if (jsonObject.getString(OPERATION).equals("get")) {
-                    jsonObject = NetworkRequestUtils.getKey(jsonObject.getString(SER), jsonObject.getString(COMPL));
-                    if (jsonObject != null) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(jsonObject.getString(KD));
-                        sb.append(jsonObject.getString(SER));
-                        sb.append(jsonObject.getString(COMPL));
-                        if(jsonObject.has(T_BEG))
-                            sb.append(jsonObject.getString(T_BEG));
-                        if(jsonObject.has(T_END))
-                            sb.append(jsonObject.getString(T_END));
-                        sb.append(jsonObject.getString(KEY));
-
-                        byte [] confBuf = sb.toString().getBytes();
-                        int crc = CryptUtils.CRC32(confBuf, confBuf.length);
-                        String crc32_from_file = jsonObject.getString(KS);
-                        if(!(crc32_from_file.toUpperCase().equals(Utils.intToHexString(crc).toUpperCase()))) {
-                            Log.e(TAG, "CRC32 ERROR");
-                            return false;
-                        }
-
-                        if (!VpnClient.ins().setNextKey(jsonObject.getString(KD),
-                                jsonObject.getString(SER),
-                                jsonObject.getString(COMPL),
-                                "10",
-                                jsonObject.getString(T_BEG),
-                                jsonObject.getString(T_END),
-                                jsonObject.getString(KEY))) {
-                            Log.e(TAG, "setNextKey ERROR");
-                            return false;
-                        }
-
-                        VpnClient.ins().saveKeyCompl(PrefsUtils.ins().getHashPassword(), getApplicationContext());
-                        NetworkRequestUtils.sendCurrentKey(jsonObject.getString(SER), jsonObject.getString(COMPL));
-                        return true;
-                    }
-                } else if (jsonObject.getString(OPERATION).equals("del")) {
-                    if (VpnClient.ins().deleteKeyCompl(jsonObject.getString(SER), jsonObject.getString(COMPL))) {
-                        VpnClient.ins().saveKeyCompl(PrefsUtils.ins().getHashPassword(), getApplicationContext());
-                    }
-
-                    if (VpnClient.ins().getWorkKey() == null) {
-                        VpnClient.stopVpnService(getApplicationContext());
-                        VpnClient.startVpnServiceWithContext(getApplicationContext());
-                    }
-                    return true;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-*/
-            return false;
-        }
-
-        private boolean checkConnectionOnKey(VpnClient.KeyInf key) {
-            if (key == null) return false;
-            Log.i(TAG, "checkConnectionOnKey  START");
-            long time = System.currentTimeMillis();
-            // Ожидание отключения от СКЗИ
-            while (VpnClient.ins().isConnected()) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                if (System.currentTimeMillis() - time > 10000) {
-                    return false;
-                }
-            }
-            Log.i(TAG, "checkConnectionOnKey  CONNECT");
-            final SocketAddress serverAddress = new InetSocketAddress(PrefsUtils.ins().getIpSkzi(), 4500);
-
-            try {
-                long lastSendTime;
-                byte [] ikesainit;
-                byte [] dataOut = new byte[1500];
-                int [] lenData = new int[1];
-                int [] target  = new int[1];
-                int [] err  = new int[1];
-                int length;
-                final DatagramChannel tunnel = DatagramChannel.open();
-                tunnel.connect(serverAddress);
-                tunnel.configureBlocking(false);
-
-                ByteBuffer packet = ByteBuffer.allocate(1500);
-                VpnClient vpnClient = VpnClient.ins();
-                VpnClient.KeyInf workKey = key;
-                short netNum = workKey.compl;
-
-                /** Попытка установки соединения на основном ключе **/
-                vpnClient.ikev2clear();
-                vpnClient.ikev2init(netNum, tunnel.socket().getLocalPort(), tunnel.socket().getLocalAddress().getAddress(),
-                        (short)0xF2D2, tunnel.socket().getPort(), tunnel.socket().getInetAddress().getAddress(),
-                        workKey.kd, workKey.ser, workKey.compl,
-                        workKey.numCompl, new Random().nextInt(), null, null);
-                ikesainit = vpnClient.ikev2getikesainit(lenData);
-                // Совершаем 3 попытки установления соединения
-                for (int i = 0; i < 2; i++) {
-                    packet.put(ikesainit).flip();
-                    packet.position(0);
-                    packet.limit(lenData[0]);
-                    tunnel.write(packet);
-                    packet.clear();
-                    lastSendTime = System.currentTimeMillis();
-                    Log.i(TAG, "IKE_SA_INIT -->");
-                    // 3 секунды на принятие правильного пакета только потом повторная передача
-                    while ((System.currentTimeMillis() - lastSendTime) < 3000) {
-                        Thread.sleep(100);
-                        length = tunnel.read(packet);
-                        if (length > 0) {
-                            Log.i(TAG, "IKE_SA_INIT <--");
-                            vpnClient.vpnprocessingdata(packet.array(), length, dataOut, lenData, target, err); // Обработка ответа на IKE_SA_INIT
-                            // Добавить проверку стадии
-                            if (err[0] == 0) {
-                                for (int j = 0; j < 2; j++) {
-                                    packet.clear();
-                                    packet.put(dataOut).flip();
-                                    packet.position(0);
-                                    packet.limit(lenData[0]);
-                                    tunnel.write(packet);
-                                    packet.clear();
-                                    lastSendTime = System.currentTimeMillis();
-                                    Log.i(TAG, "IKE_SA_AUTH -->");
-                                    // 3 секунды на принятие правильного пакета только потом повторная передача
-                                    while ((System.currentTimeMillis() - lastSendTime) < 3000) {
-                                        Thread.sleep(100);
-                                        length = tunnel.read(packet);
-                                        if (length > 0) {
-                                            Log.i(TAG, "IKE_SA_AUTH <--");
-                                            vpnClient.vpnprocessingdata(packet.array(), length, dataOut, lenData, target, err); // Обработка ответа на IKE_AUTH
-                                            if (err[0] == 0) {
-                                                return true;
-                                            } else {
-                                                Log.e(TAG, "ERR = " + err[0]);
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            Log.i(TAG, "checkConnectionOnKey  STOP");
-            return false;
-        }
-    }
-
-    private class CryptDBRunnable implements Runnable {
-
+    private static class CryptDBRunnable implements Runnable {
         @Override
         public void run() {
             DBUtils.saveDataBase();
@@ -1058,7 +807,7 @@ public class SpoMessagesService extends Service {
     }
 
     private class SendReceiveFileMessageRunnable implements Runnable {
-        private SpoFile mFile;
+        private final SpoFile mFile;
         private IsRunThread isRun = null;
 
         public SendReceiveFileMessageRunnable(SpoFile file) {
@@ -1067,7 +816,7 @@ public class SpoMessagesService extends Service {
 
         @Override
         public void run() {
-            Log.i(TAG, "SendingFileMessageRunnable start Thread = " + Thread.currentThread().getId() );
+            Log.i(TAG, "SendingFileMessageRunnable start Thread = " + Thread.currentThread().getId());
             isRun = new IsRunThread(true);
 
             if (mFile.getDir() == SpoFile.DIR_OUT) {
@@ -1076,30 +825,30 @@ public class SpoMessagesService extends Service {
                 try {
                     Uri uri = Uri.parse(mFile.getUri());
                     String fileName = Utils.getFileName(mContext, uri);
-                        InputStream in = getContentResolver().openInputStream(uri);
-                        JSONObject result = NetworkRequestUtils.uploadFile(mFile.getId(), idUser, signatureUser, fileName, in, isRun);
+                    InputStream in = getContentResolver().openInputStream(uri);
+                    JSONObject result = NetworkRequestUtils.uploadFile(mFile.getId(), idUser, signatureUser, fileName, in, isRun);
 
-                        if (result != null) {
-                            if (result.has("idFile")) {
-                                idFile = result.getString("idFile");
-                                isSent = true;
-                            }
+                    if (result != null) {
+                        if (result.has("idFile")) {
+                            idFile = result.getString("idFile");
+                            isSent = true;
                         }
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                    if (isSent) {
-                        Log.i(TAG, "Send File OK");
-                        mFile.setIdFile(idFile);
-                        mFile.setStatus(SpoFile.STATUS_OK);
-                    } else {
-                        Log.i(TAG, "Send File ERROR");
-                        mFile.setStatus(SpoFile.STATUS_ERROR);
-                    }
-                    DBUtils.updateFile(mFile);
-                    SpoListenerManager.callFileStateChanged(mFile); // Вызов колбэка
-                    endSendingFile(mFile);
+                if (isSent) {
+                    Log.i(TAG, "Send File OK");
+                    mFile.setIdFile(idFile);
+                    mFile.setStatus(SpoFile.STATUS_OK);
+                } else {
+                    Log.i(TAG, "Send File ERROR");
+                    mFile.setStatus(SpoFile.STATUS_ERROR);
+                }
+                DBUtils.updateFile(mFile);
+                SpoListenerManager.callFileStateChanged(mFile);
+                endSendingFile(mFile);
             } else {
                 boolean isDownload = false;
                 String urlDownload = mFile.getUrlDownload();
@@ -1108,11 +857,15 @@ public class SpoMessagesService extends Service {
 
                 try {
                     File downloadFile = Utils.createReceivedFile(mContext, fileName);
-                    OutputStream out = new FileOutputStream(downloadFile);
+                    OutputStream out = null;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        out = Files.newOutputStream(downloadFile.toPath());
+                    }
 
-                    if (NetworkRequestUtils.downloadFile(mFile.getId(), urlDownload, out, isRun, Integer.parseInt(message.getIdUsers().get(0)))) {
+                    if (NetworkRequestUtils.downloadFile(mFile.getId(), urlDownload, out, isRun)) {
                         mFile.setUri(Uri.fromFile(downloadFile).toString());
                         isDownload = true;
+                        assert out != null;
                         out.flush();
                         out.close();
                     }
@@ -1120,7 +873,7 @@ public class SpoMessagesService extends Service {
                     e.printStackTrace();
                 }
 
-                if(isDownload) {
+                if (isDownload) {
                     Log.i(TAG, "Download File OK");
                     mFile.setStatus(SpoFile.STATUS_OK);
                 } else {
@@ -1128,9 +881,9 @@ public class SpoMessagesService extends Service {
                     mFile.setStatus(SpoFile.STATUS_ERROR);
                 }
                 DBUtils.updateFile(mFile);
-                SpoListenerManager.callFileStateChanged(mFile); // Вызов колбэка
+                SpoListenerManager.callFileStateChanged(mFile);
             }
-            Log.i(TAG, "SendingFileMessageRunnable stop Thread = " + Thread.currentThread().getId() );
+            Log.i(TAG, "SendingFileMessageRunnable stop Thread = " + Thread.currentThread().getId());
         }
 
         public void stopSendReceive() {
@@ -1139,7 +892,7 @@ public class SpoMessagesService extends Service {
     }
 
     private class SendingTextMessageRunnable implements Runnable {
-        private SpoChatMessage mMessage;
+        private final SpoChatMessage mMessage;
         private boolean isRun;
 
         public SendingTextMessageRunnable(SpoChatMessage message) {
@@ -1148,16 +901,16 @@ public class SpoMessagesService extends Service {
 
         @Override
         public void run() {
-            Log.i(TAG, "SendingMessageRunnable start Thread = " + Thread.currentThread().getId() );
+            Log.i(TAG, "SendingMessageRunnable start Thread = " + Thread.currentThread().getId());
             boolean isSent = false;
-            
+
             isRun = true;
-            while(isRun) {
+            while (isRun) {
                 switch (mMessage.getTypeContent()) {
-                    case SpoChatMessage.FILE : {
+                    case SpoChatMessage.FILE: {
                         JSONObject result;
                         ArrayList<SpoFile> files = new ArrayList<>(Arrays.asList(DBUtils.getSpoFiles(mMessage.getId())));
-                        if (files.size() > 0) {
+                        if (!files.isEmpty()) {
                             mMessage.setSpoFiles(files);
                             String[] idFiles = new String[mMessage.getSpoFiles().size()];
                             int index = 0;
@@ -1179,7 +932,7 @@ public class SpoMessagesService extends Service {
                         }
                         break;
                     }
-                    case SpoChatMessage.TEXT : {
+                    case SpoChatMessage.TEXT: {
                         JSONObject result = NetworkRequestUtils.sendTextMessage(idUser, signatureUser, mMessage.getMessage(), mMessage.getIdUsers(), null);
                         try {
                             if (result != null && result.has("error") && result.getInt("error") == 200) {
@@ -1198,7 +951,7 @@ public class SpoMessagesService extends Service {
                     Log.i(TAG, "Send Message OK");
                     mMessage.setStatus(SpoChatMessage.SENT);
                     DBUtils.updateMessage(mMessage);
-                    SpoListenerManager.callChatMessageStateChanged(mMessage); // Вызов колбэка
+                    SpoListenerManager.callChatMessageStateChanged(mMessage);
                     break;
                 } else {
                     if (Thread.interrupted() || !isRun) {
@@ -1214,7 +967,7 @@ public class SpoMessagesService extends Service {
 
             successSendingMessage(mMessage);
 
-            Log.i(TAG, "SendingMessageRunnable stop Thread = " + Thread.currentThread().getId() );
+            Log.i(TAG, "SendingMessageRunnable stop Thread = " + Thread.currentThread().getId());
         }
 
         public void stopSending() {
@@ -1275,13 +1028,7 @@ public class SpoMessagesService extends Service {
         }, 300);
     }
 
-    /**
-     * Функция проверки наличия на сервере новой прошики
-     *
-     * @param currentVersionApp - текушая версия приложения
-     * @return массив из двух строк (версия новой прошивки, ссылка на скачивание)
-     */
-    public String[] checkUpdateApp(String currentVersionApp ) {
+    public String[] checkUpdateApp(String currentVersionApp) {
         JSONObject result = NetworkRequestUtils.checkUpdate(idUser, signatureUser, currentVersionApp);
 
         if (result != null) {
@@ -1294,7 +1041,7 @@ public class SpoMessagesService extends Service {
                     if (result.getInt("error") != 200)
                         return null;
 
-                    String [] verAndLink = new String[2];
+                    String[] verAndLink = new String[2];
 
                     verAndLink[0] = result.getString("version");
                     verAndLink[1] = result.getString("link");

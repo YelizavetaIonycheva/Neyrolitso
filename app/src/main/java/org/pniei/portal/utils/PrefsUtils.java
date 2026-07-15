@@ -4,9 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class PrefsUtils {
     private static final String TAG = "PrefsUtils";
     public static final int REGIME_NONE = 0;
@@ -18,101 +15,83 @@ public class PrefsUtils {
     private static PrefsUtils instance;
     private SharedPreferences prefs;
 
-    /** Общие **/
-    private int mRegimeSelected;        // Выбранный режим работы (0 - режим не выбран, 1 - Режим Портал, 2 - Режим Точка-Точка)
-    private boolean isLicenseReg;       // Признак регистрации лицензионного ключа на сервере
-    private String mLicenseType;        // Наименование типа лицензии ("full", "custom")
-    private String mLicenseKey;         // Лицензионный ключ
-    private String mHashPass;           // Хэш на пароль пользователя
+    /** Основные настройки */
+    private int mRegimeSelected;
+    private boolean isLicenseReg;
+    private String mLicenseType;
+    private String mLicenseKey;
+    private String mHashPass;
+    private boolean isSelectCodecs;
+    private boolean isAuth = false;
+    private boolean isAppBackground;
     private String serverDomainName;
-    private boolean isSelectCodecs;     // Признак был ли выполнен первоначальный выбор кодеков
-    private boolean isAuth = false;     // Признак прохождения аутентификации (Не сохраняется в файл)
-    private boolean isAppBackground;    // Признак работы в фоне (Не сохраняется в файл)
-    private Set<String> app_vpn_list;   // Список браузеров работающих через VPN
-    private String mIpGps;              // IP-адрес для записи координат
-    private boolean isSendGPS;          // Отправлять ли координаты
-    private int timeIntervalSendGPS;    // Интервал времени отправки координат на сервер
 
-    /** Режим Портал **/
-    private boolean isCfgEnterP;        // Признак ввода конфигурации для режима Портал
-    private String mIdP;                // Уникальный идентификатор пользователя в режиме Портал
-    private String mSignatureP;         // Подпись для доступа к системе в режиме Портал
-    private String mPhoneP;             // Номер пользователя в режиме Портал
-    private String mIpAtsP;             // IP-адрес АТС в режиме Портал
-    private String mIpDnsP;             // IP-адрес DNS в режиме Портал
-    private String mIpDnsSecondP;       // IP-адрес DNS дополнительный в режиме Портал
-    private String mIpSkzi;             // IP-адрес СКЗИ
-    private String mIpMon;              // IP-адрес сервера мониторинга ключей
-    private boolean isVpnEnable;        // Признак работы VPN в режиме Портал
-    private boolean isKeyEnter;         // Признак ввода ключей для режима Портал
+    /** Настройки для режима "Портал" */
+    private boolean isCfgEnterP;
+    private String mIdP;
+    private String mSignatureP;
+    private String mPhoneP;
+    private String mIpAtsP;
+    private String mIpDnsP;
 
-    /** Режим Точка-Точка **/
-    private boolean isCfgEnterTT;       // Признак ввода конфигурации для режима Точка-Точка
-    private String mIdTT;               // Уникальный идентификатор пользователя в режиме Точка-Точка
-    private String mSignatureTT;        // Подпись для доступа к системе в режиме Точка-Точка
-    private String mPhoneTT;            // Номер пользователя в режиме Точка-Точка
-    private String mIpAtsTT;            // IP-адрес АТС в режиме Точка-Точка
-    private String mIpDnsTT;            // IP-адрес DNS в режиме Точка-Точка
+    /** Настройки для режима "ТТ" */
+    private boolean isCfgEnterTT;
+    private String mIdTT;
+    private String mSignatureTT;
+    private String mPhoneTT;
+    private String mIpAtsTT;
+    private String mIpDnsTT;
 
     public interface JsonKeysPrefs {
-        String ID =         "id";
-        String SIGNATURE =  "signature";
-        String PHONE =      "phone";
-        String IP_ATS =     "ip_ats";
-        String IP_DNS =     "ip_dns";
-        String IP_SKZI =    "ip_skzi";
-        String IP_MON =     "ip_mon";
+        String ID = "id";
+        String SIGNATURE = "signature";
+        String PHONE = "phone";
+        String IP_ATS = "ip_ats";
+        String IP_DNS = "ip_dns";
+        String IP_SKZI = "ip_skzi";
+        String IP_MON = "ip_mon";
     }
 
     public interface ExportImportPrefs {
-        String REGIME =         "regime";
-        int REGIME_P =          1;
-        int REGIME_TT =         2;
-        String IP_ATS =         "ip_ats";
-        String IP_SKZI =        "ip_skzi";
-        String IP_MON =         "ip_mon";
-        String IP_DNS =         "ip_dns";
-        String IP_DNS_SECOND =  "ip_dns_second";
-        String VPN_APP_LIST =   "vpn_app_list";
-        String PREF_CRC =       "pref_crc";
+        String REGIME = "regime";
+        int REGIME_P = 1;
+        int REGIME_TT = 2;
+        String IP_ATS = "ip_ats";
+        String IP_SKZI = "ip_skzi";
+        String IP_MON = "ip_mon";
+        String IP_DNS = "ip_dns";
+        String IP_DNS_SECOND = "ip_dns_second";
+        String VPN_APP_LIST = "vpn_app_list";
+        String PREF_CRC = "pref_crc";
     }
 
     public interface Prefs {
-        String NAME_FILE_PREFS =    "smp_settings";
+        String NAME_FILE_PREFS = "smp_settings";
 
-        /** Общие **/
-        String REGIME_SELECTED =    "regime_selected";
-        String LICENSE_REG =        "license_reg";
-        String LICENSE_TYPE =       "license_type";
-        String LICENSE_KEY =        "license_key";
-        String HASH_PASS =          "hash_pass";
-        String SELECT_CODEC =       "select_codec";
-        String IP_GPS =             "ip_gps";
-        String SEND_GPS =           "send_gps";
-        String TIME_GPS =           "time_gps";
+        /** Основные настройки */
+        String REGIME_SELECTED = "regime_selected";
+        String LICENSE_REG = "license_reg";
+        String LICENSE_TYPE = "license_type";
+        String LICENSE_KEY = "license_key";
+        String HASH_PASS = "hash_pass";
+        String SELECT_CODEC = "select_codec";
 
-        /** Режим Портал **/
-        String CONFIG_ENTER_P =     "config_enter_p";
-        String ID_P =               "id_p";
-        String SIGNATURE_P =        "signature_p";
-        String PHONE_P =            "phone_p";
-        String IP_ATS_P =           "ip_ats_p";
-        String IP_DNS_P =           "ip_dns_p";
-        String IP_DNS_SECOND_P =    "ip_dns_second_p";
-        String IP_SKZI =            "ip_skzi";
-        String IP_MON =             "ip_mon";
-        String VPN_ENABLE =         "vpn_enable";
-        String KEY_ENTER =          "key_enter";
-        String BROWSER_LIST =       "browser_list";
+        /** Настройки для режима "Портал" */
+        String CONFIG_ENTER_P = "config_enter_p";
+        String ID_P = "id_p";
+        String SIGNATURE_P = "signature_p";
+        String PHONE_P = "phone_p";
+        String IP_ATS_P = "ip_ats_p";
+        String IP_DNS_P = "ip_dns_p";
 
-        /** Режим Точка-Точка **/
-        String CONFIG_ENTER_TT =    "config_enter_tt";
-        String ID_TT =              "id_tt";
-        String SIGNATURE_TT =       "signature_tt";
-        String PHONE_TT =           "phone_tt";
-        String IP_ATS_TT =          "ip_ats_tt";
-        String IP_DNS_TT =          "ip_dns_tt";
-        String SERVER_DOMAIN =      "server_domain";
+        /** Настройки для режима "ТТ" */
+        String CONFIG_ENTER_TT = "config_enter_tt";
+        String ID_TT = "id_tt";
+        String SIGNATURE_TT = "signature_tt";
+        String PHONE_TT = "phone_tt";
+        String IP_ATS_TT = "ip_ats_tt";
+        String IP_DNS_TT = "ip_dns_tt";
+        String SERVER_DOMAIN = "server_domain";
     }
 
     private PrefsUtils() { }
@@ -125,8 +104,7 @@ public class PrefsUtils {
         return instance;
     }
 
-
-    /** Общие **/
+    /** Основные геттеры и сеттеры */
     public int getRegimeSelected() {
         return mRegimeSelected;
     }
@@ -197,35 +175,16 @@ public class PrefsUtils {
         return isAppBackground;
     }
 
-    public String getIpGps() {
-        return mIpGps;
+    public String getServerDomainName() {
+        return serverDomainName;
     }
 
-    public void setIpGps(String ipGps) {
-        mIpGps= ipGps;
-        prefs.edit().putString(Prefs.IP_GPS, mIpGps).apply();
+    public void setServerDomainName(String serverDomainName) {
+        this.serverDomainName = serverDomainName;
+        prefs.edit().putString(Prefs.SERVER_DOMAIN, serverDomainName).apply();
     }
 
-    public boolean isSendGPS() {
-        return isSendGPS;
-    }
-
-    public void setSendGPS(boolean sendGPS) {
-        isSendGPS = sendGPS;
-        prefs.edit().putBoolean(Prefs.SEND_GPS, isSendGPS).apply();
-    }
-
-    public int getTimeIntervalSendGPS() {
-        return timeIntervalSendGPS;
-    }
-
-    public void setTimeIntervalSendGPS(int time) {
-        timeIntervalSendGPS = time;
-        prefs.edit().putInt(Prefs.TIME_GPS, timeIntervalSendGPS).apply();
-    }
-
-    /** Режим Портал **/
-
+    /** Геттеры и сеттеры для режима "Портал" */
     public boolean isCfgEnterP() {
         return isCfgEnterP;
     }
@@ -280,65 +239,7 @@ public class PrefsUtils {
         prefs.edit().putString(Prefs.IP_DNS_P, mIpDnsP).apply();
     }
 
-    public String getIpDnsSecondP() {
-        return mIpDnsSecondP;
-    }
-
-    public void setIpDnsSecondP(String ipDnsSecondP) {
-        mIpDnsSecondP = ipDnsSecondP;
-        prefs.edit().putString(Prefs.IP_DNS_SECOND_P, mIpDnsSecondP).apply();
-    }
-
-    public String getIpSkzi() {
-        return mIpSkzi;
-    }
-
-    public void setIpSkzi(String ipSkzi) {
-        mIpSkzi = ipSkzi;
-        prefs.edit().putString(Prefs.IP_SKZI, mIpSkzi).apply();
-    }
-
-    public String getIpMon() {
-        return mIpMon;
-    }
-
-    public void setIpMon(String ipMon) {
-        mIpMon = ipMon;
-        prefs.edit().putString(Prefs.IP_MON, mIpMon).apply();
-    }
-
-    public void setEnableVpn(boolean enable) {
-        isVpnEnable = enable;
-        prefs.edit().putBoolean(Prefs.VPN_ENABLE, isVpnEnable).apply();
-    }
-
-    public boolean isVpnEnable() {
-        return isVpnEnable;
-    }
-
-    public boolean isKeyEnter() {
-        return isKeyEnter;
-    }
-
-    public void setKeyEnter(boolean keyEnter) {
-        isKeyEnter = keyEnter;
-        prefs.edit().putBoolean(Prefs.KEY_ENTER, isKeyEnter).apply();
-    }
-
-    public void setVpnApps(Set<String> appList) {
-        app_vpn_list.clear();
-        app_vpn_list = appList;
-        prefs.edit()
-                .putStringSet(Prefs.BROWSER_LIST, app_vpn_list)
-                .apply();
-    }
-
-    public Set<String> getVpnApps() {
-        return app_vpn_list;
-    }
-
-    /** Режим Точка-Точка **/
-
+    /** Геттеры и сеттеры для режима "ТТ" */
     public boolean isCfgEnterTT() {
         return isCfgEnterTT;
     }
@@ -393,66 +294,40 @@ public class PrefsUtils {
         prefs.edit().putString(Prefs.IP_DNS_TT, mIpDnsTT).apply();
     }
 
-    public String getServerDomainName() {
-        return serverDomainName;
-    }
-
-    public void setServerDomainName(String serverDomainName) {
-        this.serverDomainName = serverDomainName;
-        prefs.edit().putString(Prefs.SERVER_DOMAIN, serverDomainName).apply();
-    }
-
-    /** Вспомогательные методы **/
-
+    /** Загрузка настроек */
     public void load(Context context) {
         prefs = context.getApplicationContext().getSharedPreferences(Prefs.NAME_FILE_PREFS, Context.MODE_PRIVATE);
 
-        /** Общие **/
-        mRegimeSelected     = prefs.getInt(Prefs.REGIME_SELECTED, REGIME_NONE);
-        isLicenseReg        = prefs.getBoolean(Prefs.LICENSE_REG, false);
-        mLicenseType        = prefs.getString(Prefs.LICENSE_TYPE, "");
-        mLicenseKey         = prefs.getString(Prefs.LICENSE_KEY, "");
-        mHashPass           = prefs.getString(Prefs.HASH_PASS, null);
-        isSelectCodecs      = prefs.getBoolean(Prefs.SELECT_CODEC, false);
-        isAuth              = false;
-        isAppBackground     = false;
-        app_vpn_list        = prefs.getStringSet(Prefs.BROWSER_LIST, null);
-        if (app_vpn_list != null)
-            app_vpn_list    = new HashSet <>(app_vpn_list);
-        else
-            app_vpn_list    = new HashSet <>();
-        mIpGps              = prefs.getString(Prefs.IP_GPS, "");
-        isSendGPS           = prefs.getBoolean(Prefs.SEND_GPS, false);
-        timeIntervalSendGPS = prefs.getInt(Prefs.TIME_GPS, 15);
+        /** Основные настройки */
+        mRegimeSelected = prefs.getInt(Prefs.REGIME_SELECTED, REGIME_NONE);
+        isLicenseReg = prefs.getBoolean(Prefs.LICENSE_REG, false);
+        mLicenseType = prefs.getString(Prefs.LICENSE_TYPE, "");
+        mLicenseKey = prefs.getString(Prefs.LICENSE_KEY, "");
+        mHashPass = prefs.getString(Prefs.HASH_PASS, null);
+        isSelectCodecs = prefs.getBoolean(Prefs.SELECT_CODEC, false);
+        isAuth = false;
+        isAppBackground = false;
+        serverDomainName = prefs.getString(Prefs.SERVER_DOMAIN, "impulse.ru");
 
-        serverDomainName    = prefs.getString(Prefs.SERVER_DOMAIN, "impulse.ru");
+        /** Настройки для режима "Портал" */
+        isCfgEnterP = prefs.getBoolean(Prefs.CONFIG_ENTER_P, false);
+        mIdP = prefs.getString(Prefs.ID_P, "");
+        mSignatureP = prefs.getString(Prefs.SIGNATURE_P, "");
+        mPhoneP = prefs.getString(Prefs.PHONE_P, "");
+        mIpAtsP = prefs.getString(Prefs.IP_ATS_P, "");
+        mIpDnsP = prefs.getString(Prefs.IP_DNS_P, "");
 
-        /** Режим Портал **/
-        isCfgEnterP         = prefs.getBoolean(Prefs.CONFIG_ENTER_P, false);
-        mIdP                = prefs.getString(Prefs.ID_P, "");
-        mSignatureP         = prefs.getString(Prefs.SIGNATURE_P, "");
-        mPhoneP             = prefs.getString(Prefs.PHONE_P, "");
-        mIpAtsP             = prefs.getString(Prefs.IP_ATS_P, "");
-        mIpDnsP             = prefs.getString(Prefs.IP_DNS_P, "");
-        mIpDnsSecondP       = prefs.getString(Prefs.IP_DNS_SECOND_P, "");
-        mIpSkzi             = prefs.getString(Prefs.IP_SKZI, "");
-        mIpMon              = prefs.getString(Prefs.IP_MON, "");
-        isVpnEnable         = prefs.getBoolean(Prefs.VPN_ENABLE, true);
-        isKeyEnter          = prefs.getBoolean(Prefs.KEY_ENTER, false);
-
-        /** Режим Точка-Точка **/
-        isCfgEnterTT         = prefs.getBoolean(Prefs.CONFIG_ENTER_TT, false);
-        mIdTT               = prefs.getString(Prefs.ID_TT, "");
-        mSignatureTT        = prefs.getString(Prefs.SIGNATURE_TT, "");
-        mPhoneTT            = prefs.getString(Prefs.PHONE_TT, "");
-        mIpAtsTT            = prefs.getString(Prefs.IP_ATS_TT, "");
-        mIpDnsTT            = prefs.getString(Prefs.IP_DNS_TT, "");
+        /** Настройки для режима "ТТ" */
+        isCfgEnterTT = prefs.getBoolean(Prefs.CONFIG_ENTER_TT, false);
+        mIdTT = prefs.getString(Prefs.ID_TT, "");
+        mSignatureTT = prefs.getString(Prefs.SIGNATURE_TT, "");
+        mPhoneTT = prefs.getString(Prefs.PHONE_TT, "");
+        mIpAtsTT = prefs.getString(Prefs.IP_ATS_TT, "");
+        mIpDnsTT = prefs.getString(Prefs.IP_DNS_TT, "");
     }
 
     public void deleteConfig(Context context) {
         mHashPass = null;
-        prefs.edit().clear().commit();
-        /*File file = new File(context.getApplicationInfo().dataDir + "/shared_prefs/" + Prefs.NAME_FILE_PREFS + ".xml");
-        file.delete();*/
+        prefs.edit().clear().apply();
     }
 }

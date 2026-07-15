@@ -1,8 +1,7 @@
 package org.pniei.portal.fragments;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,33 +11,26 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.material.textfield.TextInputLayout;
 
-import org.pniei.dwface.biometry.BiometryActivity;
-import org.pniei.dwface.biometry.BiometryPrefs;
-import org.pniei.dwface.biometry.BiometryUtils;
 import org.pniei.portal.R;
 import org.pniei.portal.activities.LoginActivity;
 import org.pniei.portal.databinding.RegistrationFragmentBinding;
 import org.pniei.portal.utils.CryptUtils;
 import org.pniei.portal.utils.PrefsUtils;
 
-import java.util.ArrayList;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
+import java.util.Objects;
 
 public class RegistrationFragment extends Fragment {
-    private ActivityResultLauncher<Intent> biometryResultLauncher;
+    @SuppressLint("StaticFieldLeak")
     private static Context mContext;
     private RegistrationFragmentBinding mBinding;
     private Handler mHandler;
-    private String mPassTemp;
 
     public static RegistrationFragment newInstance(Context context) {
         mContext = context;
@@ -46,7 +38,7 @@ public class RegistrationFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mHandler = new Handler(Looper.getMainLooper());
@@ -68,22 +60,37 @@ public class RegistrationFragment extends Fragment {
         });
 
         mBinding.password.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
-            @Override public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
             @Override
-            public void afterTextChanged(Editable editable) { mBinding.passwordLayout.setError(null);}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mBinding.passwordLayout.setError(null);
+            }
         });
 
         mBinding.repeatPassword.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
-            @Override public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
             @Override
-            public void afterTextChanged(Editable editable) { mBinding.repeatPasswordLayout.setError(null);}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mBinding.repeatPasswordLayout.setError(null);
+            }
         });
 
         mBinding.btnEnter.setOnClickListener(v -> checkPass());
 
-        registerForBiometryResult();
         return mBinding.getRoot();
     }
 
@@ -100,89 +107,32 @@ public class RegistrationFragment extends Fragment {
         mBinding.passwordLayout.setError(null);
         mBinding.repeatPasswordLayout.setError(null);
 
-        String pas1 = mBinding.password.getText().toString();
-        String pas2 = mBinding.repeatPassword.getText().toString();
+        String pas1 = Objects.requireNonNull(mBinding.password.getText()).toString();
+        String pas2 = Objects.requireNonNull(mBinding.repeatPassword.getText()).toString();
 
-        if (pas1.length() == 0) {
-            showError(getString(R.string.err_empty_password), mBinding.passwordLayout);
+        if (pas1.isEmpty()) {
+            showError(mContext.getString(R.string.err_empty_password), mBinding.passwordLayout);
             return;
         } else if (pas1.length() < 4) {
-            showError(getString(R.string.err_lenght_password), mBinding.passwordLayout);
+            showError(mContext.getString(R.string.err_lenght_password), mBinding.passwordLayout);
             return;
         } else if (pas1.length() != pas2.length() || !pas1.equals(pas2)) {
-            showError(getString(R.string.err_not_match_password), mBinding.repeatPasswordLayout);
+            showError(mContext.getString(R.string.err_not_match_password), mBinding.repeatPasswordLayout);
             return;
         }
 
-        if (BiometryPrefs.ins().isInitBiometryLib()) {
-            mPassTemp = pas1;
-            showBiometryDialog();
-        } else {
-            PrefsUtils.ins().setHashPass(CryptUtils.getHash(pas1.getBytes()));
-            ((LoginActivity) requireActivity()).displayFragment(ModeSelectFragment.newInstance(mContext), false);
-        }
-    }
-
-    private void showBiometryDialog() {
-        new MaterialAlertDialogBuilder(mContext)
-                .setTitle(R.string.biometry_settings)
-                .setMessage(R.string.biometry_train_info)
-                .setNegativeButton(getString(R.string.no), (dialog, which) -> {
-                    PrefsUtils.ins().setHashPass(CryptUtils.getHash(mPassTemp.getBytes()));
-                    ((LoginActivity) requireActivity()).displayFragment(ModeSelectFragment.newInstance(mContext), false);
-                })
-                .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
-                    byte [] hashPass = CryptUtils.getHash(mPassTemp.getBytes());
-                    ArrayList<byte[]> dataArray = new ArrayList<>();
-                    dataArray.add(hashPass);
-                    byte [] data = BiometryUtils.dataGeneration(dataArray);
-                    BiometryPrefs.ins().setKeyDecryptImage(hashPass);
-                    BiometryPrefs.ins().setKeyEncryptImage(hashPass);
-                    Intent newIntent = new Intent(mContext, BiometryActivity.class);
-                    newIntent.putExtra(BiometryActivity.REGIME, BiometryActivity.REGIME_COLLECT_ALL);
-                    newIntent.putExtra(BiometryActivity.DATA, data);
-                    biometryResultLauncher.launch(newIntent);
-                })
-                .show();
+        PrefsUtils.ins().setHashPass(CryptUtils.getHash(pas1.getBytes()));
+        ((LoginActivity) requireActivity()).displayFragment(ModeSelectFragment.newInstance(mContext), false);
     }
 
     private void showError(final String error, View view) {
-        mHandler.post(() ->  {
+        mHandler.post(() -> {
             if (view instanceof TextInputLayout) {
-                ((TextInputLayout)view).setError(error);
+                ((TextInputLayout) view).setError(error);
             }
             mBinding.password.setEnabled(true);
             mBinding.repeatPassword.setEnabled(true);
             mBinding.btnEnter.setEnabled(true);
         });
-    }
-
-    public void registerForBiometryResult() {
-        biometryResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent resultData = result.getData();
-                        if (resultData != null) {
-                            int res = resultData.getIntExtra(BiometryActivity.RESULT, BiometryActivity.ERROR);
-
-                            if (res == BiometryActivity.REG_OK) {
-                                byte [] nbcc = resultData.getByteArrayExtra(BiometryActivity.NBCC);
-                                if (nbcc != null) {
-                                    PrefsUtils.ins().setHashPass(CryptUtils.getHash(mPassTemp.getBytes()));
-                                    BiometryUtils.saveNBCC(mContext, nbcc);
-                                    BiometryPrefs.ins().setBiometryBind(true);
-                                    ((LoginActivity) requireActivity()).displayFragment(ModeSelectFragment.newInstance(mContext), false);
-                                } else {
-                                    Toast.makeText(mContext, R.string.error_biometry_data, Toast.LENGTH_SHORT).show();
-                                }
-                            } else if (res == BiometryActivity.TIME_OUT) {
-                                Toast.makeText(mContext, R.string.error_biometry_timeout, Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(mContext, R.string.error_biometry, Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }
-                });
     }
 }
