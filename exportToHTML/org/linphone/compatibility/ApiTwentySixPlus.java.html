@@ -1,0 +1,262 @@
+<html>
+<head>
+<title>ApiTwentySixPlus.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #ca9ee6;}
+.s1 { color: #c6d0f5;}
+.s2 { color: #949cbb;}
+.s3 { color: #ef9f76;}
+.s4 { color: #99d1db;}
+.s5 { color: #949cbb; font-style: italic;}
+.s6 { color: #a6d189;}
+</style>
+</head>
+<body bgcolor="#303446">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+ApiTwentySixPlus.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">org</span><span class="s2">.</span><span class="s1">linphone</span><span class="s2">.</span><span class="s1">compatibility</span><span class="s2">;</span>
+
+<span class="s0">import </span><span class="s1">android</span><span class="s2">.</span><span class="s1">annotation</span><span class="s2">.</span><span class="s1">TargetApi</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">android</span><span class="s2">.</span><span class="s1">app</span><span class="s2">.</span><span class="s1">Notification</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">android</span><span class="s2">.</span><span class="s1">app</span><span class="s2">.</span><span class="s1">NotificationChannel</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">android</span><span class="s2">.</span><span class="s1">app</span><span class="s2">.</span><span class="s1">NotificationManager</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">android</span><span class="s2">.</span><span class="s1">app</span><span class="s2">.</span><span class="s1">PendingIntent</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">android</span><span class="s2">.</span><span class="s1">content</span><span class="s2">.</span><span class="s1">Context</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">android</span><span class="s2">.</span><span class="s1">content</span><span class="s2">.</span><span class="s1">Intent</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">android</span><span class="s2">.</span><span class="s1">graphics</span><span class="s2">.</span><span class="s1">Bitmap</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">android</span><span class="s2">.</span><span class="s1">media</span><span class="s2">.</span><span class="s1">RingtoneManager</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">android</span><span class="s2">.</span><span class="s1">view</span><span class="s2">.</span><span class="s1">ViewTreeObserver</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">android</span><span class="s2">.</span><span class="s1">widget</span><span class="s2">.</span><span class="s1">RemoteViews</span><span class="s2">;</span>
+
+<span class="s0">import </span><span class="s1">androidx</span><span class="s2">.</span><span class="s1">core</span><span class="s2">.</span><span class="s1">app</span><span class="s2">.</span><span class="s1">NotificationCompat</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">org</span><span class="s2">.</span><span class="s1">pniei</span><span class="s2">.</span><span class="s1">portal</span><span class="s2">.</span><span class="s1">R</span><span class="s2">;</span>
+
+<span class="s1">@TargetApi</span><span class="s2">(</span><span class="s3">26</span><span class="s2">)</span>
+<span class="s0">public class </span><span class="s1">ApiTwentySixPlus </span><span class="s2">{</span>
+
+	<span class="s0">public static void </span><span class="s1">CreateChannel</span><span class="s2">(</span><span class="s1">Context context</span><span class="s2">) {</span>
+		<span class="s1">NotificationManager notificationManager </span><span class="s4">=</span>
+				<span class="s2">(</span><span class="s1">NotificationManager</span><span class="s2">) </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getSystemService</span><span class="s2">(</span><span class="s1">Context</span><span class="s2">.</span><span class="s1">NOTIFICATION_SERVICE</span><span class="s2">);</span>
+		<span class="s5">// Create service notification channel</span>
+		<span class="s1">String id </span><span class="s4">= </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">notification_service_channel_id</span><span class="s2">);</span>
+		<span class="s1">CharSequence name </span><span class="s4">= </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">content_title_notification_service</span><span class="s2">);</span>
+		<span class="s1">String description </span><span class="s4">= </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">content_title_notification_service</span><span class="s2">);</span>
+		<span class="s0">int </span><span class="s1">importance </span><span class="s4">= </span><span class="s1">NotificationManager</span><span class="s2">.</span><span class="s1">IMPORTANCE_LOW</span><span class="s2">;</span>
+		<span class="s1">NotificationChannel mChannel </span><span class="s4">= </span><span class="s0">new </span><span class="s1">NotificationChannel</span><span class="s2">(</span><span class="s1">id</span><span class="s2">, </span><span class="s1">name</span><span class="s2">, </span><span class="s1">importance</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">setDescription</span><span class="s2">(</span><span class="s1">description</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">enableVibration</span><span class="s2">(</span><span class="s0">false</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">setShowBadge</span><span class="s2">(</span><span class="s0">false</span><span class="s2">);</span>
+		<span class="s1">notificationManager</span><span class="s2">.</span><span class="s1">createNotificationChannel</span><span class="s2">(</span><span class="s1">mChannel</span><span class="s2">);</span>
+
+		<span class="s5">// Create call notification channel</span>
+		<span class="s1">id </span><span class="s4">= </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">notification_call_channel_id</span><span class="s2">);</span>
+		<span class="s1">name </span><span class="s4">= </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">content_title_notification_call</span><span class="s2">);</span>
+		<span class="s1">description </span><span class="s4">= </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">content_title_notification_call</span><span class="s2">);</span>
+		<span class="s1">importance </span><span class="s4">= </span><span class="s1">NotificationManager</span><span class="s2">.</span><span class="s1">IMPORTANCE_HIGH</span><span class="s2">;</span>
+		<span class="s1">mChannel </span><span class="s4">= </span><span class="s0">new </span><span class="s1">NotificationChannel</span><span class="s2">(</span><span class="s1">id</span><span class="s2">, </span><span class="s1">name</span><span class="s2">, </span><span class="s1">importance</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">setDescription</span><span class="s2">(</span><span class="s1">description</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">enableLights</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">enableVibration</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">setSound</span><span class="s2">(</span><span class="s1">RingtoneManager</span><span class="s2">.</span><span class="s1">getDefaultUri</span><span class="s2">(</span><span class="s1">RingtoneManager</span><span class="s2">.</span><span class="s1">TYPE_RINGTONE</span><span class="s2">), </span><span class="s0">null</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">setLightColor</span><span class="s2">(</span><span class="s1">context</span><span class="s2">.</span><span class="s1">getColor</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">color</span><span class="s2">.</span><span class="s1">notification_color_led</span><span class="s2">));</span>
+		<span class="s1">notificationManager</span><span class="s2">.</span><span class="s1">createNotificationChannel</span><span class="s2">(</span><span class="s1">mChannel</span><span class="s2">);</span>
+		
+		<span class="s1">notificationManager</span><span class="s2">.</span><span class="s1">deleteNotificationChannel</span><span class="s2">(</span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">notification_call_channel_id_old</span><span class="s2">));</span>
+
+
+		<span class="s1">id </span><span class="s4">= </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">notification_other_channel_id</span><span class="s2">);</span>
+		<span class="s1">name </span><span class="s4">= </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">content_title_notification</span><span class="s2">);</span>
+		<span class="s1">description </span><span class="s4">= </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">content_title_notification</span><span class="s2">);</span>
+		<span class="s1">importance </span><span class="s4">= </span><span class="s1">NotificationManager</span><span class="s2">.</span><span class="s1">IMPORTANCE_MIN</span><span class="s2">;</span>
+		<span class="s1">mChannel </span><span class="s4">= </span><span class="s0">new </span><span class="s1">NotificationChannel</span><span class="s2">(</span><span class="s1">id</span><span class="s2">, </span><span class="s1">name</span><span class="s2">, </span><span class="s1">importance</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">setDescription</span><span class="s2">(</span><span class="s1">description</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">enableLights</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">setLightColor</span><span class="s2">(</span><span class="s1">context</span><span class="s2">.</span><span class="s1">getColor</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">color</span><span class="s2">.</span><span class="s1">notification_color_led</span><span class="s2">));</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">setShowBadge</span><span class="s2">(</span><span class="s0">false</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">setSound</span><span class="s2">(</span><span class="s0">null</span><span class="s2">, </span><span class="s0">null</span><span class="s2">);</span>
+		<span class="s1">notificationManager</span><span class="s2">.</span><span class="s1">createNotificationChannel</span><span class="s2">(</span><span class="s1">mChannel</span><span class="s2">);</span>
+
+		<span class="s1">id </span><span class="s4">= </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">notification_spo_message_channel_id</span><span class="s2">);</span>
+		<span class="s1">name </span><span class="s4">= </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">content_title_notification_spo_message</span><span class="s2">);</span>
+		<span class="s1">description </span><span class="s4">= </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">content_title_notification_spo_message</span><span class="s2">);</span>
+		<span class="s1">importance </span><span class="s4">= </span><span class="s1">NotificationManager</span><span class="s2">.</span><span class="s1">IMPORTANCE_HIGH</span><span class="s2">;</span>
+		<span class="s1">mChannel </span><span class="s4">= </span><span class="s0">new </span><span class="s1">NotificationChannel</span><span class="s2">(</span><span class="s1">id</span><span class="s2">, </span><span class="s1">name</span><span class="s2">, </span><span class="s1">importance</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">setDescription</span><span class="s2">(</span><span class="s1">description</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">enableVibration</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">setLightColor</span><span class="s2">(</span><span class="s1">context</span><span class="s2">.</span><span class="s1">getColor</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">color</span><span class="s2">.</span><span class="s1">notification_color_led</span><span class="s2">));</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">enableLights</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">setShowBadge</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">enableVibration</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+		<span class="s1">mChannel</span><span class="s2">.</span><span class="s1">setSound</span><span class="s2">(</span><span class="s1">RingtoneManager</span><span class="s2">.</span><span class="s1">getDefaultUri</span><span class="s2">(</span><span class="s1">RingtoneManager</span><span class="s2">.</span><span class="s1">TYPE_NOTIFICATION</span><span class="s2">), </span><span class="s0">null</span><span class="s2">);</span>
+		<span class="s1">notificationManager</span><span class="s2">.</span><span class="s1">createNotificationChannel</span><span class="s2">(</span><span class="s1">mChannel</span><span class="s2">);</span>
+		
+		<span class="s1">notificationManager</span><span class="s2">.</span><span class="s1">deleteNotificationChannel</span><span class="s2">(</span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">notification_spo_message_channel_id_old</span><span class="s2">));</span>
+	
+	<span class="s2">}</span>
+
+	<span class="s0">public static </span><span class="s1">Notification createIncomingCallNotification</span><span class="s2">(</span>
+			<span class="s1">Context context</span><span class="s2">,</span>
+			<span class="s0">int </span><span class="s1">callId</span><span class="s2">,</span>
+			<span class="s1">Bitmap contactIcon</span><span class="s2">,</span>
+			<span class="s1">String contactName</span><span class="s2">,</span>
+			<span class="s1">String sipUri</span><span class="s2">,</span>
+			<span class="s1">PendingIntent intent</span><span class="s2">) {</span>
+		<span class="s1">RemoteViews notificationLayoutHeadsUp </span><span class="s4">=</span>
+				<span class="s0">new </span><span class="s1">RemoteViews</span><span class="s2">(</span>
+						<span class="s1">context</span><span class="s2">.</span><span class="s1">getPackageName</span><span class="s2">(), </span><span class="s1">R</span><span class="s2">.</span><span class="s1">layout</span><span class="s2">.</span><span class="s1">call_incoming_notification_heads_up</span><span class="s2">);</span>
+		<span class="s1">notificationLayoutHeadsUp</span><span class="s2">.</span><span class="s1">setTextViewText</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">id</span><span class="s2">.</span><span class="s1">caller</span><span class="s2">, </span><span class="s1">contactName</span><span class="s2">);</span>
+		<span class="s1">notificationLayoutHeadsUp</span><span class="s2">.</span><span class="s1">setTextViewText</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">id</span><span class="s2">.</span><span class="s1">sip_uri</span><span class="s2">, </span><span class="s1">sipUri</span><span class="s2">);</span>
+		<span class="s1">notificationLayoutHeadsUp</span><span class="s2">.</span><span class="s1">setTextViewText</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">id</span><span class="s2">.</span><span class="s1">incoming_call_info</span><span class="s2">, </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">incall_notif_incoming</span><span class="s2">));</span>
+		<span class="s5">/*if (contactIcon != null) { 
+            notificationLayoutHeadsUp.setImageViewBitmap(R.id.caller_picture, contactIcon); 
+        }*/</span>
+
+		<span class="s0">return new </span><span class="s1">NotificationCompat</span><span class="s2">.</span><span class="s1">Builder</span><span class="s2">(</span><span class="s1">context</span><span class="s2">, </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">notification_call_channel_id</span><span class="s2">))</span>
+				<span class="s2">.</span><span class="s1">setStyle</span><span class="s2">(</span><span class="s0">new </span><span class="s1">NotificationCompat</span><span class="s2">.</span><span class="s1">DecoratedCustomViewStyle</span><span class="s2">())</span>
+				<span class="s2">.</span><span class="s1">setSmallIcon</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">drawable</span><span class="s2">.</span><span class="s1">ic_call</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setContentIntent</span><span class="s2">(</span><span class="s1">intent</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setContentTitle</span><span class="s2">(</span><span class="s1">contactName</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setContentText</span><span class="s2">(</span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">incall_notif_incoming</span><span class="s2">))</span>
+				<span class="s2">.</span><span class="s1">setCategory</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">CATEGORY_CALL</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setVisibility</span><span class="s2">(</span><span class="s1">NotificationCompat</span><span class="s2">.</span><span class="s1">VISIBILITY_PUBLIC</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setPriority</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">PRIORITY_HIGH</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setWhen</span><span class="s2">(</span><span class="s1">System</span><span class="s2">.</span><span class="s1">currentTimeMillis</span><span class="s2">())</span>
+				<span class="s2">.</span><span class="s1">setAutoCancel</span><span class="s2">(</span><span class="s0">false</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setShowWhen</span><span class="s2">(</span><span class="s0">true</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setOngoing</span><span class="s2">(</span><span class="s0">true</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setColor</span><span class="s2">(</span><span class="s1">context</span><span class="s2">.</span><span class="s1">getColor</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">color</span><span class="s2">.</span><span class="s1">notification_led_color</span><span class="s2">))</span>
+				<span class="s2">.</span><span class="s1">setFullScreenIntent</span><span class="s2">(</span><span class="s1">intent</span><span class="s2">, </span><span class="s0">true</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">addAction</span><span class="s2">(</span><span class="s1">Compatibility</span><span class="s2">.</span><span class="s1">getCallDeclineAction</span><span class="s2">(</span><span class="s1">context</span><span class="s2">, </span><span class="s1">callId</span><span class="s2">))</span>
+				<span class="s2">.</span><span class="s1">addAction</span><span class="s2">(</span><span class="s1">Compatibility</span><span class="s2">.</span><span class="s1">getCallAnswerAction</span><span class="s2">(</span><span class="s1">context</span><span class="s2">, </span><span class="s1">callId</span><span class="s2">))</span>
+				<span class="s5">//.setCustomHeadsUpContentView(notificationLayoutHeadsUp)</span>
+				<span class="s2">.</span><span class="s1">setCustomContentView</span><span class="s2">(</span><span class="s1">notificationLayoutHeadsUp</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">build</span><span class="s2">();</span>
+	<span class="s2">}</span>
+
+	<span class="s0">public static </span><span class="s1">Notification createMessageNotification</span><span class="s2">(</span><span class="s1">Context context</span><span class="s2">,</span>
+	                                                     <span class="s0">int </span><span class="s1">msgCount</span><span class="s2">, </span><span class="s1">String msgSender</span><span class="s2">, </span><span class="s1">String msg</span><span class="s2">, </span><span class="s1">Bitmap contactIcon</span><span class="s2">,</span>
+	                                                     <span class="s1">PendingIntent intent</span><span class="s2">) {</span>
+		<span class="s1">String title</span><span class="s2">;</span>
+		<span class="s0">if </span><span class="s2">(</span><span class="s1">msgCount </span><span class="s4">== </span><span class="s3">1</span><span class="s2">) {</span>
+			<span class="s1">title </span><span class="s4">= </span><span class="s1">msgSender</span><span class="s2">;</span>
+		<span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+			<span class="s1">title </span><span class="s4">= </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">unread_messages</span><span class="s2">).</span><span class="s1">replace</span><span class="s2">(</span><span class="s6">&quot;%i&quot;</span><span class="s2">, </span><span class="s1">String</span><span class="s2">.</span><span class="s1">valueOf</span><span class="s2">(</span><span class="s1">msgCount</span><span class="s2">));</span>
+		<span class="s2">}</span>
+
+		<span class="s5">//NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);</span>
+		<span class="s1">Notification notif </span><span class="s4">= </span><span class="s0">null</span><span class="s2">;</span>
+		<span class="s1">notif </span><span class="s4">= </span><span class="s0">new </span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">Builder</span><span class="s2">(</span><span class="s1">context</span><span class="s2">, </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">notification_other_channel_id</span><span class="s2">))</span>
+					<span class="s2">.</span><span class="s1">setContentTitle</span><span class="s2">(</span><span class="s1">title</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setContentText</span><span class="s2">(</span><span class="s1">msg</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setSmallIcon</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">drawable</span><span class="s2">.</span><span class="s1">ic_message</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setAutoCancel</span><span class="s2">(</span><span class="s0">true</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setContentIntent</span><span class="s2">(</span><span class="s1">intent</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setDefaults</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">DEFAULT_SOUND</span>
+							<span class="s4">| </span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">DEFAULT_VIBRATE</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setLargeIcon</span><span class="s2">(</span><span class="s1">contactIcon</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setCategory</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">CATEGORY_MESSAGE</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setVisibility</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">VISIBILITY_PRIVATE</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setPriority</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">PRIORITY_HIGH</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setNumber</span><span class="s2">(</span><span class="s1">msgCount</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">build</span><span class="s2">();</span>
+
+		<span class="s0">return </span><span class="s1">notif</span><span class="s2">;</span>
+	<span class="s2">}</span>
+
+	<span class="s0">public static </span><span class="s1">Notification createInCallNotification</span><span class="s2">(</span><span class="s1">Context context</span><span class="s2">,</span>
+	                                                    <span class="s1">String title</span><span class="s2">, </span><span class="s1">String msg</span><span class="s2">, </span><span class="s0">int </span><span class="s1">iconID</span><span class="s2">, </span><span class="s1">Bitmap contactIcon</span><span class="s2">,</span>
+	                                                    <span class="s1">String contactName</span><span class="s2">, </span><span class="s1">PendingIntent intent</span><span class="s2">) {</span>
+
+		<span class="s1">Notification notif </span><span class="s4">= </span><span class="s0">new </span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">Builder</span><span class="s2">(</span><span class="s1">context</span><span class="s2">, </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">notification_other_channel_id</span><span class="s2">))</span>
+				<span class="s2">.</span><span class="s1">setContentTitle</span><span class="s2">(</span><span class="s1">contactName</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setContentText</span><span class="s2">(</span><span class="s1">msg</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setSmallIcon</span><span class="s2">(</span><span class="s1">iconID</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setAutoCancel</span><span class="s2">(</span><span class="s0">false</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setContentIntent</span><span class="s2">(</span><span class="s1">intent</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setLargeIcon</span><span class="s2">(</span><span class="s1">contactIcon</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setCategory</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">CATEGORY_CALL</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setVisibility</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">VISIBILITY_PUBLIC</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setPriority</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">PRIORITY_MIN</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">build</span><span class="s2">();</span>
+
+		<span class="s0">return </span><span class="s1">notif</span><span class="s2">;</span>
+	<span class="s2">}</span>
+
+	<span class="s0">public static </span><span class="s1">Notification createNotification</span><span class="s2">(</span><span class="s1">Context context</span><span class="s2">, </span><span class="s1">String title</span><span class="s2">, </span><span class="s1">String message</span><span class="s2">, </span><span class="s0">int </span><span class="s1">icon</span><span class="s2">, </span><span class="s0">int </span><span class="s1">level</span><span class="s2">, </span><span class="s1">Bitmap largeIcon</span><span class="s2">, </span><span class="s1">PendingIntent intent</span><span class="s2">, </span><span class="s0">boolean </span><span class="s1">isOngoingEvent</span><span class="s2">,</span><span class="s0">int </span><span class="s1">priority</span><span class="s2">) {</span>
+		<span class="s1">Notification notif</span><span class="s2">;</span>
+
+		<span class="s0">if </span><span class="s2">(</span><span class="s1">largeIcon </span><span class="s4">!= </span><span class="s0">null</span><span class="s2">) {</span>
+			<span class="s1">notif </span><span class="s4">= </span><span class="s0">new </span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">Builder</span><span class="s2">(</span><span class="s1">context</span><span class="s2">, </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">notification_service_channel_id</span><span class="s2">))</span>
+					<span class="s2">.</span><span class="s1">setContentTitle</span><span class="s2">(</span><span class="s1">title</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setContentText</span><span class="s2">(</span><span class="s1">message</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setSmallIcon</span><span class="s2">(</span><span class="s1">icon</span><span class="s2">, </span><span class="s1">level</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setLargeIcon</span><span class="s2">(</span><span class="s1">largeIcon</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setContentIntent</span><span class="s2">(</span><span class="s1">intent</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setCategory</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">CATEGORY_SERVICE</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setVisibility</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">VISIBILITY_SECRET</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setPriority</span><span class="s2">(</span><span class="s1">priority</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">build</span><span class="s2">();</span>
+		<span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+			<span class="s1">notif </span><span class="s4">= </span><span class="s0">new </span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">Builder</span><span class="s2">(</span><span class="s1">context</span><span class="s2">, </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">notification_service_channel_id</span><span class="s2">))</span>
+					<span class="s2">.</span><span class="s1">setContentTitle</span><span class="s2">(</span><span class="s1">title</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setContentText</span><span class="s2">(</span><span class="s1">message</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setSmallIcon</span><span class="s2">(</span><span class="s1">icon</span><span class="s2">, </span><span class="s1">level</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setContentIntent</span><span class="s2">(</span><span class="s1">intent</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setCategory</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">CATEGORY_SERVICE</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setVisibility</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">VISIBILITY_SECRET</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">setPriority</span><span class="s2">(</span><span class="s1">priority</span><span class="s2">)</span>
+					<span class="s2">.</span><span class="s1">build</span><span class="s2">();</span>
+		<span class="s2">}</span>
+
+		<span class="s0">return </span><span class="s1">notif</span><span class="s2">;</span>
+	<span class="s2">}</span>
+
+	<span class="s0">public static void </span><span class="s1">removeGlobalLayoutListener</span><span class="s2">(</span><span class="s1">ViewTreeObserver viewTreeObserver</span><span class="s2">, </span><span class="s1">ViewTreeObserver</span><span class="s2">.</span><span class="s1">OnGlobalLayoutListener keyboardListener</span><span class="s2">) {</span>
+		<span class="s1">viewTreeObserver</span><span class="s2">.</span><span class="s1">removeOnGlobalLayoutListener</span><span class="s2">(</span><span class="s1">keyboardListener</span><span class="s2">);</span>
+	<span class="s2">}</span>
+
+	<span class="s0">public static </span><span class="s1">Notification createMissedCallNotification</span><span class="s2">(</span><span class="s1">Context context</span><span class="s2">, </span><span class="s1">String title</span><span class="s2">, </span><span class="s1">String text</span><span class="s2">, </span><span class="s1">PendingIntent intent</span><span class="s2">) {</span>
+		<span class="s1">Notification notif </span><span class="s4">= </span><span class="s0">new </span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">Builder</span><span class="s2">(</span><span class="s1">context</span><span class="s2">, </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">notification_other_channel_id</span><span class="s2">))</span>
+				<span class="s2">.</span><span class="s1">setContentTitle</span><span class="s2">(</span><span class="s1">title</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setContentText</span><span class="s2">(</span><span class="s1">text</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setSmallIcon</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">drawable</span><span class="s2">.</span><span class="s1">ic_call_missed</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setAutoCancel</span><span class="s2">(</span><span class="s0">true</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setContentIntent</span><span class="s2">(</span><span class="s1">intent</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setDefaults</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">DEFAULT_SOUND</span>
+						<span class="s4">| </span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">DEFAULT_VIBRATE</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setCategory</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">CATEGORY_MESSAGE</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setVisibility</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">VISIBILITY_PRIVATE</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setPriority</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">PRIORITY_HIGH</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">build</span><span class="s2">();</span>
+
+		<span class="s0">return </span><span class="s1">notif</span><span class="s2">;</span>
+	<span class="s2">}</span>
+
+	<span class="s0">public static </span><span class="s1">Notification createSimpleNotification</span><span class="s2">(</span><span class="s1">Context context</span><span class="s2">, </span><span class="s1">String title</span><span class="s2">, </span><span class="s1">String text</span><span class="s2">, </span><span class="s1">PendingIntent intent</span><span class="s2">) {</span>
+		<span class="s1">Notification notif </span><span class="s4">= </span><span class="s0">new </span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">Builder</span><span class="s2">(</span><span class="s1">context</span><span class="s2">, </span><span class="s1">context</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">string</span><span class="s2">.</span><span class="s1">notification_other_channel_id</span><span class="s2">))</span>
+				<span class="s2">.</span><span class="s1">setContentTitle</span><span class="s2">(</span><span class="s1">title</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setContentText</span><span class="s2">(</span><span class="s1">text</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setSmallIcon</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">mipmap</span><span class="s2">.</span><span class="s1">ic_launcher</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setAutoCancel</span><span class="s2">(</span><span class="s0">true</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setContentIntent</span><span class="s2">(</span><span class="s1">intent</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setDefaults</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">DEFAULT_SOUND</span>
+						<span class="s4">| </span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">DEFAULT_VIBRATE</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setCategory</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">CATEGORY_MESSAGE</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setVisibility</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">VISIBILITY_PRIVATE</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">setPriority</span><span class="s2">(</span><span class="s1">Notification</span><span class="s2">.</span><span class="s1">PRIORITY_HIGH</span><span class="s2">)</span>
+				<span class="s2">.</span><span class="s1">build</span><span class="s2">();</span>
+
+		<span class="s0">return </span><span class="s1">notif</span><span class="s2">;</span>
+	<span class="s2">}</span>
+
+	<span class="s0">public static void </span><span class="s1">startService</span><span class="s2">(</span><span class="s1">Context context</span><span class="s2">, </span><span class="s1">Intent intent</span><span class="s2">) {</span>
+		<span class="s1">context</span><span class="s2">.</span><span class="s1">startForegroundService</span><span class="s2">(</span><span class="s1">intent</span><span class="s2">);</span>
+	<span class="s2">}</span>
+<span class="s2">}</span>
+</pre>
+</body>
+</html>

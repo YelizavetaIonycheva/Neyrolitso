@@ -88,7 +88,7 @@ public class CallOutgoingActivity extends AppCompatActivity implements OnClickLi
 			@Override
 			public void callState(LinphoneCore lc, LinphoneCall call, LinphoneCall.State state, String message) {
 				if (call == mCall && State.Connected == state) {
-					if (!MainActivity.isInstantiated()) {
+					if (!MainActivity.isInstanciated()) {
 						return;
 					}
 					MainActivity.instance().startIncallActivity(mCall);
@@ -154,7 +154,7 @@ public class CallOutgoingActivity extends AppCompatActivity implements OnClickLi
 					break;
 				}
 				if (State.StreamsRunning == cstate) {
-					if (!MainActivity.isInstantiated()) {
+					if (!MainActivity.isInstanciated()) {
 						return;
 					}
 					MainActivity.instance().startIncallActivity(mCall);

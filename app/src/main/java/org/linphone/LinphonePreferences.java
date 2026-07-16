@@ -3,7 +3,6 @@ package org.linphone;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-
 import org.linphone.core.LinphoneAddress;
 import org.linphone.core.LinphoneAddress.TransportType;
 import org.linphone.core.LinphoneAuthInfo;
@@ -16,13 +15,13 @@ import org.linphone.core.LinphoneProxyConfig;
 import org.linphone.core.LpConfig;
 import org.linphone.core.TunnelConfig;
 import org.linphone.mediastream.Log;
-import org.pniei.portal.R;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import org.pniei.portal.R;
 
 public class LinphonePreferences {
 	private static final int LINPHONE_CORE_RANDOM_PORT = -1;
@@ -145,7 +144,7 @@ public class LinphonePreferences {
 	}
 
 	public static class AccountBuilder {
-		private final LinphoneCore lc;
+		private LinphoneCore lc;
 		private String tempUsername;
 		private String tempDisplayName;
 		private String tempUserId;
@@ -166,6 +165,7 @@ public class LinphonePreferences {
 		private int tempQualityReportingInterval = 0;
 		private boolean tempEnabled = true;
 		private boolean tempNoDefault = false;
+		private boolean tempVPNAccount = false;
 
 
 		public AccountBuilder(LinphoneCore lc) {

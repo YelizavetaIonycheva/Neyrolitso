@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +13,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.util.ArraySet;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -20,6 +25,7 @@ import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.linphone.LinphoneManager;
@@ -28,6 +34,7 @@ import org.linphone.LinphoneService;
 import org.linphone.core.LinphoneCore;
 import org.linphone.core.LinphoneCoreException;
 import org.linphone.core.LinphoneCoreListenerBase;
+import org.linphone.core.PayloadType;
 import org.linphone.mediastream.Log;
 import org.pniei.dwface.biometry.BiometryActivity;
 import org.pniei.dwface.biometry.BiometryPrefs;
@@ -39,42 +46,50 @@ import org.pniei.portal.activities.SecondaryActivity;
 import org.pniei.portal.database.DBUtils;
 import org.pniei.portal.fragments.LoggerFragment;
 import org.pniei.portal.fragments.UpdateFragment;
+import org.pniei.portal.liveData.ManagerLiveData;
+import org.pniei.portal.services.GPSService;
+import org.pniei.portal.services.MonitoringService;
 import org.pniei.portal.services.SpoMessagesService;
 import org.pniei.portal.utils.CryptUtils;
 import org.pniei.portal.utils.Logger;
+import org.pniei.portal.utils.NetworkRequestUtils;
 import org.pniei.portal.utils.PrefsUtils;
 import org.pniei.portal.utils.Utils;
+import org.pniei.portal.vpn.VpnClient;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.charset.StandardCharsets;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-import android.activity.result.ActivityResultLauncher;
-import android.activity.result.contract.ActivityResultContracts;
-import android.appcompat.app.AlertDialog;
-import android.core.content.ContextCompat;
-import android.documentfile.provider.DocumentFile;
-import android.preference.CheckBoxPreference;
-import android.preference.EditTextPreference;
-import android.preference.ListPreference;
-import android.preference.MultiSelectPreference;
-import android.preference.Preference;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceFragmentCompat;
-import android.preference.PreferenceScreen;
-import android.preference.SwitchPreferenceCompat;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.documentfile.provider.DocumentFile;
+import androidx.preference.CheckBoxPreference;
+import androidx.preference.EditTextPreference;
+import androidx.preference.ListPreference;
+import androidx.preference.MultiSelectListPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceCategory;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceScreen;
+import androidx.preference.SwitchPreferenceCompat;
 
 import static org.pniei.portal.utils.PrefsUtils.ExportImportPrefs;
 import static org.pniei.portal.utils.PrefsUtils.REGIME_P;
 
 public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
     private LinphonePreferences mPrefs;
-    private PreferenceScreen mPreferencesScreen;
+    private PreferenceScreen mPreferenceScreen;
     private ActivityResultLauncher<Intent> biometryResultLauncher;
     private ActivityResultLauncher<Intent> selectDirResultLauncher;
     private ActivityResultLauncher<Intent> selectFileResultLauncher;
@@ -83,6 +98,7 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
     private DocumentFile pickedFile = null;
     private TextView selectedDir = null;
     private Handler mHandler;
+    /*private AlertDialog waitDialog;*/
     private String mRootKey;
     private LinphoneCoreListenerBase mListener;
 
@@ -98,16 +114,24 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
         mPreferenceScreen = findPreference(rootKey);
         mHandler = new Handler(Looper.getMainLooper());
         mRootKey = rootKey;
-
-        if(rootKey.equals(getString(R.string.pref_media_key))) {
+        /*if(rootKey.equals(getString(R.string.pref_codecs_key))) {
+            initCodecsSettings();
+        } else*/ if(rootKey.equals(getString(R.string.pref_media_key))) {
             initMediaSettings();
             setMediaPreferencesListener();
         } else if(rootKey.equals(getString(R.string.pref_ip_address_key))) {
             initIpAddressSettings();
             setIpAddressPreferencesListener();
+        } else if(rootKey.equals(getString(R.string.pref_vpn_info_key))) {
+            initKeyInfo();
         } else if(rootKey.equals(getString(R.string.pref_biometry_settings_key))) {
             registerForBiometryResult();
+            registerForSelectDirResult();
+            registerForSelectFileResult();
             initBiometrySettings();
+        } else if(rootKey.equals(getString(R.string.pref_gps_key))) {
+            initGpsSettings();
+            setGpsPreferencesListener();
         } else if(rootKey.equals(getString(R.string.pref_advanced_key))) {
             registerForSelectDirResult();
             registerForSelectFileResult();
@@ -115,6 +139,8 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
             setAdvancedPreferencesListener();
         }
 
+
+        //hideSettings();
         if(mPreferenceScreen != null)
             getPreferenceManager().setPreferences(mPreferenceScreen);
     }
@@ -130,6 +156,78 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                 .replace(getId(), fragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (PrefsUtils.ins().getRegimeSelected() == REGIME_P && mRootKey.equals(getString(R.string.pref_vpn_info_key))) {
+            ManagerLiveData.ins().getSkziTimeError().observe(getViewLifecycleOwner(), s -> {
+                if (!s.equals("")) {
+                    findPreference(getString(R.string.pref_connect_skzi_time_error_key)).setVisible(true);
+                    findPreference(getString(R.string.pref_connect_skzi_time_error_key)).setOnPreferenceClickListener(preference -> {
+                        new MaterialAlertDialogBuilder(mContext)
+                                .setTitle(getString(R.string.pref_connect_skzi_time_error))
+                                .setMessage(s)
+                                .setPositiveButton("OK", null)
+                                .show();
+                        return true;
+                    });
+                } else {
+                    findPreference(getString(R.string.pref_connect_skzi_time_error_key)).setVisible(false);
+                }
+            });
+        }
+
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    private void initCodecsSettings() {
+        PreferenceCategory codecs = (PreferenceCategory) findPreference(getString(R.string.pref_audio_codecs_key));
+        codecs.removeAll();
+
+        LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
+        for (final PayloadType pt : lc.getAudioCodecs()) {
+            if(!pt.getMime().equals("L16") && !pt.getMime().equals("opus")) {
+                CheckBoxPreference codec = new CheckBoxPreference(getActivity());
+                codec.setTitle(pt.getMime());
+                codec.setSummary(pt.getRate() + " Hz");
+                codec.setChecked(lc.isPayloadTypeEnabled(pt));
+
+                codec.setOnPreferenceChangeListener((preference, newValue) -> {
+                    boolean enable = (Boolean) newValue;
+                    try {
+                        LinphoneManager.getLcIfManagerNotDestroyedOrNull().enablePayloadType(pt, enable);
+                    } catch (LinphoneCoreException e) {
+                        Log.e(e);
+                    }
+                    return true;
+                });
+                codecs.addPreference(codec);
+            }
+        }
+
+        codecs = (PreferenceCategory) findPreference(getString(R.string.pref_video_codecs_key));
+        codecs.removeAll();
+        for (final PayloadType pt : lc.getVideoCodecs()) {
+            if (pt.getMime().equals("H264")) {
+                final CheckBoxPreference codec = new CheckBoxPreference(getActivity());
+                codec.setTitle(pt.getMime());
+                codec.setChecked(lc.isPayloadTypeEnabled(pt));
+                codec.setEnabled(false);
+                /*codec.setOnPreferenceChangeListener((preference, newValue) -> {
+                    boolean enable = (Boolean) newValue;
+                    try {
+                        LinphoneManager.getLcIfManagerNotDestroyedOrNull().enablePayloadType(pt, enable);
+                    } catch (LinphoneCoreException e) {
+                        Log.e(e);
+                    }
+                    return true;
+                });*/
+
+                codecs.addPreference(codec);
+            }
+        }
+
     }
 
     private void initIpAddressSettings() {
@@ -155,6 +253,14 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
             EditTextPreference ipDnsSecond = findPreference(getString(R.string.pref_ip_dns_second_key));
             ipDnsSecond.setVisible(false);
         } else {
+            EditTextPreference ipSkzi = findPreference(getString(R.string.pref_ip_skzi_key));
+            ipSkzi.setSummary(PrefsUtils.ins().getIpSkzi());
+            ipSkzi.setText(PrefsUtils.ins().getIpSkzi());
+
+            EditTextPreference ipMon = findPreference(getString(R.string.pref_ip_mon_key));
+            ipMon.setSummary(PrefsUtils.ins().getIpMon());
+            ipMon.setText(PrefsUtils.ins().getIpMon());
+
             EditTextPreference ipAts = findPreference(getString(R.string.pref_ip_ats_key));
             ipAts.setSummary(PrefsUtils.ins().getIpAtsP());
             ipAts.setText(PrefsUtils.ins().getIpAtsP());
@@ -162,6 +268,10 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
             EditTextPreference ipDns = findPreference(getString(R.string.pref_ip_dns_key));
             ipDns.setSummary(PrefsUtils.ins().getIpDnsP());
             ipDns.setText(PrefsUtils.ins().getIpDnsP());
+
+            EditTextPreference ipDnsSecond = findPreference(getString(R.string.pref_ip_dns_second_key));
+            ipDnsSecond.setSummary(PrefsUtils.ins().getIpDnsSecondP());
+            ipDnsSecond.setText(PrefsUtils.ins().getIpDnsSecondP());
         }
     }
 
@@ -175,12 +285,41 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
             return true;
         });
 
+        findPreference(getString(R.string.pref_ip_skzi_key)).setOnPreferenceChangeListener((preference, newValue) -> {
+            if(!PrefsUtils.ins().getIpSkzi().equals(newValue.toString())) {
+                PrefsUtils.ins().setIpSkzi(newValue.toString());
+                preference.setSummary(newValue.toString());
+                MonitoringService.stopMonitoringService(mContext);
+
+                if (PrefsUtils.ins().isVpnEnable()) {
+                    if(VpnClient.restartVpnService(getActivity()))
+                        MonitoringService.startMonitoringService(mContext);
+                }
+            }
+            return true;
+        });
+
+        findPreference(getString(R.string.pref_ip_mon_key)).setOnPreferenceChangeListener((preference, newValue) -> {
+            if(!PrefsUtils.ins().getIpMon().equals(newValue.toString())) {
+                PrefsUtils.ins().setIpMon(newValue.toString());
+                preference.setSummary(newValue.toString());
+                MonitoringService.stopMonitoringService(mContext);
+
+                if (PrefsUtils.ins().isVpnEnable()) {
+                    if(VpnClient.restartVpnService(getActivity()))
+                        MonitoringService.startMonitoringService(mContext);
+                }
+            }
+            return true;
+        });
+
         findPreference(getString(R.string.pref_ip_ats_key)).setOnPreferenceChangeListener((preference, newValue) -> {
             if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
                 if(!PrefsUtils.ins().getIpAtsTT().equals(newValue.toString())) {
                     PrefsUtils.ins().setIpAtsTT(newValue.toString());
                     preference.setSummary(newValue.toString());
                     mPrefs.setAccountDomain(0, newValue.toString());
+                    preference.setSummary(newValue.toString());
                     LinphoneManager.getLc().refreshRegisters();
                 }
             } else {
@@ -188,6 +327,7 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                     PrefsUtils.ins().setIpAtsP(newValue.toString());
                     preference.setSummary(newValue.toString());
                     mPrefs.setAccountDomain(0, newValue.toString());
+                    preference.setSummary(newValue.toString());
                     LinphoneManager.getLc().refreshRegisters();
                 }
             }
@@ -204,6 +344,28 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                 if(!PrefsUtils.ins().getIpDnsP().equals(newValue.toString())) {
                     PrefsUtils.ins().setIpDnsP(newValue.toString());
                     preference.setSummary(newValue.toString());
+                    MonitoringService.stopMonitoringService(mContext);
+
+                    if (PrefsUtils.ins().isVpnEnable()) {
+                        if(VpnClient.restartVpnService(getActivity()))
+                            MonitoringService.startMonitoringService(mContext);
+                    }
+                }
+            }
+            return true;
+        });
+
+        findPreference(getString(R.string.pref_ip_dns_second_key)).setOnPreferenceChangeListener((preference, newValue) -> {
+            if (PrefsUtils.ins().getRegimeSelected() == REGIME_P) {
+                if(!PrefsUtils.ins().getIpDnsSecondP().equals(newValue.toString())) {
+                    PrefsUtils.ins().setIpDnsSecondP(newValue.toString());
+                    preference.setSummary(newValue.toString());
+                    MonitoringService.stopMonitoringService(mContext);
+
+                    if (PrefsUtils.ins().isVpnEnable()) {
+                        if(VpnClient.restartVpnService(getActivity()))
+                            MonitoringService.startMonitoringService(mContext);
+                    }
                 }
             }
             return true;
@@ -211,6 +373,7 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
     }
 
     private void initMediaSettings() {
+
         mListener = new LinphoneCoreListenerBase() {
             @Override
             public void ecCalibrationStatus(LinphoneCore lc, final LinphoneCore.EcCalibratorStatus status, final int delayMs, Object data) {
@@ -249,6 +412,7 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
             echoCalibration.setSummary(String.format(getString(R.string.ec_calibrated), mPrefs.getEchoCalibration()));
         }
 
+
         initializePreferredVideoSizePreferences((ListPreference) findPreference(getString(R.string.pref_preferred_video_size_key)));
         updateVideoPreferencesAccordingToPreset();
 
@@ -269,6 +433,22 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
         setListPreferenceValues(pref, entries, values);
 
         String value = mPrefs.getPreferredVideoSize();
+        pref.setSummary(value);
+        pref.setValue(value);
+    }
+
+    private void initializePreferredVideoFpsPreferences(ListPreference pref) {
+        List<CharSequence> entries = new ArrayList<CharSequence>();
+        List<CharSequence> values = new ArrayList<CharSequence>();
+        entries.add(getString(R.string.pref_none));
+        values.add("0");
+        for (int i = 5; i <= 30; i += 5) {
+            String str = Integer.toString(i);
+            entries.add(str);
+            values.add(str);
+        }
+        setListPreferenceValues(pref, entries, values);
+        String value = Integer.toString(mPrefs.getPreferredVideoFps());
         pref.setSummary(value);
         pref.setValue(value);
     }
@@ -339,7 +519,6 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
     }
 
     private void initAdvancedSettings() {
-        // Настройки для VPN, GPS, мониторинга и SKZI удалены
         if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
             findPreference(getString(R.string.pref_export_logs_key)).setVisible(false);
         }
@@ -347,21 +526,33 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
 
     private void setAdvancedPreferencesListener() {
         findPreference(getString(R.string.pref_export_logs_key)).setOnPreferenceClickListener(preference -> {
-            ((SecondaryActivity)getActivity()).displayFragment(LoggerFragment.newInstance(), true);
+            /*if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(requireActivity(),new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
+            }
+            else {*/
+                ((SecondaryActivity)getActivity()).displayFragment(LoggerFragment.newInstance(), true);
+            //}
             return false;
         });
 
         findPreference(getString(R.string.pref_update_po_key)).setOnPreferenceClickListener(preference -> {
-            ((SecondaryActivity)getActivity()).displayFragment(UpdateFragment.newInstance(mContext), true);
+            /*if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(requireActivity(),new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
+            }
+            else {*/
+                ((SecondaryActivity)getActivity()).displayFragment(UpdateFragment.newInstance(mContext), true);
+           // }
             return false;
         });
+
 
         findPreference(getString(R.string.pref_reset_spomp_key)).setOnPreferenceClickListener(preference -> {
             new MaterialAlertDialogBuilder(mContext)
                     .setTitle(getString(R.string.pref_reset_config_title))
                     .setMessage(getString(R.string.reset_config_info))
                     .setNegativeButton("Отмена", null)
-                    .setPositiveButton("Сбросить", (dialogInterface, i) -> {
+                    .setPositiveButton("Сброc", (dialogInterface, i) -> {
+                        VpnClient.deleteKeys(getContext());
                         PrefsUtils.ins().deleteConfig(getContext());
                         DBUtils.deleteDB(getContext());
                         Logger.inc().clear();
@@ -377,11 +568,21 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                     .setTitle(getString(R.string.pref_change_regime_title))
                     .setMessage(getString(R.string.change_regime_info))
                     .setNegativeButton("Отмена", null)
-                    .setPositiveButton("Сменить", (dialog, which) -> {
+                    .setPositiveButton("Сменить", (dialogInterface, i) -> {
                         Utils.showWaitDialog(mContext, getString(R.string.pref_change_regime_title));
+
+                        /*waitDialog = new MaterialAlertDialogBuilder(mContext)
+                                .setTitle("Смена режима работы")
+                                .setView(R.layout.dialog_wait)
+                                .setCancelable(false)
+                                .show();*/
 
                         new Thread(() -> {
                             mContext.stopService(new Intent(Intent.ACTION_MAIN).setClass(mContext, LinphoneService.class));
+                            if (PrefsUtils.ins().getRegimeSelected() == REGIME_P) {
+                                VpnClient.stopVpnService(mContext);
+                                MonitoringService.stopMonitoringService(mContext);
+                            }
                             SpoMessagesService.stop(mContext);
                             PrefsUtils.ins().setAuth(false);
                             PrefsUtils.ins().setRegimeSelected(PrefsUtils.REGIME_NONE);
@@ -389,6 +590,7 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
 
                             mHandler.post(() -> {
                                 Utils.closeWaitDialog();
+                                /*waitDialog.dismiss();*/
                                 Intent intent = new Intent(mContext, LoginActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
                                 startActivity(intent);
@@ -429,6 +631,7 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                         new Thread(() -> {
                             DocumentFile fileCont = pickedDir.createFile("text", getString(R.string.file_export_prefs));
 
+                            // Формирование экспортируемых настроек
                             JSONObject jsonObject = new JSONObject();
                             StringBuilder sb = new StringBuilder();
 
@@ -438,8 +641,19 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                                     sb.append(ExportImportPrefs.REGIME_P);
                                     jsonObject.put(ExportImportPrefs.IP_ATS, PrefsUtils.ins().getIpAtsP());
                                     sb.append(PrefsUtils.ins().getIpAtsP());
+                                    jsonObject.put(ExportImportPrefs.IP_SKZI, PrefsUtils.ins().getIpSkzi());
+                                    sb.append(PrefsUtils.ins().getIpSkzi());
+                                    jsonObject.put(ExportImportPrefs.IP_MON, PrefsUtils.ins().getIpMon());
+                                    sb.append(PrefsUtils.ins().getIpMon());
                                     jsonObject.put(ExportImportPrefs.IP_DNS, PrefsUtils.ins().getIpDnsP());
                                     sb.append(PrefsUtils.ins().getIpDnsP());
+                                    jsonObject.put(ExportImportPrefs.IP_DNS_SECOND, PrefsUtils.ins().getIpDnsSecondP());
+                                    JSONArray apps = new JSONArray();
+                                    for (String app : PrefsUtils.ins().getVpnApps()) {
+                                        apps.put(app);
+                                        sb.append(app);
+                                    }
+                                    jsonObject.put(ExportImportPrefs.VPN_APP_LIST, apps);
                                 } else {
                                     jsonObject.put(ExportImportPrefs.REGIME, ExportImportPrefs.REGIME_TT);
                                     sb.append(ExportImportPrefs.REGIME_TT);
@@ -449,6 +663,7 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                                     sb.append(PrefsUtils.ins().getIpDnsTT());
                                 }
 
+                                // Расчет контрольной суммы
                                 byte [] configs = sb.toString().getBytes();
                                 int crc = CryptUtils.CRC32(configs, configs.length);
                                 jsonObject.put(ExportImportPrefs.PREF_CRC, Utils.intToHexString(crc));
@@ -501,14 +716,19 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
 
                         new Thread(() -> {
                             byte [] data = null;
+
                             try (InputStream is = mContext.getContentResolver().openInputStream(pickedFile.getUri())) {
                                 data = new byte[is.available()];
                                 is.read(data);
 
                                 JSONObject jsonObject = new JSONObject(new String(data));
 
+                                /*if (!jsonObject.has(ExportImportPrefs.REGIME)) {
+                                    throw new Exception("Отсутствует поле \"regime\"");
+                                }*/
                                 int regime;
-                                String ipAts, ipDns, prefCrc;
+                                String ipAts, ipSkzi = "", ipMon = "", ipDns, ipDnsSecond = "", prefCrc;
+                                Set<String> vpnAppList = new ArraySet<>();
                                 StringBuilder sb = new StringBuilder();
 
                                 regime = jsonObject.getInt(ExportImportPrefs.REGIME);
@@ -525,13 +745,25 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                                 sb.append(ipAts);
 
                                 if (regime == ExportImportPrefs.REGIME_P) {
+                                    ipSkzi = jsonObject.getString(ExportImportPrefs.IP_SKZI);
+                                    sb.append(ipSkzi);
+                                    ipMon = jsonObject.getString(ExportImportPrefs.IP_MON);
+                                    sb.append(ipMon);
                                     ipDns = jsonObject.getString(ExportImportPrefs.IP_DNS);
                                     sb.append(ipDns);
+                                    ipDnsSecond = jsonObject.getString(ExportImportPrefs.IP_DNS_SECOND);
+                                    sb.append(ipDnsSecond);
+                                    JSONArray jsonArray = jsonObject.getJSONArray(ExportImportPrefs.VPN_APP_LIST);
+                                    for (int i = 0; i < jsonArray.length(); i++) {
+                                        String appName = jsonArray.getString(i);
+                                        vpnAppList.add(appName);
+                                        sb.append(appName);
+                                    }
                                 } else if (regime == ExportImportPrefs.REGIME_TT) {
                                     ipDns = jsonObject.getString(ExportImportPrefs.IP_DNS);
                                     sb.append(ipDns);
                                 } else {
-                                    throw new Exception("Неизвестный режим в файле конфигурации");
+                                    throw new Exception("Некорректное содержание поля \"regime\"");
                                 }
 
                                 prefCrc = jsonObject.getString(ExportImportPrefs.PREF_CRC);
@@ -539,21 +771,38 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                                 byte [] configs = sb.toString().getBytes();
                                 int crc = CryptUtils.CRC32(configs, configs.length);
                                 if(!(prefCrc.equalsIgnoreCase(Utils.intToHexString(crc)))) {
-                                    throw new Exception("Контрольная сумма не совпадает");
+                                    throw new Exception("Несовпала контрольная сумма");
                                 }
 
+                                // Применение настроек
                                 PrefsUtils prefs = PrefsUtils.ins();
                                 if (regime == ExportImportPrefs.REGIME_P) {
                                     prefs.setIpAtsP(ipAts);
+                                    prefs.setIpSkzi(ipSkzi);
+                                    prefs.setIpMon(ipMon);
                                     prefs.setIpDnsP(ipDns);
+                                    prefs.setIpDnsSecondP(ipDnsSecond);
+                                    prefs.setVpnApps(vpnAppList);
                                 } else {
                                     prefs.setIpAtsTT(ipAts);
                                     prefs.setIpDnsTT(ipDns);
                                 }
 
+                                //initIpAddressSettings();  // Обвновление значений на экране
+
+                                // Обновление параметров sip клиента
                                 LinphonePreferences sipPrefs = LinphonePreferences.instance();
                                 sipPrefs.setAccountDomain(0, ipAts);
 
+                                // Переустановка соединения с СКЗИ для режима Портал
+                                if (regime == ExportImportPrefs.REGIME_P) {
+                                    MonitoringService.stopMonitoringService(mContext);
+
+                                    if (PrefsUtils.ins().isVpnEnable()) {
+                                        if(VpnClient.restartVpnService(getActivity()))
+                                            MonitoringService.startMonitoringService(mContext);
+                                    }
+                                }
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                                 mHandler.post(() -> {
@@ -582,6 +831,73 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
         });
     }
 
+    private void initKeyInfo() {
+        ((SwitchPreferenceCompat)findPreference(getString(R.string.pref_connect_skzi_key))).setChecked(PrefsUtils.ins().isVpnEnable());
+        findPreference(getString(R.string.pref_connect_skzi_key)).setOnPreferenceChangeListener( (preference, newValue) -> {
+            if ((boolean)newValue) {
+                if (!VpnClient.startVpnService(getActivity())) {
+                    // Toast с сообщением о некорректных IP адресах
+                    Toast.makeText(mContext, R.string.bad_ip_skzi_address, Toast.LENGTH_SHORT);
+                } else {
+                    MonitoringService.startMonitoringService(mContext);
+                }
+            } else {
+                VpnClient.stopVpnService(getContext());
+                MonitoringService.stopMonitoringService(mContext);
+            }
+            findPreference(getString(R.string.pref_connect_skzi_time_error_key)).setVisible(false);
+            PrefsUtils.ins().setEnableVpn((boolean)newValue);
+            return true;
+        });
+        ArrayList<VpnClient.KeyInf> nextKeys = VpnClient.ins().getNextKeys();
+        if (nextKeys != null) {
+            for(int i = 0; i < nextKeys.size(); i++) {
+                PreferenceCategory keys_category = (PreferenceCategory) findPreference(getString(R.string.pref_key_compl_key));
+                PreferenceScreen preferenceScreen = createPrefScreenNextKey();
+                preferenceScreen.setKey("key_next_settings_" + i);
+                preferenceScreen.setTitle("Комплект ключей (очередной) " + (i + 1));
+                keys_category.addPreference(preferenceScreen);
+            }
+        }
+
+        MultiSelectListPreference work_with_vpn = (MultiSelectListPreference)findPreference(getString(R.string.pref_work_with_vpn_key));
+        PackageManager pm = mContext.getPackageManager();
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("http://" + NetworkRequestUtils.URL_SERVICES_ADDRESS + PrefsUtils.ins().getServerDomainName()));
+        List<ResolveInfo> listBrowser = pm.queryIntentActivities(intent, PackageManager.MATCH_ALL);
+        String [] list_package_app = new String [listBrowser.size()];
+        String [] list_name_app = new String [listBrowser.size()];
+
+        int i = 0;
+        for(ResolveInfo resolveInfo : listBrowser) {
+            list_package_app[i] = resolveInfo.activityInfo.packageName;
+            list_name_app[i] = resolveInfo.activityInfo.loadLabel(getContext().getPackageManager()).toString();
+            i++;
+        }
+
+        work_with_vpn.setEntries(list_name_app);
+        work_with_vpn.setEntryValues(list_package_app);
+        work_with_vpn.setValues(PrefsUtils.ins().getVpnApps());
+
+        work_with_vpn.setOnPreferenceChangeListener((preference, newValue) -> {
+            PrefsUtils.ins().setVpnApps((Set<String>)newValue);
+            MonitoringService.stopMonitoringService(mContext);
+            if (PrefsUtils.ins().isVpnEnable()) {
+                if(VpnClient.restartVpnService(getActivity()))
+                    MonitoringService.startMonitoringService(mContext);
+            }
+            return true;
+        });
+    }
+
+    private PreferenceScreen createPrefScreenNextKey() {
+        PreferenceScreen preferenceScreen = getPreferenceManager().createPreferenceScreen(getContext());
+        PreferenceCategory preferenceCategory = new PreferenceCategory(getContext());
+        preferenceCategory.setTitle(R.string.key_next_settings_title);
+        preferenceScreen.addPreference(preferenceCategory);
+        return preferenceScreen;
+    }
+
     private void initBiometrySettings() {
         PreferenceCategory category = findPreference(getString(R.string.pref_biometry_settings_cat_key));
         if (category == null)
@@ -602,10 +918,15 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
             deleteBiometry.setVisible(true);
             deleteBiometry.setOnPreferenceClickListener(preference -> {
                 new MaterialAlertDialogBuilder(getContext())
-                        .setTitle("Удаление биометрии")
-                        .setNegativeButton("Отмена", null)
+                        .setTitle("Удалить биометрический контейнер ?")
+                        .setNegativeButton("Нет", null)
                         .setPositiveButton("Да", (dialog, which) -> {
-                            Utils.showWaitDialog(mContext, "Удаление биометрии");
+                            Utils.showWaitDialog(mContext, "Удаление контейнера");
+                            /*waitDialog = new MaterialAlertDialogBuilder(mContext)
+                                    .setTitle("Удаление контейнера")
+                                    .setView(R.layout.dialog_wait)
+                                    .setCancelable(false)
+                                    .show();*/
 
                             new Thread(() -> {
                                 BiometryPrefs.ins().setBiometryBind(false);
@@ -618,8 +939,9 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
 
                                 mHandler.post(() -> {
                                     Utils.closeWaitDialog();
+                                   /* waitDialog.dismiss();*/
                                     initBiometrySettings();
-                                    Toast.makeText(mContext, "Биометрия удалена", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(mContext, "Биометрический контейнер удален", Toast.LENGTH_SHORT).show();
                                 });
                             }).start();
                         })
@@ -630,15 +952,15 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
             updateBiometry.setVisible(true);
             updateBiometry.setOnPreferenceClickListener(preference -> {
                 new MaterialAlertDialogBuilder(mContext)
-                        .setTitle("Обновление биометрии")
+                        .setTitle("Переобучение биометрического контейнера")
                         .setMessage(R.string.info_update_biometry)
                         .setNegativeButton("Отмена", null)
-                        .setPositiveButton("Обновить", (dialog, which) -> {
+                        .setPositiveButton("Переобучить", (dialog, which) -> {
                             ArrayList<byte[]> dataArray = new ArrayList<>();
                             dataArray.add(PrefsUtils.ins().getHashPass());
                             byte [] data = BiometryUtils.dataGeneration(dataArray);
-                            BiometryPrefs.ins().setKeyDecryptImage(PrefsUtils.ins().getHashPass());
-                            BiometryPrefs.ins().setKeyEncryptImage(PrefsUtils.ins().getHashPass());
+							BiometryPrefs.ins().setKeyDecryptImage(PrefsUtils.ins().getHashPass());
+							BiometryPrefs.ins().setKeyEncryptImage(PrefsUtils.ins().getHashPass());
                             Intent newIntent = new Intent(mContext, BiometryActivity.class);
                             newIntent.putExtra(BiometryActivity.REGIME, BiometryActivity.REGIME_UPDATE);
                             newIntent.putExtra(BiometryActivity.DATA, data);
@@ -651,7 +973,7 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
             exportBiometry.setVisible(true);
             exportBiometry.setOnPreferenceClickListener(preference -> {
                 AlertDialog alertDialog = new MaterialAlertDialogBuilder(mContext)
-                        .setTitle("Экспорт биометрии")
+                        .setTitle("Экспорт биометрического контейнера")
                         .setMessage(R.string.info_export_biometry)
                         .setView(R.layout.dialog_export_biometry)
                         .setNegativeButton("Отмена", null)
@@ -662,15 +984,22 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                             CheckBox isAddImagesCheckBox = ((AlertDialog)dialog).findViewById(R.id.isAddImages);
                             boolean isAddImages = isAddImagesCheckBox.isChecked();
 
-                            Utils.showWaitDialog(mContext, "Экспорт биометрии");
+                            Utils.showWaitDialog(mContext, "Экспорт контейнера");
+                            /*waitDialog = new MaterialAlertDialogBuilder(mContext)
+                                    .setTitle("Экспорт контейнера")
+                                    .setView(R.layout.dialog_wait)
+                                    .setCancelable(false)
+                                    .show();*/
 
                             new Thread(() -> {
                                 DocumentFile fileCont = pickedDir.createFile("text", "ImpulsBiom.bc");
+                                // Создание архива
                                 File archive = BiometryUtils.exportContainer(mContext, isAddImages);
                                 if (archive == null) {
                                     mHandler.post(() -> {
                                         Utils.closeWaitDialog();
-                                        Toast.makeText(mContext, "Ошибка экспорта биометрии", Toast.LENGTH_SHORT).show();
+                                       /* waitDialog.dismiss();*/
+                                        Toast.makeText(mContext, "Ошибка экспорта контейнера", Toast.LENGTH_SHORT).show();
                                     });
                                     return;
                                 }
@@ -680,6 +1009,7 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                                     FileInputStream fis = new FileInputStream(archive);
                                     data = new byte [fis.available()];
                                     fis.read(data);
+                                    // Шифрование архива
                                     data = CryptUtils.cryptData(data, PrefsUtils.ins().getHashPass());
                                     os.write(data);
                                     os.flush();
@@ -688,13 +1018,15 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                                     archive.delete();
                                     mHandler.post(() -> {
                                         Utils.closeWaitDialog();
-                                        Toast.makeText(mContext, "Ошибка экспорта биометрии", Toast.LENGTH_SHORT).show();
+                                        /*waitDialog.dismiss();*/
+                                        Toast.makeText(mContext, "Ошибка экспорта контейнера", Toast.LENGTH_SHORT).show();
                                     });
                                     return;
                                 }
                                 mHandler.post(() -> {
                                     Utils.closeWaitDialog();
-                                    Toast.makeText(mContext, "Биометрия экспортирована", Toast.LENGTH_SHORT).show();
+                                    /*waitDialog.dismiss();*/
+                                    Toast.makeText(mContext, "Контейнер экспортирован", Toast.LENGTH_SHORT).show();
                                 });
                             }).start();
                         })
@@ -713,7 +1045,7 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
             createBiometry.setVisible(true);
             createBiometry.setOnPreferenceClickListener(preference -> {
                 new MaterialAlertDialogBuilder(mContext)
-                        .setTitle("Создание биометрии")
+                        .setTitle("Создание биометрического контейнера")
                         .setMessage(R.string.info_create_biometry)
                         .setNegativeButton("Отмена", null)
                         .setPositiveButton("Создать", (dialog, which) -> {
@@ -721,8 +1053,8 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                             dataArray.add(PrefsUtils.ins().getHashPass());
                             byte [] data = BiometryUtils.dataGeneration(dataArray);
                             BiometryUtils.createDirs(mContext);
-                            BiometryPrefs.ins().setKeyDecryptImage(PrefsUtils.ins().getHashPass());
-                            BiometryPrefs.ins().setKeyEncryptImage(PrefsUtils.ins().getHashPass());
+							BiometryPrefs.ins().setKeyDecryptImage(PrefsUtils.ins().getHashPass());
+							BiometryPrefs.ins().setKeyEncryptImage(PrefsUtils.ins().getHashPass());
                             Intent newIntent = new Intent(mContext, BiometryActivity.class);
                             newIntent.putExtra(BiometryActivity.REGIME, BiometryActivity.REGIME_COLLECT_ALL);
                             newIntent.putExtra(BiometryActivity.DATA, data);
@@ -747,13 +1079,13 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
 
                             String passEnter = editText.getText().toString();
                             if (passEnter.length() == 0) {
-                                Toast.makeText(mContext, "Введите пароль", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, "Пароль не введен", Toast.LENGTH_SHORT).show();
                                 return;
                             }
 
                             if (pickedFile == null)
                                 return;
-                            Utils.showWaitDialog(mContext, "Импорт биометрии");
+                            Utils.showWaitDialog(mContext, "Импорт контейнера");
 
                             new Thread(() -> {
                                 File temp = new File(BiometryUtils.getBiometryDir(mContext), "BiomContArchive");
@@ -778,7 +1110,7 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                                     temp.delete();
                                     mHandler.post(() -> {
                                         Utils.closeWaitDialog();
-                                        Toast.makeText(mContext, "Ошибка импорта биометрии", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(mContext, "Ошибка импорта контейнера", Toast.LENGTH_SHORT).show();
                                     });
                                     return;
                                 }
@@ -787,7 +1119,8 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                                     temp.delete();
                                     mHandler.post(() -> {
                                         Utils.closeWaitDialog();
-                                        Toast.makeText(mContext, "Ошибка импорта биометрии", Toast.LENGTH_SHORT).show();
+                                        /*waitDialog.dismiss();*/
+                                        Toast.makeText(mContext, "Ошибка импорта контейнера", Toast.LENGTH_SHORT).show();
                                     });
                                     return;
                                 }
@@ -796,8 +1129,9 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                                 BiometryPrefs.ins().setBiometryBind(true);
                                 mHandler.post(() -> {
                                     Utils.closeWaitDialog();
+                                    /*waitDialog.dismiss();*/
                                     initBiometrySettings();
-                                    Toast.makeText(mContext, "Биометрия импортирована", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(mContext, "Контейнер импортирован", Toast.LENGTH_SHORT).show();
                                 });
                             }).start();
                         })
@@ -810,6 +1144,7 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                     selectFileResultLauncher.launch(intent);
                 });
                 selectedDir = alertDialog.findViewById(R.id.nameDir);
+
                 return true;
             });
         }
@@ -874,6 +1209,79 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                 });
     }
 
+    private void initGpsSettings() {
+        EditTextPreference ip_db = findPreference(getString(R.string.pref_ip_db_key));
+        ip_db.setSummary(PrefsUtils.ins().getIpGps());
+        ip_db.setText(PrefsUtils.ins().getIpGps());
+        ip_db.setVisible(PrefsUtils.ins().isSendGPS());
+
+        CheckBoxPreference send_gps = (CheckBoxPreference) findPreference(getString(R.string.pref_send_gps_key));
+        send_gps.setChecked(PrefsUtils.ins().isSendGPS());
+
+        ListPreference gps_time = (ListPreference) findPreference(getString(R.string.pref_gps_time_key));
+        gps_time.setSummary(String.valueOf(PrefsUtils.ins().getTimeIntervalSendGPS()));
+        gps_time.setValue(String.valueOf(PrefsUtils.ins().getTimeIntervalSendGPS()));
+        gps_time.setVisible(PrefsUtils.ins().isSendGPS());
+    }
+
+    private void setGpsPreferencesListener() {
+
+        findPreference(getString(R.string.pref_ip_db_key)).setOnPreferenceChangeListener((preference, newValue) -> {
+            if(!PrefsUtils.ins().getIpGps().equals(newValue.toString())) {
+                PrefsUtils.ins().setIpGps(newValue.toString());
+                preference.setSummary(newValue.toString());
+                if(PrefsUtils.ins().isSendGPS()) {
+                    if (getActivity().getPackageManager().checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getActivity().getPackageName()) == PackageManager.PERMISSION_GRANTED) {
+                        GPSService.stopGPSService(getContext());
+                        GPSService.startGPSService(getContext());
+                    } else {
+                        MainActivity.instance().checkAndRequestAccessFineLocationPermission();
+                    }
+                }
+            }
+            return true;
+        });
+
+        findPreference(getString(R.string.pref_send_gps_key)).setOnPreferenceChangeListener((preference, newValue) -> {
+            boolean enabled = (Boolean) newValue;
+
+            if(enabled) {
+                if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    PrefsUtils.ins().setSendGPS(true);
+                    GPSService.startGPSService(getContext());
+                    findPreference(getString(R.string.pref_gps_time_key)).setVisible(enabled);
+                    findPreference(getString(R.string.pref_ip_db_key)).setVisible(enabled);
+                } else {
+                    MainActivity.instance().checkAndRequestAccessFineLocationPermission();
+                }
+                ManagerLiveData.ins().setGpsEvent(ManagerLiveData.GpsEvent.LOCATION_NOT_FIXED);
+            } else {
+                GPSService.stopGPSService(mContext);
+                findPreference(getString(R.string.pref_gps_time_key)).setVisible(enabled);
+                findPreference(getString(R.string.pref_ip_db_key)).setVisible(enabled);
+                PrefsUtils.ins().setSendGPS(false);
+                ManagerLiveData.ins().setGpsEvent(ManagerLiveData.GpsEvent.NOT_USE);
+            }
+
+            return true;
+        });
+
+        findPreference(getString(R.string.pref_gps_time_key)).setOnPreferenceChangeListener((preference, newValue) -> {
+            int time = Integer.parseInt(newValue.toString());
+            PrefsUtils.ins().setTimeIntervalSendGPS(time);
+            preference.setSummary(newValue.toString());
+            if(PrefsUtils.ins().isSendGPS()) {
+                if (getActivity().getPackageManager().checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getActivity().getPackageName()) == PackageManager.PERMISSION_GRANTED) {
+                    GPSService.stopGPSService(getContext());
+                    GPSService.startGPSService(getContext());
+                } else {
+                    MainActivity.instance().checkAndRequestAccessFineLocationPermission();
+                }
+            }
+            return true;
+        });
+    }
+
     public void startEchoTester() {
         Preference preference = findPreference(getString(R.string.pref_echo_tester_key));
         try {
@@ -908,6 +1316,10 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
 
     @Override
     public void onDestroyView() {
+        if (PrefsUtils.ins().getRegimeSelected() == REGIME_P && mRootKey.equals(getString(R.string.pref_vpn_info_key))) {
+            ManagerLiveData.ins().getSkziTimeError().removeObservers(getViewLifecycleOwner());
+        }
         super.onDestroyView();
     }
+
 }

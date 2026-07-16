@@ -87,9 +87,7 @@ public class CallActivity extends AppCompatActivity implements OnClickListener, 
 	private StatusFragment status;
 	private CallAudioFragment audioCallFragment;
 	private CallVideoFragment videoCallFragment;
-	private boolean isSpeakerEnabled = false;
-    private boolean isMicMuted = false;
-    private boolean isVideoAsk;
+	private boolean isSpeakerEnabled = false, isMicMuted = false, isTransferAllowed, isVideoAsk;
 	private int cameraNumber;
 	private CountDownTimer timer;
 	private boolean isVideoCallPaused = false;
@@ -150,7 +148,7 @@ public class CallActivity extends AppCompatActivity implements OnClickListener, 
 		instance = this;
 
 		if (getResources().getBoolean(R.bool.orientation_portrait_only)) {
-			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
 
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
@@ -160,12 +158,13 @@ public class CallActivity extends AppCompatActivity implements OnClickListener, 
 		dtmfNumpad = new Dtmf();
 		mBinding.setDtmfnumber(dtmfNumpad);
 
+		//Earset Connectivity Broadcast Processing
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction("android.intent.action.HEADSET_PLUG");
 		headsetReceiver = new HeadsetReceiver();
 		registerReceiver(headsetReceiver, intentFilter);
 
-        boolean isTransferAllowed = getApplicationContext().getResources().getBoolean(R.bool.allow_transfers);
+		isTransferAllowed = getApplicationContext().getResources().getBoolean(R.bool.allow_transfers);
 
 		cameraNumber = AndroidCameraConfiguration.retrieveCameras().length;
 
@@ -1427,7 +1426,7 @@ public class CallActivity extends AppCompatActivity implements OnClickListener, 
 				mHandler.post(() -> {
 					if (LinphoneManager.getLcIfManagerNotDestroyedOrNull() == null) return;
 					synchronized(LinphoneManager.getLc()) {
-						//if (LinphoneActivity.isInstantiated()) {
+						//if (LinphoneActivity.isInstanciated()) {
 							LinphoneCallParams params = call.getCurrentParams();
 							if (params != null) {
 								LinphoneCallStats audioStats = call.getAudioStats();

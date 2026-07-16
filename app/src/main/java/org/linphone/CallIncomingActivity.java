@@ -203,7 +203,7 @@ public class CallIncomingActivity extends AppCompatActivity {
 			// the above method takes care of Samsung Galaxy S
 			Toast.makeText(this, R.string.couldnt_accept_call, Toast.LENGTH_LONG).show();
 		} else {
-			if (!MainActivity.isInstantiated()) {
+			if (!MainActivity.isInstanciated()) {
 				return;
 			}
 			LinphoneManager.getInstance().routeAudioToReceiver();

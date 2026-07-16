@@ -4,12 +4,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import org.linphone.CallOutgoingActivity;
 import org.linphone.LinphoneManager;
 import org.linphone.LinphoneService;
@@ -26,11 +20,20 @@ import org.pniei.portal.fragments.ContactSelectFragment;
 import org.pniei.portal.fragments.ContactSyncFragment;
 import org.pniei.portal.fragments.HistoryDetailFragment;
 import org.pniei.portal.listener.OnBackClickListener;
+import org.pniei.portal.services.MonitoringService;
 import org.pniei.portal.services.SpoMessagesService;
 import org.pniei.portal.utils.PrefsUtils;
 import org.pniei.portal.utils.Utils;
+import org.pniei.portal.vpn.VpnClient;
 
-public class SecondaryActivity extends AppCompatActivity {
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+public class SecondaryActivity extends AppCompatActivity  {
+    // Ключи принимаемых параметров
     public static final String TYPE_FRAGMENT_KEY = "t_f_key";
     public static final String CHAT_ROOM_ID_KEY = "c_r_id_key";
     public static final String CONTACT_ID_KEY = "c_id_key";
@@ -50,6 +53,7 @@ public class SecondaryActivity extends AppCompatActivity {
     public static final int HISTORY_DETAIL_FRAGMENT = 6;
 
     private LinphoneCoreListenerBase mListener;
+    private Intent mIntent;
     private Fragment currentFragment;
 
     @Override
@@ -58,34 +62,34 @@ public class SecondaryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_secondary);
 
-        Intent mIntent = getIntent();
+        mIntent = getIntent();
         if (mIntent != null && mIntent.hasExtra(TYPE_FRAGMENT_KEY)) {
             switch (mIntent.getIntExtra(TYPE_FRAGMENT_KEY, 0)) {
-                case CHAT_FRAGMENT: {
+                case CHAT_FRAGMENT : {
                     currentFragment = ChatFragment.newInstance(this, mIntent.getLongExtra(CHAT_ROOM_ID_KEY, 0));
                     break;
                 }
-                case CONTACT_INFO_FRAGMENT: {
+                case CONTACT_INFO_FRAGMENT : {
                     currentFragment = ContactInfoFragment.newInstance(this, mIntent.getLongExtra(CONTACT_ID_KEY, 0));
                     break;
                 }
-                case CONTACT_CHANGE_FRAGMENT: {
+                case CONTACT_CHANGE_FRAGMENT : {
                     currentFragment = ContactChangeFragment.newInstance(this, mIntent.getBooleanExtra(CONTACT_IS_NEW_KEY, true), mIntent.getLongExtra(CONTACT_ID_KEY, 0));
                     break;
                 }
-                case CONTACT_SELECT_FRAGMENT: {
+                case CONTACT_SELECT_FRAGMENT : {
                     currentFragment = ContactSelectFragment.newInstance(this, mIntent.getBooleanExtra(CONTACT_IS_PNONE_KEY, true));
                     break;
                 }
-                case CONTACT_SYNC_FRAGMENT: {
+                case CONTACT_SYNC_FRAGMENT : {
                     currentFragment = ContactSyncFragment.newInstance(this);
                     break;
                 }
-                case SETTINGS_FRAGMENT: {
+                case SETTINGS_FRAGMENT : {
                     currentFragment = SettingsFragment.newInstance(this);
                     break;
                 }
-                case HISTORY_DETAIL_FRAGMENT: {
+                case HISTORY_DETAIL_FRAGMENT : {
                     currentFragment = HistoryDetailFragment.newInstance(mIntent.getStringExtra(HISTORY_NUMBER),
                             mIntent.getStringExtra(HISTORY_STATUS),
                             mIntent.getStringExtra(HISTORY_TIME),
@@ -98,16 +102,19 @@ public class SecondaryActivity extends AppCompatActivity {
             throw new RuntimeException("Activity intent not have Extra");
         }
 
-        mListener = new LinphoneCoreListenerBase() {
+        mListener = new LinphoneCoreListenerBase(){
             @Override
             public void callState(LinphoneCore lc, LinphoneCall call, LinphoneCall.State state, String message) {
-                if (state == LinphoneCall.State.OutgoingInit || state == LinphoneCall.State.OutgoingProgress) {
-                    startActivity(new Intent(SecondaryActivity.this, CallOutgoingActivity.class));
+                /*  if (state == LinphoneCall.State.IncomingReceived) {
+                    startActivity(new Intent(MainActivity.instance(), CallIncomingActivity.class));
+                } else*/ if (state == LinphoneCall.State.OutgoingInit || state == LinphoneCall.State.OutgoingProgress) {
+                    startActivity(new Intent(MainActivity.instance(), CallOutgoingActivity.class));
                 } else if (state == LinphoneCall.State.CallEnd || state == LinphoneCall.State.Error || state == LinphoneCall.State.CallReleased) {
-                    // Ничего не делаем, так как MainActivity обрабатывает возврат к звонку
+                    //resetClassicMenuLayoutAndGoBackToCallIfStillRunning();
                 }
             }
         };
+
     }
 
     public void displayFragment(Fragment fragment, boolean toBackStack) {
@@ -115,7 +122,7 @@ public class SecondaryActivity extends AppCompatActivity {
         FragmentTransaction transaction = fm.beginTransaction();
 
         if (fragment instanceof ChatFragment) {
-            while (fm.getBackStackEntryCount() > 0) {
+            while(fm.getBackStackEntryCount() > 0) {
                 fm.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             }
         } else {
@@ -130,7 +137,7 @@ public class SecondaryActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (currentFragment instanceof OnBackClickListener) {
-            if (((OnBackClickListener) currentFragment).allowBackPressed()) {
+            if (((OnBackClickListener)currentFragment).allowBackPressed()) {
                 super.onBackPressed();
             }
         } else {
@@ -140,6 +147,12 @@ public class SecondaryActivity extends AppCompatActivity {
 
     public void quit(boolean isSaveDB) {
         stopService(new Intent(Intent.ACTION_MAIN).setClass(this, LinphoneService.class));
+
+        if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_P) {
+            VpnClient.stopVpnService(this);
+            MonitoringService.stopMonitoringService(this);
+        }
+
         SpoMessagesService.stop(this);
         if (isSaveDB) {
             DBUtils.closeDB();
@@ -163,7 +176,7 @@ public class SecondaryActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (!LinphoneService.isReady()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ) {
                 startForegroundService(new Intent(Intent.ACTION_MAIN).setClass(this, LinphoneService.class));
             } else {
                 startService(new Intent(Intent.ACTION_MAIN).setClass(this, LinphoneService.class));
@@ -181,4 +194,5 @@ public class SecondaryActivity extends AppCompatActivity {
         PrefsUtils.ins().setAppBackground(false);
         SpoMessagesService.instance().removeMessageNotification();
     }
+
 }

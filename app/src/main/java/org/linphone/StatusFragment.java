@@ -1,17 +1,13 @@
 package org.linphone;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
 
 import org.linphone.core.LinphoneCall;
 import org.linphone.core.LinphoneContent;
@@ -23,18 +19,40 @@ import org.linphone.core.LinphoneProxyConfig;
 import org.pniei.portal.R;
 import org.pniei.portal.activities.MainActivity;
 import org.pniei.portal.databinding.StatusBinding;
+import org.pniei.portal.liveData.ManagerLiveData;
 import org.pniei.portal.utils.PrefsUtils;
+import org.pniei.portal.vpn.VpnClient;
+
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+
+import static org.pniei.portal.liveData.ManagerLiveData.GpsEvent.LOCATION_FIXED;
+import static org.pniei.portal.liveData.ManagerLiveData.GpsEvent.LOCATION_NOT_FIXED;
+import static org.pniei.portal.liveData.ManagerLiveData.GpsEvent.NOT_USE;
+import static org.pniei.portal.liveData.ManagerLiveData.GpsEvent.PROVIDER_DISABLE;
+import static org.pniei.portal.liveData.ManagerLiveData.GpsEvent.PROVIDER_ENABLE;
+import static org.pniei.portal.liveData.ManagerLiveData.VpnQuality.QUALITY_HIGH;
+import static org.pniei.portal.liveData.ManagerLiveData.VpnQuality.QUALITY_LOW;
+import static org.pniei.portal.liveData.ManagerLiveData.VpnQuality.QUALITY_MIDL;
+import static org.pniei.portal.liveData.ManagerLiveData.VpnQuality.VPN_DISABLE;
+import static org.pniei.portal.liveData.ManagerLiveData.VpnQuality.VPN_ENABLE;
 
 public class StatusFragment extends Fragment {
     private StatusBinding mBinding;
-    private final Handler refreshHandler = new Handler();
+    private Handler refreshHandler = new Handler();
     private Runnable mCallQualityUpdater;
     private boolean isInCall, isAttached = false;
     private LinphoneCoreListenerBase mListener;
     private int mDisplayedQuality = -1;
+    private Integer vpnQuality = 0;
+    private final int GPS_STATUS_NOT_USE = -1;
+    private final int GPS_STATUS_OFF = 0;
+    private final int GPS_STATUS_NOT_FIXED = 1;
+    private final int GPS_STATUS_FIXED = 2;
+    private int gpsStatus;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.status, container, false);
 
         mListener = new LinphoneCoreListenerBase(){
@@ -53,19 +71,18 @@ public class StatusFragment extends Fragment {
                 }
 
                 if (lc.getDefaultProxyConfig() != null && lc.getDefaultProxyConfig().equals(proxy)) {
-                    mBinding.statusLed.setImageResource(getStatusIconResource(state));
+                    mBinding.statusLed.setImageResource(getStatusIconResource(state, true));
                     mBinding.statusText.setText(getStatusIconText(state));
                 } else if(lc.getDefaultProxyConfig() == null) {
-                    mBinding.statusLed.setImageResource(getStatusIconResource(state));
+                    mBinding.statusLed.setImageResource(getStatusIconResource(state, true));
                     mBinding.statusText.setText(getStatusIconText(state));
                 }
 
                 try {
                     mBinding.statusText.setOnClickListener(v -> lc.refreshRegisters());
-                } catch (IllegalStateException ignored) {}
+                } catch (IllegalStateException ise) {}
             }
 
-            @SuppressLint("SetTextI18n")
             @Override
             public void notifyReceived(LinphoneCore lc, LinphoneEvent ev, String eventName, LinphoneContent content) {
                 if(!content.getType().equals("application")) return;
@@ -90,6 +107,7 @@ public class StatusFragment extends Fragment {
                     mBinding.voicemailCount.setVisibility(View.GONE);
                 }
             }
+
         };
 
         isAttached = true;
@@ -103,14 +121,17 @@ public class StatusFragment extends Fragment {
             isInCall = true;
         }
 
-        // GPS удален
-        mBinding.gpsStatus.setVisibility(View.GONE);
-
-        // VPN удален
-        mBinding.vpnStatus.setVisibility(View.GONE);
+        if (PrefsUtils.ins().isSendGPS()) {
+            LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+            boolean gpsEnable = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            updateGpsStatusIcon(gpsEnable ? GPS_STATUS_NOT_FIXED : GPS_STATUS_OFF);
+        } else {
+            updateGpsStatusIcon(GPS_STATUS_NOT_USE);
+        }
 
         return mBinding.getRoot();
     }
+
 
     @Override
     public void onDetach() {
@@ -130,10 +151,10 @@ public class StatusFragment extends Fragment {
         mBinding.btnMenu.setEnabled(enabled);
     }
 
-    private int getStatusIconResource(RegistrationState state) {
+    private int getStatusIconResource(LinphoneCore.RegistrationState state, boolean isDefaultAccount) {
         try {
             LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
-            boolean defaultAccountConnected = (lc != null && lc.getDefaultProxyConfig() != null && lc.getDefaultProxyConfig().isRegistered());
+            boolean defaultAccountConnected = (isDefaultAccount && lc != null && lc.getDefaultProxyConfig() != null && lc.getDefaultProxyConfig().isRegistered()) || !isDefaultAccount;
             if (state == RegistrationState.RegistrationOk && defaultAccountConnected) {
                 LinphoneCore.RegistrationState.flagRegistrationOk = true;
                 return R.drawable.led_connected;
@@ -163,31 +184,28 @@ public class StatusFragment extends Fragment {
 
         try {
             if (state == RegistrationState.RegistrationOk && LinphoneManager.getLcIfManagerNotDestroyedOrNull().getDefaultProxyConfig().isRegistered()) {
-                assert context != null;
                 return context.getString(R.string.status_connected);
             } else if (state == RegistrationState.RegistrationProgress) {
-                assert context != null;
                 return context.getString(R.string.status_in_progress);
             } else if (state == RegistrationState.RegistrationFailed) {
-                assert context != null;
                 return context.getString(R.string.status_error);
             } else {
-                assert context != null;
                 return context.getString(R.string.status_not_connected);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        assert context != null;
         return context.getString(R.string.status_not_connected);
     }
+
 
     //INCALL STATUS BAR
     private void startCallQuality() {
         mBinding.callQuality.setVisibility(View.VISIBLE);
         refreshHandler.postDelayed(mCallQualityUpdater = new Runnable() {
-            final LinphoneCall mCurrentCall = LinphoneManager.getLc().getCurrentCall();
+            LinphoneCall mCurrentCall = LinphoneManager.getLc()
+                    .getCurrentCall();
 
             public void run() {
                 if (mCurrentCall == null) {
@@ -205,25 +223,62 @@ public class StatusFragment extends Fragment {
         }, 1000);
     }
 
+    private void updateGpsStatusIcon(int event) {
+        int gpsStatus = GPS_STATUS_NOT_USE;
+        switch (event) {
+            case NOT_USE :
+                gpsStatus = GPS_STATUS_NOT_USE;
+                break;
+            case PROVIDER_DISABLE :
+                gpsStatus = GPS_STATUS_OFF;
+                break;
+
+            case PROVIDER_ENABLE:
+                if (gpsStatus != GPS_STATUS_FIXED)
+                    gpsStatus = GPS_STATUS_NOT_FIXED;
+                break;
+
+            case LOCATION_NOT_FIXED:
+                gpsStatus = GPS_STATUS_NOT_FIXED;
+                break;
+
+            case LOCATION_FIXED:
+                gpsStatus = GPS_STATUS_FIXED;
+                break;
+        }
+
+        switch(gpsStatus) {
+            case GPS_STATUS_NOT_USE     : mBinding.gpsStatus.setVisibility(View.GONE); break;
+            case GPS_STATUS_OFF         : mBinding.gpsStatus.setVisibility(View.VISIBLE); mBinding.gpsStatus.setImageResource(R.drawable.ic_gps_off); break;
+            case GPS_STATUS_NOT_FIXED   : mBinding.gpsStatus.setVisibility(View.VISIBLE); mBinding.gpsStatus.setImageResource(R.drawable.ic_gps_not_fixed); break;
+            case GPS_STATUS_FIXED       : mBinding.gpsStatus.setVisibility(View.VISIBLE); mBinding.gpsStatus.setImageResource(R.drawable.ic_gps_fixed); break;
+        }
+    }
+
     void updateQualityOfSignalIcon(float quality) {
         int iQuality = (int) quality;
 
         if (iQuality == mDisplayedQuality) return;
         if (quality >= 4) // Good Quality
         {
-            mBinding.callQuality.setImageResource(R.drawable.call_quality_indicator_4);
+            mBinding.callQuality.setImageResource(
+                    R.drawable.call_quality_indicator_4);
         } else if (quality >= 3) // Average quality
         {
-            mBinding.callQuality.setImageResource(R.drawable.call_quality_indicator_3);
+            mBinding.callQuality.setImageResource(
+                    R.drawable.call_quality_indicator_3);
         } else if (quality >= 2) // Low quality
         {
-            mBinding.callQuality.setImageResource(R.drawable.call_quality_indicator_2);
+            mBinding.callQuality.setImageResource(
+                    R.drawable.call_quality_indicator_2);
         } else if (quality >= 1) // Very low quality
         {
-            mBinding.callQuality.setImageResource(R.drawable.call_quality_indicator_1);
+            mBinding.callQuality.setImageResource(
+                    R.drawable.call_quality_indicator_1);
         } else // Worst quality
         {
-            mBinding.callQuality.setImageResource(R.drawable.call_quality_indicator_0);
+            mBinding.callQuality.setImageResource(
+                    R.drawable.call_quality_indicator_0);
         }
         mDisplayedQuality = iQuality;
     }
@@ -244,32 +299,59 @@ public class StatusFragment extends Fragment {
             if (isInCall && (call != null || lc.getConferenceSize() > 1 || lc.getCallsNb() > 0)) {
                 if (call != null) {
                     startCallQuality();
+                    //refreshStatusItems(call, call.getCurrentParams().getVideoEnabled());
                 }
                 mBinding.btnMenu.setVisibility(View.INVISIBLE);
                 mBinding.callQuality.setVisibility(View.VISIBLE);
 
+                // We are obviously connected
                 if(lc.getDefaultProxyConfig() == null){
                     mBinding.statusLed.setImageResource(R.drawable.led_disconnected);
                     LinphoneCore.RegistrationState.flagRegistrationOk = false;
                     mBinding.statusText.setText(getString(R.string.no_account));
                 } else {
-                    mBinding.statusLed.setImageResource(getStatusIconResource(lc.getDefaultProxyConfig().getState()));
+                    mBinding.statusLed.setImageResource(getStatusIconResource(lc.getDefaultProxyConfig().getState(),true));
                     mBinding.statusText.setText(getStatusIconText(lc.getDefaultProxyConfig().getState()));
                 }
             }
         } else {
             mBinding.statusText.setVisibility(View.VISIBLE);
         }
+
+        if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_P) {
+            if (VpnClient.ins().isConnected()) {
+                //mBinding.speed.setVisibility(View.VISIBLE);
+                updateVpnQualityIcon(vpnQuality);
+            }
+            ManagerLiveData.ins().getVpnQuality().observe(getViewLifecycleOwner(), integer -> updateVpnQualityIcon(integer));
+            //ManagerLiveData.ins().getVpnInfo().observe(getViewLifecycleOwner(), vpnInfo -> updateVpnInfo(vpnInfo));
+        } else {
+            //mBinding.speed.setVisibility(View.GONE);
+            mBinding.vpnStatus.setVisibility(View.INVISIBLE);
+        }
+
+        ManagerLiveData.ins().getGpsEvent().observe(getViewLifecycleOwner(), integer -> updateGpsStatusIcon(integer));
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
+        /*LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
+        if (lc != null) {
+            lc.removeListener(mListener);
+        }*/
+
         if (mCallQualityUpdater != null) {
             refreshHandler.removeCallbacks(mCallQualityUpdater);
             mCallQualityUpdater = null;
         }
+        if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_P) {
+            ManagerLiveData.ins().getVpnQuality().removeObservers(getViewLifecycleOwner());
+            ManagerLiveData.ins().getVpnInfo().removeObservers(getViewLifecycleOwner());
+        }
+
+        ManagerLiveData.ins().getGpsEvent().removeObservers(getViewLifecycleOwner());
     }
 
     @Override
@@ -281,4 +363,40 @@ public class StatusFragment extends Fragment {
             lc.removeListener(mListener);
         }
     }
+
+    private void updateVpnQualityIcon(int quality) {
+        vpnQuality = quality;
+        switch (quality) {
+			case VPN_DISABLE 	:
+				mBinding.vpnStatus.setVisibility(View.INVISIBLE);
+                //mBinding.speed.setVisibility(View.INVISIBLE);
+				break;
+            case VPN_ENABLE 	:
+                mBinding.vpnStatus.setVisibility(View.VISIBLE);
+                //mBinding.speed.setVisibility(View.VISIBLE);
+                mBinding.vpnStatus.setImageResource(R.drawable.ic_vpn_quality_off);
+                break;
+            case QUALITY_HIGH 	:
+                mBinding.vpnStatus.setVisibility(View.VISIBLE);
+                //mBinding.speed.setVisibility(View.VISIBLE);
+                mBinding.vpnStatus.setImageResource(R.drawable.ic_vpn_quality_high);
+                break;
+            case QUALITY_MIDL 	:
+                mBinding.vpnStatus.setVisibility(View.VISIBLE);
+                //mBinding.speed.setVisibility(View.VISIBLE);
+                mBinding.vpnStatus.setImageResource(R.drawable.ic_vpn_quality_midle);
+                break;
+            case QUALITY_LOW 	:
+                mBinding.vpnStatus.setVisibility(View.VISIBLE);
+                //mBinding.speed.setVisibility(View.VISIBLE);
+                mBinding.vpnStatus.setImageResource(R.drawable.ic_vpn_quality_low);
+                break;
+        }
+    }
+
+    /*private void updateVpnInfo(@NotNull ManagerLiveData.VpnInfo vpnInfo) {
+        mBinding.speedIn.setText(String.format("%.2f kB/s", vpnInfo.getSpeedIN()));
+        mBinding.speedOut.setText(String.format("%.2f kB/s", vpnInfo.getSpeedOUT()));
+    }*/
+
 }

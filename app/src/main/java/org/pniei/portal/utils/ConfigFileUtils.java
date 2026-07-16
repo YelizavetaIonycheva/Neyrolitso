@@ -29,15 +29,15 @@ public class ConfigFileUtils {
             return null;
         }
 
-        File[] files = downloadsDir.listFiles((dir, name) -> name.startsWith(CONFIG_FILE_PREFIX) && name.endsWith(CONFIG_FILE_EXTENSION));
+        File[] files = downloadsDir.listFiles((dir, name) ->
+                name.startsWith(CONFIG_FILE_PREFIX) && name.endsWith(CONFIG_FILE_EXTENSION));
 
         if (files == null || files.length == 0) {
-            Log.e(TAG, "Файлы конфигурации не найдены в папке Downloads.");
+            Log.e(TAG, "Файл конфигурации не найден в папке Downloads.");
             return null;
         }
 
-        // Используем первый найденный файл
-        // (spompXXX.cfg, где XXX - номер телефона)
+        // Берем первый найденный файл
         File configFile = files[0];
         Log.i(TAG, "Найден файл конфигурации: " + configFile.getName());
 
@@ -51,7 +51,7 @@ public class ConfigFileUtils {
             String jsonString = new String(data, StandardCharsets.UTF_8);
             return new JSONObject(jsonString);
         } catch (IOException | JSONException e) {
-            Log.e(TAG, "Ошибка загрузки или парсинга файла конфигурации.", e);
+            Log.e(TAG, "Ошибка парсинга конфигурационного файла.");
             return null;
         }
     }

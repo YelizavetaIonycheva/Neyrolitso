@@ -30,6 +30,7 @@ import org.linphone.core.CallDirection;
 import org.linphone.core.LinphoneAccountCreator;
 import org.linphone.core.LinphoneAddress;
 import org.linphone.core.LinphoneAuthInfo;
+import org.linphone.core.LinphoneBuffer;
 import org.linphone.core.LinphoneCall;
 import org.linphone.core.LinphoneCall.State;
 import org.linphone.core.LinphoneCallParams;
@@ -70,7 +71,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.pniei.portal.R;
@@ -308,7 +311,7 @@ public class LinphoneManager implements LinphoneCoreListener, SensorEventListene
 			} catch (LinphoneCoreException e) {
 				return;
 			}
-		} else if (MainActivity.isInstantiated()) {
+		} else if (MainActivity.isInstanciated()) {
 			MainActivity.instance().displayCustomToast(getString(R.string.error_network_unreachable), Toast.LENGTH_LONG);
 		} else {
 			Log.e("Error: " + getString(R.string.error_network_unreachable));
@@ -779,7 +782,7 @@ public class LinphoneManager implements LinphoneCoreListener, SensorEventListene
 
 	public Context getContext() {
 		try {
-			if (MainActivity.isInstantiated())
+			if (MainActivity.isInstanciated())
 				return MainActivity.instance();
 			else if (CallActivity.isInstanciated())
 				return CallActivity.instance();

@@ -5,12 +5,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import org.pniei.dwface.biometry.DWFace;
 import org.pniei.portal.R;
 import org.pniei.portal.utils.Logger;
 import org.pniei.portal.utils.PrefsUtils;
 import org.pniei.portal.utils.Utils;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class LauncherActivity extends AppCompatActivity {
     private final String TAG = "LauncherActivity";
@@ -18,6 +19,7 @@ public class LauncherActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         Utils.initTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
@@ -33,11 +35,7 @@ public class LauncherActivity extends AppCompatActivity {
     private void initApp() {
         new Thread(() -> {
             if (PrefsUtils.ins().isAuth()) {
-                try {
-                    Thread.sleep(250);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                try { Thread.sleep(250); } catch (InterruptedException e) { e.printStackTrace(); }
                 Intent newIntent = new Intent(LauncherActivity.this, MainActivity.class);
                 startActivity(newIntent);
                 finish();
@@ -45,14 +43,23 @@ public class LauncherActivity extends AppCompatActivity {
             }
 
             PrefsUtils.ins().load(this);
+            DWFace.Init(getApplicationContext());
             Utils.copyAssetsFiles(this, "sound", "");
             Logger.inc().init(this);
 
-            mHandler.post(() -> {
-                Intent newIntent = new Intent(LauncherActivity.this, LoginActivity.class);
-                startActivity(newIntent);
-                finish();
-            });
+            if (PrefsUtils.ins().isLicenseReg()) {
+                mHandler.post(() -> {
+                    Intent newIntent = new Intent(LauncherActivity.this, LoginActivity.class);
+                    startActivity(newIntent);
+                    finish();
+                });
+            } else {
+                mHandler.post(() -> {
+                    Intent newIntent = new Intent(LauncherActivity.this, RegLicenseActivity.class);
+                    startActivity(newIntent);
+                    finish();
+                });
+            }
         }).start();
     }
 }

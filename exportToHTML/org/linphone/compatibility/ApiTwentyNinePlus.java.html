@@ -1,0 +1,100 @@
+<html>
+<head>
+<title>ApiTwentyNinePlus.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #949cbb; font-style: italic;}
+.s1 { color: #c6d0f5;}
+.s2 { color: #ca9ee6;}
+.s3 { color: #949cbb;}
+.s4 { color: #ef9f76;}
+.s5 { color: #99d1db;}
+</style>
+</head>
+<body bgcolor="#303446">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+ApiTwentyNinePlus.java</font>
+</center></td></tr></table>
+<pre><span class="s0">/* 
+ * Copyright (c) 2010-2019 Belledonne Communications SARL. 
+ * 
+ * This file is part of linphone-android 
+ * (see https://www.linphone.org). 
+ * 
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the GNU General Public License as published by 
+ * the Free Software Foundation, either version 3 of the License, or 
+ * (at your option) any later version. 
+ * 
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * GNU General Public License for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License 
+ * along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;. 
+ */</span>
+<span class="s2">package </span><span class="s1">org</span><span class="s3">.</span><span class="s1">linphone</span><span class="s3">.</span><span class="s1">compatibility</span><span class="s3">;</span>
+
+<span class="s2">import static </span><span class="s1">org</span><span class="s3">.</span><span class="s1">linphone</span><span class="s3">.</span><span class="s1">compatibility</span><span class="s3">.</span><span class="s1">Compatibility</span><span class="s3">.</span><span class="s1">INTENT_ANSWER_CALL_NOTIF_ACTION</span><span class="s3">;</span>
+<span class="s2">import static </span><span class="s1">org</span><span class="s3">.</span><span class="s1">linphone</span><span class="s3">.</span><span class="s1">compatibility</span><span class="s3">.</span><span class="s1">Compatibility</span><span class="s3">.</span><span class="s1">INTENT_HANGUP_CALL_NOTIF_ACTION</span><span class="s3">;</span>
+<span class="s2">import static </span><span class="s1">org</span><span class="s3">.</span><span class="s1">linphone</span><span class="s3">.</span><span class="s1">compatibility</span><span class="s3">.</span><span class="s1">Compatibility</span><span class="s3">.</span><span class="s1">INTENT_NOTIF_ID</span><span class="s3">;</span>
+
+<span class="s2">import </span><span class="s1">android</span><span class="s3">.</span><span class="s1">annotation</span><span class="s3">.</span><span class="s1">TargetApi</span><span class="s3">;</span>
+<span class="s2">import </span><span class="s1">android</span><span class="s3">.</span><span class="s1">app</span><span class="s3">.</span><span class="s1">Notification</span><span class="s3">;</span>
+<span class="s2">import </span><span class="s1">android</span><span class="s3">.</span><span class="s1">app</span><span class="s3">.</span><span class="s1">PendingIntent</span><span class="s3">;</span>
+<span class="s2">import </span><span class="s1">android</span><span class="s3">.</span><span class="s1">content</span><span class="s3">.</span><span class="s1">Context</span><span class="s3">;</span>
+<span class="s2">import </span><span class="s1">android</span><span class="s3">.</span><span class="s1">content</span><span class="s3">.</span><span class="s1">Intent</span><span class="s3">;</span>
+<span class="s2">import </span><span class="s1">android</span><span class="s3">.</span><span class="s1">os</span><span class="s3">.</span><span class="s1">Build</span><span class="s3">;</span>
+
+<span class="s2">import </span><span class="s1">org</span><span class="s3">.</span><span class="s1">linphone</span><span class="s3">.</span><span class="s1">notifications</span><span class="s3">.</span><span class="s1">NotificationBroadcastReceiver</span><span class="s3">;</span>
+
+<span class="s2">import </span><span class="s1">androidx</span><span class="s3">.</span><span class="s1">core</span><span class="s3">.</span><span class="s1">app</span><span class="s3">.</span><span class="s1">NotificationCompat</span><span class="s3">;</span>
+<span class="s2">import </span><span class="s1">org</span><span class="s3">.</span><span class="s1">pniei</span><span class="s3">.</span><span class="s1">portal</span><span class="s3">.</span><span class="s1">R</span><span class="s3">;</span>
+
+<span class="s1">@TargetApi</span><span class="s3">(</span><span class="s4">29</span><span class="s3">)</span>
+<span class="s2">public class </span><span class="s1">ApiTwentyNinePlus </span><span class="s3">{</span>
+
+    <span class="s2">public static </span><span class="s1">NotificationCompat</span><span class="s3">.</span><span class="s1">Action getCallAnswerAction</span><span class="s3">(</span><span class="s1">Context context</span><span class="s3">, </span><span class="s2">int </span><span class="s1">callId</span><span class="s3">) {</span>
+        <span class="s1">Intent answerIntent </span><span class="s5">= </span><span class="s2">new </span><span class="s1">Intent</span><span class="s3">(</span><span class="s1">context</span><span class="s3">, </span><span class="s1">NotificationBroadcastReceiver</span><span class="s3">.</span><span class="s2">class</span><span class="s3">);</span>
+        <span class="s1">answerIntent</span><span class="s3">.</span><span class="s1">setAction</span><span class="s3">(</span><span class="s1">INTENT_ANSWER_CALL_NOTIF_ACTION</span><span class="s3">);</span>
+        <span class="s1">answerIntent</span><span class="s3">.</span><span class="s1">putExtra</span><span class="s3">(</span><span class="s1">INTENT_NOTIF_ID</span><span class="s3">, </span><span class="s1">callId</span><span class="s3">);</span>
+
+        <span class="s1">PendingIntent answerPendingIntent</span><span class="s3">;</span>
+        <span class="s2">if </span><span class="s3">(</span><span class="s1">Build</span><span class="s3">.</span><span class="s1">VERSION</span><span class="s3">.</span><span class="s1">SDK_INT </span><span class="s5">&gt;= </span><span class="s1">Build</span><span class="s3">.</span><span class="s1">VERSION_CODES</span><span class="s3">.</span><span class="s1">S</span><span class="s3">) {</span>
+            <span class="s1">answerPendingIntent </span><span class="s5">= </span><span class="s1">PendingIntent</span><span class="s3">.</span><span class="s1">getBroadcast</span><span class="s3">(</span><span class="s1">context</span><span class="s3">, </span><span class="s1">callId</span><span class="s3">, </span><span class="s1">answerIntent</span><span class="s3">, </span><span class="s1">PendingIntent</span><span class="s3">.</span><span class="s1">FLAG_UPDATE_CURRENT </span><span class="s5">| </span><span class="s1">PendingIntent</span><span class="s3">.</span><span class="s1">FLAG_MUTABLE</span><span class="s3">);</span>
+        <span class="s3">} </span><span class="s2">else </span><span class="s3">{</span>
+            <span class="s1">answerPendingIntent </span><span class="s5">= </span><span class="s1">PendingIntent</span><span class="s3">.</span><span class="s1">getBroadcast</span><span class="s3">(</span><span class="s1">context</span><span class="s3">, </span><span class="s1">callId</span><span class="s3">, </span><span class="s1">answerIntent</span><span class="s3">, </span><span class="s1">PendingIntent</span><span class="s3">.</span><span class="s1">FLAG_UPDATE_CURRENT</span><span class="s3">);</span>
+        <span class="s3">}</span>
+
+        <span class="s2">return new </span><span class="s1">NotificationCompat</span><span class="s3">.</span><span class="s1">Action</span><span class="s3">.</span><span class="s1">Builder</span><span class="s3">(</span>
+                        <span class="s1">R</span><span class="s3">.</span><span class="s1">drawable</span><span class="s3">.</span><span class="s1">ic_call</span><span class="s3">,</span>
+                        <span class="s1">context</span><span class="s3">.</span><span class="s1">getString</span><span class="s3">(</span><span class="s1">R</span><span class="s3">.</span><span class="s1">string</span><span class="s3">.</span><span class="s1">notification_call_answer_label</span><span class="s3">),</span>
+                        <span class="s1">answerPendingIntent</span><span class="s3">)</span>
+                <span class="s3">.</span><span class="s1">build</span><span class="s3">();</span>
+    <span class="s3">}</span>
+
+    <span class="s2">public static </span><span class="s1">NotificationCompat</span><span class="s3">.</span><span class="s1">Action getCallDeclineAction</span><span class="s3">(</span><span class="s1">Context context</span><span class="s3">, </span><span class="s2">int </span><span class="s1">callId</span><span class="s3">) {</span>
+        <span class="s1">Intent hangupIntent </span><span class="s5">= </span><span class="s2">new </span><span class="s1">Intent</span><span class="s3">(</span><span class="s1">context</span><span class="s3">, </span><span class="s1">NotificationBroadcastReceiver</span><span class="s3">.</span><span class="s2">class</span><span class="s3">);</span>
+        <span class="s1">hangupIntent</span><span class="s3">.</span><span class="s1">setAction</span><span class="s3">(</span><span class="s1">INTENT_HANGUP_CALL_NOTIF_ACTION</span><span class="s3">);</span>
+        <span class="s1">hangupIntent</span><span class="s3">.</span><span class="s1">putExtra</span><span class="s3">(</span><span class="s1">INTENT_NOTIF_ID</span><span class="s3">, </span><span class="s1">callId</span><span class="s3">);</span>
+
+        <span class="s1">PendingIntent hangupPendingIntent</span><span class="s3">;</span>
+        <span class="s2">if </span><span class="s3">(</span><span class="s1">Build</span><span class="s3">.</span><span class="s1">VERSION</span><span class="s3">.</span><span class="s1">SDK_INT </span><span class="s5">&gt;= </span><span class="s1">Build</span><span class="s3">.</span><span class="s1">VERSION_CODES</span><span class="s3">.</span><span class="s1">S</span><span class="s3">) {</span>
+            <span class="s1">hangupPendingIntent </span><span class="s5">= </span><span class="s1">PendingIntent</span><span class="s3">.</span><span class="s1">getBroadcast</span><span class="s3">(</span><span class="s1">context</span><span class="s3">, </span><span class="s1">callId</span><span class="s3">, </span><span class="s1">hangupIntent</span><span class="s3">, </span><span class="s1">PendingIntent</span><span class="s3">.</span><span class="s1">FLAG_UPDATE_CURRENT </span><span class="s5">| </span><span class="s1">PendingIntent</span><span class="s3">.</span><span class="s1">FLAG_MUTABLE</span><span class="s3">);</span>
+        <span class="s3">} </span><span class="s2">else </span><span class="s3">{</span>
+            <span class="s1">hangupPendingIntent </span><span class="s5">= </span><span class="s1">PendingIntent</span><span class="s3">.</span><span class="s1">getBroadcast</span><span class="s3">(</span><span class="s1">context</span><span class="s3">, </span><span class="s1">callId</span><span class="s3">, </span><span class="s1">hangupIntent</span><span class="s3">, </span><span class="s1">PendingIntent</span><span class="s3">.</span><span class="s1">FLAG_UPDATE_CURRENT</span><span class="s3">);</span>
+        <span class="s3">}</span>
+
+        <span class="s2">return new </span><span class="s1">NotificationCompat</span><span class="s3">.</span><span class="s1">Action</span><span class="s3">.</span><span class="s1">Builder</span><span class="s3">(</span>
+                        <span class="s1">R</span><span class="s3">.</span><span class="s1">drawable</span><span class="s3">.</span><span class="s1">ic_call_end</span><span class="s3">,</span>
+                        <span class="s1">context</span><span class="s3">.</span><span class="s1">getString</span><span class="s3">(</span><span class="s1">R</span><span class="s3">.</span><span class="s1">string</span><span class="s3">.</span><span class="s1">notification_call_hangup_label</span><span class="s3">),</span>
+                        <span class="s1">hangupPendingIntent</span><span class="s3">)</span>
+                <span class="s3">.</span><span class="s1">build</span><span class="s3">();</span>
+    <span class="s3">}</span>
+<span class="s3">}</span>
+</pre>
+</body>
+</html>
