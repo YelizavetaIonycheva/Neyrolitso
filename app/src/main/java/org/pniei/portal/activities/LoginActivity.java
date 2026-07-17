@@ -124,27 +124,28 @@ public class LoginActivity extends AppCompatActivity {
             LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
             if(!isSelected) {
 
+                assert lc != null;
                 for (PayloadType pt : lc.getAudioCodecs()) {
                     try {
                         lc.enablePayloadType(pt, false);
-                    } catch (LinphoneCoreException e) { }
+                    } catch (LinphoneCoreException ignored) { }
                 }
 
                 PayloadType pt3 = lc.getAudioCodecs()[0];
                 try {
                     lc.enablePayloadType(pt3, true);
-                } catch (LinphoneCoreException e) { }
+                } catch (LinphoneCoreException ignored) { }
 
 
                 for (PayloadType pt : lc.getVideoCodecs()) {
                     try {
                         lc.enablePayloadType(pt, false);
-                    } catch (LinphoneCoreException e) { }
+                    } catch (LinphoneCoreException ignored) { }
                 }
                 PayloadType pt4 = lc.getVideoCodecs()[0];
                 try {
                     lc.enablePayloadType(pt4, true);
-                } catch (LinphoneCoreException e) { }
+                } catch (LinphoneCoreException ignored) { }
                 PrefsUtils.ins().setSelectCodecs(true);
             }
 

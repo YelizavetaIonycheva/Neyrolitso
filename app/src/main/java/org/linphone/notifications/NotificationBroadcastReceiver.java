@@ -1,56 +1,32 @@
-/*
- * Copyright (c) 2010-2019 Belledonne Communications SARL.
- *
- * This file is part of linphone-android
- * (see https://www.linphone.org).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
 package org.linphone.notifications;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.os.Build;
-import android.os.Bundle;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+
 import org.linphone.LinphoneManager;
 import org.linphone.LinphoneService;
 import org.linphone.compatibility.Compatibility;
 import org.linphone.core.LinphoneAddress;
 import org.linphone.core.LinphoneCall;
 import org.linphone.core.LinphoneCoreException;
-import org.pniei.portal.R;
 import org.pniei.portal.activities.MainActivity;
 import org.pniei.portal.database.DBUtils;
-import org.pniei.portal.database.SpoChatMessage;
 import org.pniei.portal.database.SpoContact;
 import org.pniei.portal.notification.SpoNotificationsManager;
 import org.pniei.portal.services.SpoMessagesService;
 import org.pniei.portal.utils.CryptUtils;
 import org.pniei.portal.utils.PrefsUtils;
+
 import static org.pniei.portal.notification.SpoNotificationsManager.CHAT_ID;
 
-import androidx.core.app.NotificationCompat;
+import java.util.Objects;
 
 public class NotificationBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
-        if (intent.getAction().equals(SpoNotificationsManager.INTENT_REPLY_NOTIF_ACTION)
-                || intent.getAction().equals(SpoNotificationsManager.INTENT_MARK_AS_READ_ACTION)) {
+        if (Objects.equals(intent.getAction(), SpoNotificationsManager.INTENT_REPLY_NOTIF_ACTION)
+                || Objects.equals(intent.getAction(), SpoNotificationsManager.INTENT_MARK_AS_READ_ACTION)) {
             long idChat = intent.getLongExtra(CHAT_ID, 0);
             if (idChat == 0)
                 return;
@@ -76,8 +52,8 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
             } else {
                 SpoMessagesService.instance().removeMessageNotification();
             }
-        } else if (intent.getAction().equals(Compatibility.INTENT_ANSWER_CALL_NOTIF_ACTION)
-                || intent.getAction().equals(Compatibility.INTENT_HANGUP_CALL_NOTIF_ACTION)) {
+        } else if (Objects.equals(intent.getAction(), Compatibility.INTENT_ANSWER_CALL_NOTIF_ACTION)
+                || Objects.equals(intent.getAction(), Compatibility.INTENT_HANGUP_CALL_NOTIF_ACTION)) {
             if (!LinphoneService.isReady()) {
                 return;
             }
@@ -85,7 +61,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
             if (intent.getAction().equals(Compatibility.INTENT_ANSWER_CALL_NOTIF_ACTION)) {
                 try {
                     LinphoneCall[] calls = LinphoneManager.getLc().getCalls();
-                    for (LinphoneCall call: calls) {
+                    for (LinphoneCall call : calls) {
                         if (call.getState() == LinphoneCall.State.IncomingReceived) {
                             LinphoneManager.getInstance().routeAudioToReceiver();
 
@@ -113,7 +89,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
                 }
             } else {
                 LinphoneCall[] calls = LinphoneManager.getLc().getCalls();
-                for (LinphoneCall call: calls) {
+                for (LinphoneCall call : calls) {
                     if (call.getState() == LinphoneCall.State.IncomingReceived) {
                         LinphoneManager.getLc().terminateCall(call);
                         break;

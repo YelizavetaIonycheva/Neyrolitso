@@ -44,7 +44,6 @@ import org.linphone.core.LinphoneFriend;
 import org.linphone.core.LinphoneProxyConfig;
 import org.linphone.core.Reason;
 import org.pniei.portal.R;
-import org.pniei.portal.services.GPSService;
 import org.pniei.portal.database.DBUtils;
 import org.pniei.portal.database.SpoContact;
 import org.pniei.portal.fragments.ChatListFragment;

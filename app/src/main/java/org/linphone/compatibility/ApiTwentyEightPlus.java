@@ -1,25 +1,6 @@
-/*
- * Copyright (c) 2010-2019 Belledonne Communications SARL.
- *
- * This file is part of linphone-android
- * (see https://www.linphone.org).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
 package org.linphone.compatibility;
 
-import android.annotation.TargetApi;
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -28,12 +9,14 @@ import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Icon;
+
 import org.linphone.notifications.Notifiable;
 import org.linphone.notifications.NotifiableMessage;
 
 import org.pniei.portal.R;
 
-@TargetApi(28)
+@SuppressLint("UseRequiresApi")
+@androidx.annotation.RequiresApi(28)
 class ApiTwentyEightPlus {
     public static Notification createMessageNotification(Context context, Notifiable notif, Bitmap contactIcon, PendingIntent intent) {
 
@@ -64,7 +47,7 @@ class ApiTwentyEightPlus {
         style.setGroupConversation(notif.isGroup());
 
         return new Notification.Builder(
-                        context, context.getString(R.string.notification_other_channel_id))
+                context, context.getString(R.string.notification_other_channel_id))
                 .setSmallIcon(R.drawable.ic_message)
                 .setAutoCancel(true)
                 .setContentIntent(intent)

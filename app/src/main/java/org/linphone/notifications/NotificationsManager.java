@@ -1,25 +1,8 @@
-/*
- * Copyright (c) 2010-2019 Belledonne Communications SARL.
- *
- * This file is part of linphone-android
- * (see https://www.linphone.org).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
 package org.linphone.notifications;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -30,8 +13,10 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+
 import java.io.IOException;
 import java.util.HashMap;
+
 import org.linphone.CallActivity;
 import org.linphone.CallIncomingActivity;
 import org.linphone.CallOutgoingActivity;
@@ -42,7 +27,6 @@ import org.linphone.compatibility.Compatibility;
 import org.linphone.core.LinphoneAddress;
 import org.linphone.core.LinphoneCall;
 import org.pniei.portal.R;
-import org.pniei.portal.utils.PrefsUtils;
 import org.pniei.portal.activities.MainActivity;
 import org.pniei.portal.database.DBUtils;
 import org.pniei.portal.database.SpoContact;
@@ -53,15 +37,13 @@ public class NotificationsManager {
 
     private final Context mContext;
     private final NotificationManager mNM;
-    private final HashMap<String, Notifiable> mChatNotifMap;
     private final HashMap<String, Notifiable> mCallNotifMap;
     private int mLastNotificationId;
-    private final Notification mServiceNotification;
     private int mCurrentForegroundServiceNotification;
 
     public NotificationsManager(Context context) {
         mContext = context;
-        mChatNotifMap = new HashMap<>();
+        HashMap<String, Notifiable> mChatNotifMap = new HashMap<>();
         mCallNotifMap = new HashMap<>();
         mCurrentForegroundServiceNotification = 0;
 
@@ -77,7 +59,7 @@ public class NotificationsManager {
                 }
             }
         } else {*/
-            mNM.cancelAll();
+        mNM.cancelAll();
         //}
 
         mLastNotificationId = 10; // Do not conflict with hardcoded notifications ids !
@@ -100,16 +82,16 @@ public class NotificationsManager {
             pendingIntent = PendingIntent.getActivity(mContext, SERVICE_NOTIF_ID, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
 
-        mServiceNotification = Compatibility.createNotification(
-                        mContext,
-                        mContext.getString(R.string.service_name),
-                        "",
-                        R.drawable.ic_notify,
-                        R.mipmap.ic_launcher,
-                        bm,
-                        pendingIntent,
-                        Notification.PRIORITY_MIN,
-                        true);
+        Notification mServiceNotification = Compatibility.createNotification(
+                mContext,
+                mContext.getString(R.string.service_name),
+                "",
+                R.drawable.ic_notify,
+                R.mipmap.ic_launcher,
+                bm,
+                pendingIntent,
+                Notification.PRIORITY_MIN,
+                true);
     }
 
     public void destroy() {
@@ -126,6 +108,7 @@ public class NotificationsManager {
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
     }
 
+    @SuppressLint("ForegroundServiceType")
     private void startForeground(Notification notification, int id) {
         if (LinphoneService.isReady()) {
             LinphoneService.instance().startForeground(id, notification);
@@ -188,7 +171,7 @@ public class NotificationsManager {
         int notificationTextId;
         int iconId;
 
-        if(call.getState() == LinphoneCall.State.CallReleased || call.getState() == LinphoneCall.State.CallEnd) {
+        if (call.getState() == LinphoneCall.State.CallReleased || call.getState() == LinphoneCall.State.CallEnd) {
             if (mCurrentForegroundServiceNotification == notif.getNotificationId()) {
                 stopForeground();
             }

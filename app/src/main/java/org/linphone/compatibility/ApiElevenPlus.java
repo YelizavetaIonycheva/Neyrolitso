@@ -3,7 +3,7 @@ package org.linphone.compatibility;
 import java.util.ArrayList;
 
 import org.pniei.portal.R;
-import android.annotation.TargetApi;
+
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -19,150 +19,145 @@ import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Intents.Insert;
 import android.widget.TextView;
 
-@TargetApi(11)
 public class ApiElevenPlus {
 
-	@SuppressWarnings("deprecation")
-	public static Notification createMessageNotification(Context context,
-			int msgCount, String msgSender, String msg, Bitmap contactIcon,
-			PendingIntent intent) {
-		String title;
-		if (msgCount == 1) {
-			title = msgSender;
-		} else {
-			title = context.getString(R.string.unread_messages)
-					.replace("%i", String.valueOf(msgCount));
-		}
+    @SuppressWarnings("deprecation")
+    public static Notification createMessageNotification(Context context,
+                                                         int msgCount, String msgSender, String msg, Bitmap contactIcon,
+                                                         PendingIntent intent) {
+        String title;
+        if (msgCount == 1) {
+            title = msgSender;
+        } else {
+            title = context.getString(R.string.unread_messages)
+                    .replace("%i", String.valueOf(msgCount));
+        }
 
-		Notification notif = new Notification.Builder(context)
-						.setContentTitle(title)
-						.setContentText(msg)
-						.setContentIntent(intent)
-						.setSmallIcon(R.drawable.chat)
-						.setAutoCancel(true)
-						.setDefaults(
-								Notification.DEFAULT_LIGHTS
-										| Notification.DEFAULT_SOUND
-										| Notification.DEFAULT_VIBRATE)
-						.setWhen(System.currentTimeMillis())
-						.setNumber(msgCount)
-						.setLargeIcon(contactIcon).getNotification();
+        return new Notification.Builder(context)
+                .setContentTitle(title)
+                .setContentText(msg)
+                .setContentIntent(intent)
+                .setSmallIcon(R.drawable.chat)
+                .setAutoCancel(true)
+                .setDefaults(
+                        Notification.DEFAULT_LIGHTS
+                                | Notification.DEFAULT_SOUND
+                                | Notification.DEFAULT_VIBRATE)
+                .setWhen(System.currentTimeMillis())
+                .setNumber(msgCount)
+                .setLargeIcon(contactIcon).getNotification();
+    }
 
-		return notif;
-	}
+    @SuppressWarnings("deprecation")
+    public static Notification createInCallNotification(Context context,
+                                                        String title, String msg, int iconID, Bitmap contactIcon,
+                                                        String contactName, PendingIntent intent) {
 
-	@SuppressWarnings("deprecation")
-	public static Notification createInCallNotification(Context context,
-			String title, String msg, int iconID, Bitmap contactIcon,
-			String contactName, PendingIntent intent) {
+        Notification notif = new Notification.Builder(context).setContentTitle(contactName)
+                .setContentText(msg).setSmallIcon(iconID)
+                .setAutoCancel(false)
+                .setContentIntent(intent)
+                .setWhen(System.currentTimeMillis())
+                .setLargeIcon(contactIcon).getNotification();
+        notif.flags |= Notification.FLAG_ONGOING_EVENT;
 
-		Notification notif = new Notification.Builder(context).setContentTitle(contactName)
-						.setContentText(msg).setSmallIcon(iconID)
-						.setAutoCancel(false)
-						.setContentIntent(intent)
-						.setWhen(System.currentTimeMillis())
-						.setLargeIcon(contactIcon).getNotification();
-		notif.flags |= Notification.FLAG_ONGOING_EVENT;
+        return notif;
+    }
 
-		return notif;
-	}
+    @SuppressWarnings("deprecation")
+    public static Notification createNotification(Context context, String title, String message, int icon, int level, Bitmap largeIcon, PendingIntent intent, boolean isOngoingEvent) {
+        Notification notif;
 
-	@SuppressWarnings("deprecation")
-	public static Notification createNotification(Context context, String title, String message, int icon, int level, Bitmap largeIcon, PendingIntent intent, boolean isOngoingEvent) {
-		Notification notif;
+        if (largeIcon != null) {
+            notif = new Notification.Builder(context)
+                    .setContentTitle(title)
+                    .setContentText(message)
+                    .setSmallIcon(icon, level)
+                    .setLargeIcon(largeIcon)
+                    .setContentIntent(intent)
+                    .setWhen(System.currentTimeMillis())
+                    .getNotification();
+        } else {
+            notif = new Notification.Builder(context)
+                    .setContentTitle(title)
+                    .setContentText(message)
+                    .setSmallIcon(icon, level)
+                    .setContentIntent(intent)
+                    .setWhen(System.currentTimeMillis())
+                    .getNotification();
+        }
+        if (isOngoingEvent) {
+            notif.flags |= Notification.FLAG_ONGOING_EVENT;
+        }
 
-		if (largeIcon != null) {
-			notif = new Notification.Builder(context)
-	        .setContentTitle(title)
-	        .setContentText(message)
-	        .setSmallIcon(icon, level)
-	        .setLargeIcon(largeIcon)
-	        .setContentIntent(intent)
-	        .setWhen(System.currentTimeMillis())
-	        .getNotification();
-		} else {
-			notif = new Notification.Builder(context)
-	        .setContentTitle(title)
-	        .setContentText(message)
-	        .setSmallIcon(icon, level)
-	        .setContentIntent(intent)
-	        .setWhen(System.currentTimeMillis())
-	        .getNotification();
-		}
-		if (isOngoingEvent) {
-			notif.flags |= Notification.FLAG_ONGOING_EVENT;
-		}
+        return notif;
+    }
 
-		return notif;
-	}
+    public static Intent prepareAddContactIntent(String displayName, String sipUri) {
+        Intent intent = new Intent(Intent.ACTION_INSERT, Contacts.CONTENT_URI);
+        intent.putExtra(ContactsContract.Intents.Insert.NAME, displayName);
 
-	public static Intent prepareAddContactIntent(String displayName, String sipUri) {
-		Intent intent = new Intent(Intent.ACTION_INSERT, Contacts.CONTENT_URI);
-		intent.putExtra(ContactsContract.Intents.Insert.NAME, displayName);
+        if (sipUri != null && sipUri.startsWith("sip:")) {
+            sipUri = sipUri.substring(4);
+        }
 
-		if (sipUri != null && sipUri.startsWith("sip:")) {
-			sipUri = sipUri.substring(4);
-		}
+        ArrayList<ContentValues> data = new ArrayList<>();
+        ContentValues sipAddressRow = new ContentValues();
+        sipAddressRow.put(Contacts.Data.MIMETYPE, SipAddress.CONTENT_ITEM_TYPE);
+        sipAddressRow.put(SipAddress.DATA, sipUri);
+        data.add(sipAddressRow);
+        intent.putParcelableArrayListExtra(Insert.DATA, data);
 
-		ArrayList<ContentValues> data = new ArrayList<ContentValues>();
-		ContentValues sipAddressRow = new ContentValues();
-		sipAddressRow.put(Contacts.Data.MIMETYPE, SipAddress.CONTENT_ITEM_TYPE);
-		sipAddressRow.put(SipAddress.SIP_ADDRESS, sipUri);
-		data.add(sipAddressRow);
-		intent.putParcelableArrayListExtra(Insert.DATA, data);
+        return intent;
+    }
 
-		return intent;
-	}
+    public static Intent prepareEditContactIntentWithSipAddress(int id, String sipUri) {
+        Intent intent = new Intent(Intent.ACTION_EDIT, Contacts.CONTENT_URI);
+        Uri contactUri = ContentUris.withAppendedId(Contacts.CONTENT_URI, id);
+        intent.setData(contactUri);
 
-	public static Intent prepareEditContactIntentWithSipAddress(int id, String sipUri) {
-		Intent intent = new Intent(Intent.ACTION_EDIT, Contacts.CONTENT_URI);
-		Uri contactUri = ContentUris.withAppendedId(Contacts.CONTENT_URI, id);
-		intent.setData(contactUri);
+        ArrayList<ContentValues> data = new ArrayList<>();
+        ContentValues sipAddressRow = new ContentValues();
+        sipAddressRow.put(Contacts.Data.MIMETYPE, SipAddress.CONTENT_ITEM_TYPE);
+        sipAddressRow.put(SipAddress.SIP_ADDRESS, sipUri);
+        data.add(sipAddressRow);
+        intent.putParcelableArrayListExtra(Insert.DATA, data);
 
-		ArrayList<ContentValues> data = new ArrayList<ContentValues>();
-		ContentValues sipAddressRow = new ContentValues();
-		sipAddressRow.put(Contacts.Data.MIMETYPE, SipAddress.CONTENT_ITEM_TYPE);
-		sipAddressRow.put(SipAddress.SIP_ADDRESS, sipUri);
-		data.add(sipAddressRow);
-		intent.putParcelableArrayListExtra(Insert.DATA, data);
+        return intent;
+    }
 
-		return intent;
-	}
+    @SuppressWarnings("deprecation")
+    public static Notification createMissedCallNotification(Context context, String title, String text, PendingIntent intent) {
 
-	@SuppressWarnings("deprecation")
-	public static Notification createMissedCallNotification(Context context, String title, String text, PendingIntent intent) {
-		Notification notif = new Notification.Builder(context)
-		.setContentTitle(title)
-		.setContentText(text)
-		.setContentIntent(intent)
-		.setSmallIcon(R.drawable.ic_call_missed)
-		.setAutoCancel(true)
-		.setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
-		.setWhen(System.currentTimeMillis()).getNotification();
+        return new Notification.Builder(context)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setContentIntent(intent)
+                .setSmallIcon(R.drawable.ic_call_missed)
+                .setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
+                .setWhen(System.currentTimeMillis()).getNotification();
+    }
 
-		return notif;
-	}
+    @SuppressWarnings("deprecation")
+    public static Notification createSimpleNotification(Context context, String title, String text, PendingIntent intent) {
 
-	@SuppressWarnings("deprecation")
-	public static Notification createSimpleNotification(Context context, String title, String text, PendingIntent intent) {
-		Notification notif = new Notification.Builder(context)
-		.setContentTitle(title)
-		.setContentText(text)
-		.setContentIntent(intent)
-		.setSmallIcon(R.mipmap.ic_launcher)
-		.setAutoCancel(true)
-		.setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
-		.setWhen(System.currentTimeMillis()).getNotification();
+        return new Notification.Builder(context)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setContentIntent(intent)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
+                .setWhen(System.currentTimeMillis()).getNotification();
+    }
 
-		return notif;
-	}
+    @SuppressWarnings("deprecation")
+    public static void setTextAppearance(TextView textview, Context context, int style) {
+        textview.setTextAppearance(context, style);
+    }
 
-	@SuppressWarnings("deprecation")
-	public static void setTextAppearance(TextView textview, Context context, int style) {
-		textview.setTextAppearance(context, style);
-	}
-
-	public static void scheduleAlarm(AlarmManager alarmManager, int type, long triggerAtMillis, PendingIntent operation) {
-		alarmManager.set(type, triggerAtMillis, operation);
-	}
+    public static void scheduleAlarm(AlarmManager alarmManager, int type, long triggerAtMillis, PendingIntent operation) {
+        alarmManager.set(type, triggerAtMillis, operation);
+    }
 }
