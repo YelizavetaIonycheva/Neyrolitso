@@ -2,6 +2,7 @@ package org.pniei.portal.fragments;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -22,6 +23,7 @@ import org.linphone.core.LinphoneCallLog;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -103,7 +105,7 @@ public class HistoryListFragment extends Fragment implements View.OnClickListene
         } else if (id == R.id.selectAll) {
             if (mAdapter != null) {
                 mBinding.checkBox.setChecked(!mBinding.checkBox.isChecked());
-                mAdapter.setAllCheked(mBinding.checkBox.isChecked());
+                mAdapter.setAllChecked(mBinding.checkBox.isChecked());
 
                 if (mBinding.checkBox.isChecked()) {
                     setStateActionButton(STATE.DELETE, true);
@@ -133,7 +135,7 @@ public class HistoryListFragment extends Fragment implements View.OnClickListene
         Log.d(TAG, "updateContacts");
         new Thread(() -> {
             mLogs = new ArrayList<>(Arrays.asList(LinphoneManager.getLc().getCallLogs()));
-            mHandler.postDelayed(() -> updateUI(), 200);
+            mHandler.postDelayed(this::updateUI, 200);
             /*ArrayList<LinphoneCallLog> logs = new ArrayList<>(Arrays.asList(LinphoneManager.getLc().getCallLogs()));
             if (mLogs == null || (mLogs.size() != logs.size())) {
                 mLogs = logs;
@@ -145,7 +147,7 @@ public class HistoryListFragment extends Fragment implements View.OnClickListene
     public void updateUI() {
         Log.d(TAG, "updateUI");
 
-        if (mLogs.size() > 0) {
+        if (!mLogs.isEmpty()) {
             mBinding.textEmptyHistoryList.setVisibility(View.GONE);
             mBinding.historyList.setVisibility(View.VISIBLE);
             if (mAdapter == null) {
@@ -172,12 +174,6 @@ public class HistoryListFragment extends Fragment implements View.OnClickListene
         boolean isVisible;
 
         switch (state) {
-            case GONE:
-            default: {
-                idImage = R.drawable.ic_close;
-                isVisible = false;
-                break;
-            }
             case CLOSE: {
                 idImage = R.drawable.ic_close;
                 isVisible = true;
@@ -186,6 +182,12 @@ public class HistoryListFragment extends Fragment implements View.OnClickListene
             case DELETE: {
                 idImage = R.drawable.ic_delete;
                 isVisible = true;
+                break;
+            }
+            case GONE:
+            default: {
+                idImage = R.drawable.ic_close;
+                isVisible = false;
                 break;
             }
         }
@@ -231,7 +233,7 @@ public class HistoryListFragment extends Fragment implements View.OnClickListene
         }
 
         class HistoryHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-            private HistoryCellBinding mBinding;
+            private final HistoryCellBinding mBinding;
             LinphoneCallLog mLog;
             SpoContact mContact;
             private int mPosition;
@@ -280,7 +282,7 @@ public class HistoryListFragment extends Fragment implements View.OnClickListene
                 if (mContact != null && mContact.getUriPhoto() != null) {
                     Bitmap bm = null;
                     try {
-                        bm = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), Uri.parse(mContact.getUriPhoto()));
+                        bm = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), Uri.parse(mContact.getUriPhoto()));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -370,6 +372,7 @@ public class HistoryListFragment extends Fragment implements View.OnClickListene
             mHistory = history;
         }
 
+        @SuppressLint("NotifyDataSetChanged")
         public void setShowCheckbox(boolean show){
             isShowCheckbox = show;
             if (isShowCheckbox) {
@@ -383,9 +386,8 @@ public class HistoryListFragment extends Fragment implements View.OnClickListene
             return checked;
         }
 
-        public void setAllCheked(boolean value) {
-            for (int i = 0; i < checked.length; i++)
-                checked[i] = value;
+        public void setAllChecked(boolean value) {
+            Arrays.fill(checked, value);
             updateUI();
         }
     }
@@ -398,6 +400,7 @@ public class HistoryListFragment extends Fragment implements View.OnClickListene
 
         //mBinding.historyList.scrollBy(0, 0);
         if (mListState != null) {
+            assert mBinding.historyList.getLayoutManager() != null;
             mBinding.historyList.getLayoutManager().onRestoreInstanceState(mListState);
         }
         mListState = null;
@@ -407,6 +410,7 @@ public class HistoryListFragment extends Fragment implements View.OnClickListene
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        assert mBinding.historyList.getLayoutManager() != null;
         mListState = mBinding.historyList.getLayoutManager().onSaveInstanceState();
         outState.putParcelable(LIST_STATE_KEY, mListState);
     }

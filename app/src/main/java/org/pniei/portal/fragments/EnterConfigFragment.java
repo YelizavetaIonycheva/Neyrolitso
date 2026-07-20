@@ -1,5 +1,6 @@
 package org.pniei.portal.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -10,34 +11,32 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.google.android.material.textfield.TextInputLayout;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.pniei.portal.R;
 import org.pniei.portal.activities.LoginActivity;
 import org.pniei.portal.databinding.EnterConfigFragmentBinding;
-import org.pniei.portal.utils.CryptUtils;
 import org.pniei.portal.utils.PrefsUtils;
 import org.pniei.portal.utils.Utils;
-import org.pniei.portal.vpn.VpnClient;
-import java.io.File;
-import java.io.FileOutputStream;
-
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.Fragment;
 
 public class EnterConfigFragment extends Fragment {
     private ActivityResultLauncher<Intent> selectConfigResultLauncher;
+    @SuppressLint("StaticFieldLeak")
     private static Context mContext;
     private Handler mHandler;
     private EnterConfigFragmentBinding mBinding;
-    private DocumentFile selectedKeyFile = null;
     private DocumentFile selectedConfFile = null;
-    private boolean checkFileConfig = false;
+    private final boolean checkFileConfig = false;
 
     private static int selectedRegime;
 
@@ -48,7 +47,7 @@ public class EnterConfigFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mBinding = DataBindingUtil.inflate(inflater, R.layout.enter_config_fragment, container, false);
@@ -78,51 +77,47 @@ public class EnterConfigFragment extends Fragment {
 
             if (selectedRegime == PrefsUtils.REGIME_P) {
                 //if (!PrefsUtils.ins().isCfgEnterP()) {
-                    byte [] bufConfig = Utils.readFileFromZip(mContext, selectedConfFile, ".cfgp");
-                    if (bufConfig == null) {
-                        showError(getString(R.string.err_file_cfg_not_found), mBinding.confFileLayout);
-                        return;
-                    }
+                byte[] bufConfig = Utils.readFileFromZip(mContext, selectedConfFile, ".cfgp");
+                if (bufConfig == null) {
+                    showError(getString(R.string.err_file_cfg_not_found), mBinding.confFileLayout);
+                    return;
+                }
 
-                    if (!checkConfigFile(new String(bufConfig))) {
-                        showError(getString(R.string.init_config_error), mBinding.confFileLayout);
-                        return;
-                    }
+                if (checkConfigFile(new String(bufConfig))) {
+                    showError(getString(R.string.init_config_error), mBinding.confFileLayout);
+                    return;
+                }
                 //}
 
                 //if (!PrefsUtils.ins().isKeyEnter()) {
-                    byte [] keyData = Utils.readFileFromZip(mContext, selectedConfFile, ".key");
+                byte[] keyData = Utils.readFileFromZip(mContext, selectedConfFile, ".key");
 
-                    if (keyData == null) {
-                        showError(getString(R.string.err_file_key_not_found), mBinding.confFileLayout);
-                        return;
-                    }
+                if (keyData == null) {
+                    showError(getString(R.string.err_file_key_not_found), mBinding.confFileLayout);
+                    return;
+                }
 
-                    if (!saveVpnKey(keyData)) {
-                        showError(getString(R.string.err_key_save), mBinding.confFileLayout);
-                        return;
-                    }
-                    PrefsUtils.ins().setCfgEnterP(true);
-                    PrefsUtils.ins().setKeyEnter(true);
-               // }
+                PrefsUtils.ins().setCfgEnterP(true);
+                PrefsUtils.ins().setKeyEnter(true);
+                // }
             } else {
                 //if (PrefsUtils.ins().isCfgEnterTT()) {
-                    byte [] bufConfig = Utils.readFileFromZip(mContext, selectedConfFile, ".cfgt");
-                    if (bufConfig == null) {
-                        showError(getString(R.string.err_file_cfg_not_found), mBinding.confFileLayout);
-                        return;
-                    }
+                byte[] bufConfig = Utils.readFileFromZip(mContext, selectedConfFile, ".cfgt");
+                if (bufConfig == null) {
+                    showError(getString(R.string.err_file_cfg_not_found), mBinding.confFileLayout);
+                    return;
+                }
 
-                    if (!checkConfigFile(new String(bufConfig))) {
-                        showError(getString(R.string.init_config_error), mBinding.confFileLayout);
-                        return;
-                    }
-                    PrefsUtils.ins().setCfgEnterTT(true);
-               // }
+                if (checkConfigFile(new String(bufConfig))) {
+                    showError(getString(R.string.init_config_error), mBinding.confFileLayout);
+                    return;
+                }
+                PrefsUtils.ins().setCfgEnterTT(true);
+                // }
             }
 
             PrefsUtils.ins().setRegimeSelected(selectedRegime);
-            ((LoginActivity)getActivity()).loginOk();
+            ((LoginActivity) requireActivity()).loginOk();
         }).start();
 
     }
@@ -131,7 +126,7 @@ public class EnterConfigFragment extends Fragment {
         mHandler.post(() -> {
             mBinding.progressPar.setVisibility(View.INVISIBLE);
             if (view instanceof TextInputLayout) {
-                ((TextInputLayout)view).setError(error);
+                ((TextInputLayout) view).setError(error);
             }
         });
     }
@@ -150,18 +145,17 @@ public class EnterConfigFragment extends Fragment {
                 String KS = jsonObject.getString("ks");
 
                 if (selectedRegime == PrefsUtils.REGIME_P) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(id)
-                            .append(signature)
-                            .append(phone)
-                            .append(ipSkzi)
-                            .append(ipMon)
-                            .append(ipAts)
-                            .append(ipDns);
-                    byte [] configs = sb.toString().getBytes();
+                    String sb = id +
+                            signature +
+                            phone +
+                            ipSkzi +
+                            ipMon +
+                            ipAts +
+                            ipDns;
+                    byte[] configs = sb.getBytes();
                     int crc = CryptUtils.CRC32(configs, configs.length);
-                    if(!(KS.equalsIgnoreCase(Utils.intToHexString(crc)))) {
-                        return false;
+                    if (!(KS.equalsIgnoreCase(Utils.intToHexString(crc)))) {
+                        return true;
                     }
 
                     PrefsUtils.ins().setIdP(id);
@@ -172,16 +166,15 @@ public class EnterConfigFragment extends Fragment {
                     PrefsUtils.ins().setIpAtsP(ipAts + ":5070");
                     PrefsUtils.ins().setIpDnsP(ipDns);
                 } else {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(id)
-                            .append(signature)
-                            .append(phone)
-                            .append(ipAts)
-                            .append(ipDns);
-                    byte [] configs = sb.toString().getBytes();
+                    String sb = id +
+                            signature +
+                            phone +
+                            ipAts +
+                            ipDns;
+                    byte[] configs = sb.getBytes();
                     int crc = CryptUtils.CRC32(configs, configs.length);
-                    if(!(KS.equalsIgnoreCase(Utils.intToHexString(crc)))) {
-                        return false;
+                    if (!(KS.equalsIgnoreCase(Utils.intToHexString(crc)))) {
+                        return true;
                     }
                     PrefsUtils.ins().setIdTT(id);
                     PrefsUtils.ins().setSignatureTT(signature);
@@ -190,32 +183,12 @@ public class EnterConfigFragment extends Fragment {
                     PrefsUtils.ins().setIpDnsTT(ipDns);
                 }
 
-                return true;
+                return false;
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        return false;
-    }
-
-    private boolean saveVpnKey(byte [] keyData) {
-        byte [] cryptKeyData;
-
-        cryptKeyData = CryptUtils.cryptData(keyData, PrefsUtils.ins().getHashPass());
-        if(cryptKeyData == null)
-            return true;
-
-        try {
-            File fileKey = VpnClient.getFileKey(mContext);
-            FileOutputStream fout = new FileOutputStream(fileKey);
-            fout.write(cryptKeyData);
-            fout.flush();
-            fout.close();
-            return VpnClient.ins().loadAndRefreshKeys(mContext);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        return true;
     }
 
     public void registerForSelectFileResult() {
@@ -226,11 +199,10 @@ public class EnterConfigFragment extends Fragment {
                         Intent resultData = result.getData();
                         if (resultData != null) {
                             Uri fileUri = resultData.getData();
+                            assert fileUri != null;
                             selectedConfFile = DocumentFile.fromSingleUri(mContext, fileUri);
-                            if (selectedConfFile != null) {
-                                mBinding.confFile.setText(selectedConfFile.getName());
-                                mBinding.confFileLayout.setError(null);
-                            }
+                            mBinding.confFile.setText(selectedConfFile.getName());
+                            mBinding.confFileLayout.setError(null);
                         }
                     }
                 });

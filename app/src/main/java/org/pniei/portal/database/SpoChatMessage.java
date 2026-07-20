@@ -5,18 +5,14 @@ import android.net.Uri;
 import android.os.Environment;
 
 import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import androidx.core.util.Pair;
 
 import org.pniei.portal.R;
 import org.pniei.portal.services.SpoMessagesService;
-import org.pniei.portal.utils.FileUtils;
 import org.pniei.portal.utils.Utils;
 
 public class SpoChatMessage {
@@ -26,8 +22,8 @@ public class SpoChatMessage {
     public static final int UNREAD = 0;
     public static final int TEXT = 0;
     public static final int FILE = 1;
-   // public static final int IMAGE = 2;
-   // public static final int VOICE = 3;
+    // public static final int IMAGE = 2;
+    // public static final int VOICE = 3;
     public static final int SENDING = 0;
     public static final int SENT = 1;
 
@@ -43,7 +39,8 @@ public class SpoChatMessage {
     private ArrayList<SpoFile> mSpoFiles;
     private String mIdUsersStr;
 
-    private SpoChatMessage() { }
+    private SpoChatMessage() {
+    }
 
     public SpoChatMessage(long id, int dir, int isRead, int typeContent, int status, ArrayList<String> idUsers, String message, long idSpoChatRoom, long date) {
         mId = id;
@@ -56,11 +53,11 @@ public class SpoChatMessage {
         mIdSpoChatRoom = idSpoChatRoom;
         mDate = date;
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < idUsers.size()-1; i++) {
+        for (int i = 0; i < idUsers.size() - 1; i++) {
             sb.append(idUsers.get(i));
             sb.append(",");
         }
-        sb.append(idUsers.get(idUsers.size()-1));
+        sb.append(idUsers.get(idUsers.size() - 1));
         mIdUsersStr = sb.toString();
     }
 
@@ -77,10 +74,8 @@ public class SpoChatMessage {
 
         mIdUsers = new ArrayList<>();
         if (mIdUsersStr.contains(",")) {
-            String [] list = mIdUsersStr.split(",");
-            for (String num : list) {
-                mIdUsers.add(num);
-            }
+            String[] list = mIdUsersStr.split(",");
+            Collections.addAll(mIdUsers, list);
         } else {
             mIdUsers.add(mIdUsersStr);
         }
@@ -97,11 +92,11 @@ public class SpoChatMessage {
         mDate = date;
 
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < idUsers.size()-1; i++) {
+        for (int i = 0; i < idUsers.size() - 1; i++) {
             sb.append(idUsers.get(i));
             sb.append(",");
         }
-        sb.append(idUsers.get(idUsers.size()-1));
+        sb.append(idUsers.get(idUsers.size() - 1));
         mIdUsersStr = sb.toString();
     }
 
@@ -120,14 +115,14 @@ public class SpoChatMessage {
         Uri fileUriSended;
 
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < idUsers.size()-1; i++) {
+        for (int i = 0; i < idUsers.size() - 1; i++) {
             sb.append(idUsers.get(i));
             sb.append(",");
         }
-        sb.append(idUsers.get(idUsers.size()-1));
+        sb.append(idUsers.get(idUsers.size() - 1));
         message.mIdUsersStr = sb.toString();
 
-        if (filesInfo != null && filesInfo.size() > 0) {
+        if (filesInfo != null && !filesInfo.isEmpty()) {
             message.mTypeContent = FILE;
             ArrayList<SpoFile> files = new ArrayList<>();
             for (SpoFile.FileInterface fileInfo : filesInfo) {
@@ -137,22 +132,22 @@ public class SpoChatMessage {
 
                 Context mContext = SpoMessagesService.instance().getContext();
                 if (android.os.Build.VERSION.SDK_INT < 29) {
-                    fileUriSended = Uri.parse( Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + mContext.getString(R.string.app_name) + "/Sended/" + file.getName());
-                    fileUriResieve = Uri.parse( Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + mContext.getString(R.string.app_name) + "/Recieved/" + file.getName());
+                    fileUriSended = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + mContext.getString(R.string.app_name) + "/Sended/" + file.getName());
+                    fileUriResieve = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + mContext.getString(R.string.app_name) + "/Recieved/" + file.getName());
                 } else {
                     fileUriSended = Uri.parse(mContext.getExternalMediaDirs()[0].getAbsolutePath() + "/Sended/" + file.getName());
                     fileUriResieve = Uri.parse(mContext.getExternalMediaDirs()[0].getAbsolutePath() + "/Recieved/" + file.getName());
                 }
                 File fileRecieve = new File(String.valueOf(fileUriResieve));
                 File fileSended = new File(String.valueOf(fileUriSended));
-                if ((!fileSended.isFile())&&(!fileRecieve.isFile())) {
-                        file.setStatus(SpoFile.STATUS_READY_TO_DOWNLOAD);
+                if ((!fileSended.isFile()) && (!fileRecieve.isFile())) {
+                    file.setStatus(SpoFile.STATUS_READY_TO_DOWNLOAD);
                 } else {
                     if (fileRecieve.isFile()) {
                         file.setStatus(SpoFile.STATUS_OK);
                         file.setUri(String.valueOf("file://" + fileRecieve));
                     }
-                    if (fileSended.isFile()){
+                    if (fileSended.isFile()) {
                         file.setStatus(SpoFile.STATUS_OK);
                         file.setUri(String.valueOf("file://" + fileSended));
                     }
@@ -172,6 +167,7 @@ public class SpoChatMessage {
         message.mDate = new Date().getTime();
         return message;
     }
+
     public static SpoChatMessage createOutgoingResendMessage(long idMessage, SpoChatRoom chatRoom) {
         SpoChatMessage resendMessageInfo = DBUtils.getChatMessageById(idMessage);
         SpoChatMessage message = new SpoChatMessage();
@@ -186,17 +182,18 @@ public class SpoChatMessage {
         message.mDate = new Date().getTime();
 
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < message.mIdUsers.size()-1; i++) {
+        for (int i = 0; i < message.mIdUsers.size() - 1; i++) {
             sb.append(message.mIdUsers.get(i));
             sb.append(",");
         }
-        sb.append(message.mIdUsers.get(message.mIdUsers.size()-1));
+        sb.append(message.mIdUsers.get(message.mIdUsers.size() - 1));
         message.mIdUsersStr = sb.toString();
 
         message.mSpoFiles = new ArrayList<>(Arrays.asList(DBUtils.getSpoFiles(idMessage)));
 
         return message;
     }
+
     public static SpoChatMessage createOutgoingMessage(ArrayList<Uri> uriFiles, String text, SpoChatRoom chatRoom) {
         SpoChatMessage message = new SpoChatMessage();
         message.mId = 0;
@@ -210,14 +207,14 @@ public class SpoChatMessage {
         message.mDate = new Date().getTime();
 
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < message.mIdUsers.size()-1; i++) {
+        for (int i = 0; i < message.mIdUsers.size() - 1; i++) {
             sb.append(message.mIdUsers.get(i));
             sb.append(",");
         }
-        sb.append(message.mIdUsers.get(message.mIdUsers.size()-1));
+        sb.append(message.mIdUsers.get(message.mIdUsers.size() - 1));
         message.mIdUsersStr = sb.toString();
 
-        if (uriFiles != null && uriFiles.size() > 0) {
+        if (uriFiles != null && !uriFiles.isEmpty()) {
             message.mTypeContent = FILE;
             ArrayList<SpoFile> files = new ArrayList<>();
 
@@ -248,11 +245,11 @@ public class SpoChatMessage {
         message.mDate = new Date().getTime();
 
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < message.mIdUsers.size()-1; i++) {
+        for (int i = 0; i < message.mIdUsers.size() - 1; i++) {
             sb.append(message.mIdUsers.get(i));
             sb.append(",");
         }
-        sb.append(message.mIdUsers.get(message.mIdUsers.size()-1));
+        sb.append(message.mIdUsers.get(message.mIdUsers.size() - 1));
         message.mIdUsersStr = sb.toString();
 
         ArrayList<SpoFile> files = new ArrayList<>();
@@ -278,7 +275,9 @@ public class SpoChatMessage {
         return mId;
     }
 
-    public void setId(long id) {mId = id;}
+    public void setId(long id) {
+        mId = id;
+    }
 
     public void setDir(int mDir) {
         this.mDir = mDir;

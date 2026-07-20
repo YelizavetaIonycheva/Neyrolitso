@@ -1,5 +1,6 @@
 package org.pniei.portal.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -8,11 +9,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,10 +21,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import org.pniei.portal.BuildConfig;
+
 import org.pniei.portal.R;
 import org.pniei.portal.databinding.UpdateFragmentBinding;
 import org.pniei.portal.services.SpoMessagesService;
@@ -36,6 +39,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
     private String linkUpdateApp = null;
     private boolean isDownloadingFile = false;
     private boolean isCheckUpdate = false;
+    @SuppressLint("StaticFieldLeak")
     private static Context mContext;
     private boolean isShowBtnUpdate = false;
 
@@ -45,12 +49,10 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mHandler = new Handler(Looper.getMainLooper());
         mBinding = DataBindingUtil.inflate(inflater, R.layout.update_fragment, container, false);
-
-        mBinding.currentVersion.setText(BuildConfig.VERSION_NAME);
 
         mBinding.btnCheckUpdate.setOnClickListener(this);
         mBinding.btnDownloadUpdate.setOnClickListener(this);
@@ -80,19 +82,11 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
             showProgressInfo(true, getString(R.string.progress_check_update_po));
             showNewVersionInfo(false, null);
 
-            String [] verAndLink = SpoMessagesService.instance().checkUpdateApp(BuildConfig.VERSION_NAME);
-
-            if (isCheckUpdate) {
-                if (verAndLink != null && verAndLink.length == 2) {
-                    showNewVersionInfo(true,  verAndLink[0]);
-                    linkUpdateApp = verAndLink[1];
-                } else {
-                    showNewVersionInfo(true, null);
-                    linkUpdateApp = null;
-                }
-                showProgressInfo(false, null);
-            }
-        }).start();
+            showNewVersionInfo(true, null);
+            linkUpdateApp = null;
+            showProgressInfo(false, null);
+        }
+                start();
     }
 
     private void downloadUpdate() {
@@ -213,7 +207,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
         HttpURLConnection c = null;
         final int bufSize = 10240;
         int needRead, alreadyRead;
-        byte [] buf = new byte[bufSize];
+        byte[] buf = new byte[bufSize];
         int len, temp, perc = -1;
         double count = 0, fileSize;
         StringBuilder sb = new StringBuilder();
@@ -260,7 +254,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
 
                 return isDownloadingFile;
             }
-        }  catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         } finally {
             if (c != null) {

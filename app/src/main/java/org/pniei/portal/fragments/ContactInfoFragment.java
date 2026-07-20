@@ -1,5 +1,6 @@
 package org.pniei.portal.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,35 +10,35 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import org.linphone.LinphoneManager;
-
-import java.io.IOException;
-import java.util.ArrayList;
-
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import org.linphone.LinphoneManager;
 import org.linphone.core.LinphoneCore;
 import org.pniei.portal.R;
+import org.pniei.portal.activities.SecondaryActivity;
+import org.pniei.portal.database.DBUtils;
+import org.pniei.portal.database.SpoChatRoom;
+import org.pniei.portal.database.SpoContact;
+import org.pniei.portal.databinding.ContactInfoFragmentBinding;
 import org.pniei.portal.listener.OnBackClickListener;
 import org.pniei.portal.listener.SpoContactListener;
-import org.pniei.portal.utils.Utils;
-import org.pniei.portal.activities.SecondaryActivity;
-import org.pniei.portal.database.SpoChatRoom;
 import org.pniei.portal.listener.SpoListenerManager;
-import org.pniei.portal.database.SpoContact;
-import org.pniei.portal.database.DBUtils;
-import org.pniei.portal.databinding.ContactInfoFragmentBinding;
 import org.pniei.portal.services.SpoMessagesService;
-import  org.pniei.portal.vpn.VpnConnection;
+import org.pniei.portal.utils.Utils;
 
-public class ContactInfoFragment extends Fragment implements SpoContactListener, OnBackClickListener  {
+import java.io.IOException;
+import java.util.ArrayList;
+
+public class ContactInfoFragment extends Fragment implements SpoContactListener, OnBackClickListener {
     private static final String ARG_CONTACT_ID = "id_contact";
+    @SuppressLint("StaticFieldLeak")
     private static Context mContext;
     private SpoContact mContact;
     private ContactInfoFragmentBinding mBinding;
@@ -56,11 +57,12 @@ public class ContactInfoFragment extends Fragment implements SpoContactListener,
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        assert getArguments() != null;
         mIdContact = getArguments().getLong(ARG_CONTACT_ID);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContact = DBUtils.getContact(mIdContact);
 
@@ -72,13 +74,11 @@ public class ContactInfoFragment extends Fragment implements SpoContactListener,
         mBinding.btnEdit.setOnClickListener(v -> {
             if (mContact != null) {
                 Fragment fragment = ContactChangeFragment.newInstance(mContext, false, mContact.getId());
-                ((SecondaryActivity)getActivity()).displayFragment(fragment, true);
+                ((SecondaryActivity) requireActivity()).displayFragment(fragment, true);
             }
         });
 
-        mBinding.btnClose.setOnClickListener(v -> {
-            backOrClose();
-        });
+        mBinding.btnClose.setOnClickListener(v -> backOrClose());
 
         mBinding.btnDelete.setOnClickListener(v -> {
             // открыть диалоговое окно
@@ -115,21 +115,21 @@ public class ContactInfoFragment extends Fragment implements SpoContactListener,
             }
 
             Fragment fragment = ChatFragment.newInstance(mContext, DBUtils.getChatRoomForIdUser(mContact.getIdUser()).getId());
-            ((SecondaryActivity)getActivity()).displayFragment(fragment, false);
+            ((SecondaryActivity) requireActivity()).displayFragment(fragment, false);
         });
 
         mBinding.btnCall.setOnClickListener(v -> {
-            if(LinphoneCore.RegistrationState.flagRegistrationOk == true) {
+            if (LinphoneCore.RegistrationState.flagRegistrationOk) {
                 LinphoneManager.getInstance().newOutgoingCall(mContact.getSipNumber(), "");
-            }else{
-                Toast.makeText(getActivity(),"Нет соединения с СКЗИ",Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getActivity(), "Нет соединения с СКЗИ", Toast.LENGTH_SHORT).show();
             }
         });
 
         if (mContact.getUriPhoto() != null) {
             Bitmap bm = null;
             try {
-                bm = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), Uri.parse(mContact.getUriPhoto()));
+                bm = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), Uri.parse(mContact.getUriPhoto()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -147,10 +147,10 @@ public class ContactInfoFragment extends Fragment implements SpoContactListener,
     }
 
     private void backOrClose() {
-        if(getActivity().getSupportFragmentManager().getBackStackEntryCount() > 0)
-            getActivity().getSupportFragmentManager().popBackStack();
+        if (requireActivity().getSupportFragmentManager().getBackStackEntryCount() > 0)
+            requireActivity().getSupportFragmentManager().popBackStack();
         else
-            getActivity().finish();
+            requireActivity().finish();
     }
 
     @Override
@@ -164,7 +164,8 @@ public class ContactInfoFragment extends Fragment implements SpoContactListener,
     }
 
     @Override
-    public void onSpoContactAdd(boolean result, String msg) { }
+    public void onSpoContactAdd(boolean result, String msg) {
+    }
 
     @Override
     public void onSpoContactDelete(boolean result, String msg) {

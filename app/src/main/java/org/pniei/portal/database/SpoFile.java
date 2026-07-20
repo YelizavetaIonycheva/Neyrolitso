@@ -70,7 +70,8 @@ public class SpoFile {
         mName = name;
     }
 
-    public SpoFile () { }
+    public SpoFile() {
+    }
 
     public void setId(long id) {
         mId = id;

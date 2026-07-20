@@ -15,7 +15,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import org.pniei.portal.listener.SpoListenerManager;
-import org.pniei.portal.vpn.VpnClient;
 
 public class NetworkRequestUtils {
     private static final String URL_IMS_ADDRESS     = "message.";
@@ -49,7 +48,6 @@ public class NetworkRequestUtils {
 
     private static final int TIME_OUT = 20000;
 
-    private static String crlf = "\r\n";
     private static String twoHyphens = "--";
     private static String boundary =  "----BOUNDARY";
 
@@ -124,6 +122,7 @@ public class NetworkRequestUtils {
         if (mime == null)
             mime = "application/octet-stream";
         StringBuilder sb = new StringBuilder();
+        String crlf = "\r\n";
         try {
         sb.append(twoHyphens).append(boundary).append(crlf)
             .append("Content-Disposition: form-data; name=\"file\"; filename=\"").append(new String(fileName.getBytes("utf-8"), "iso-8859-1")).append("\"").append(crlf)

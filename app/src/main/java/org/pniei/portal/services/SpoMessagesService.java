@@ -9,6 +9,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,36 +25,33 @@ import org.pniei.portal.database.SpoContact;
 import org.pniei.portal.database.SpoFile;
 import org.pniei.portal.listener.SpoListenerManager;
 import org.pniei.portal.notification.SpoNotificationsManager;
-import org.pniei.portal.utils.CryptUtils;
 import org.pniei.portal.utils.IsRunThread;
 import org.pniei.portal.utils.NetworkRequestUtils;
 import org.pniei.portal.utils.PrefsUtils;
 import org.pniei.portal.utils.Utils;
-import org.pniei.portal.vpn.VpnClient;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import androidx.annotation.Nullable;
-
 public class SpoMessagesService extends Service {
-    private static final String TAG = "SpoMessagesService";
+    private static final String TAG = "MessagesService";
     public static final String ACTION_START = "start";
     public static final String ACTION_STOP = "stop";
     public static final String ACTION_SEND_MESSAGE = "snd_msg";
@@ -79,8 +78,6 @@ public class SpoMessagesService extends Service {
 
     private boolean isStarting = false;
     private int TIME_DELAY_REQUEST_MESSAGE = 15;
-    private final int TIME_DELAY_REQUEST_KEY = 300;
-    private final int TIME_DELAY_CRYPT_DB = 60;
     private ScheduledExecutorService processRequestMessage = null;
     private ScheduledExecutorService processRequestKey = null;
     private ScheduledExecutorService processCryptDB = null;
@@ -94,7 +91,7 @@ public class SpoMessagesService extends Service {
     private String signatureUser = null;
     private SpoNotificationsManager mSpoNotificationsManager;
 
-    private class Pair<F, S> {
+    private static class Pair<F, S> {
         private F first;
         private S second;
 
@@ -152,7 +149,7 @@ public class SpoMessagesService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
-            switch (intent.getAction()) {
+            switch (Objects.requireNonNull(intent.getAction())) {
                 case ACTION_SEND_MESSAGE : {
                     sendMessage(intent.getLongExtra(MESSAGE_ID_KEY, -1));
                     break;
@@ -301,9 +298,9 @@ public class SpoMessagesService extends Service {
                             }
                             DBUtils.saveDataBase();
 
-                            ///////////////
                             LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
                             for(SpoContact contact : addContacts) {
+                                assert lc != null;
                                 LinphoneFriend lf = lc.createFriend();
                                 if (lf != null) {
                                     if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
@@ -315,7 +312,6 @@ public class SpoMessagesService extends Service {
                                 }
                             }
                             LinphoneManager.getInstance().subscribeFriendList(true);
-                            ///////////////
 
                             SpoListenerManager.callContactSync(true, null, addContacts, changedContacts);
                             return;
@@ -349,8 +345,8 @@ public class SpoMessagesService extends Service {
                             contact.setIdUser(result.getString("id"));
                             contact.setId(DBUtils.saveContact(contact));
                             checkChatRoom(contact); // Если от пользователя с данным номером были сообщения, необходимо установить idUsers
-                            ///////////
                             LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
+                            assert lc != null;
                             LinphoneFriend lf = lc.createFriend();
                             if (lf != null) {
                                 if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
@@ -361,7 +357,6 @@ public class SpoMessagesService extends Service {
                                 lc.addFriend(lf);
                             }
                             LinphoneManager.getInstance().subscribeFriendList(true);
-                            ///////////
                             SpoListenerManager.callContactAdd(true, null);
                         } else  {
                             SpoListenerManager.callContactAdd(false, Utils.getError(result.getString("error")));
@@ -383,7 +378,7 @@ public class SpoMessagesService extends Service {
         String idUser = "phone:" + contact.getSipNumber();
         SpoChatRoom chatRoom = DBUtils.getChatRoomForIdUser(idUser);
         if (chatRoom != null) {
-            List<SpoChatMessage> messages = Arrays.asList(DBUtils.getSpoChatMessagesRange(chatRoom.getId(), 0));
+            SpoChatMessage[] messages = DBUtils.getSpoChatMessagesRange(chatRoom.getId(), 0);
             List<String> idUsers = new ArrayList<>();
             idUsers.add(contact.getIdUser());
             for (SpoChatMessage message: messages) {
@@ -442,18 +437,15 @@ public class SpoMessagesService extends Service {
                         if (result.has("error") && result.getInt("error") == 200) {
                             Log.i(TAG, "Контакт удален, id = " + contact.getIdUser());
 
-                            ///////////
                             LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
+                            assert lc != null;
                             LinphoneFriend[] lfs = lc.getFriendList();
-                            if (lfs.length > 0) {
-                                for (LinphoneFriend lf : lfs) {
-                                    if (lf.getAddress() != null && lf.getAddress().getUserName() != null && contact!= null && lf.getAddress().getUserName().equals(contact.getSipNumber())) {
-                                        lc.removeFriend(lf);
-                                        break;
-                                    }
+                            for (LinphoneFriend lf : lfs) {
+                                if (lf.getAddress() != null && lf.getAddress().getUserName() != null && lf.getAddress().getUserName().equals(contact.getSipNumber())) {
+                                    lc.removeFriend(lf);
+                                    break;
                                 }
                             }
-                            ///////////
 
                             DBUtils.deleteContact(contact);
                             SpoListenerManager.callContactDelete(true, null);
@@ -484,17 +476,13 @@ public class SpoMessagesService extends Service {
 
     private void startRequestKey() {
         processRequestKey  = Executors.newSingleThreadScheduledExecutor();
+        int TIME_DELAY_REQUEST_KEY = 300;
         processRequestKey.scheduleWithFixedDelay(new RequestKeyRunnable(), 10, TIME_DELAY_REQUEST_KEY, TimeUnit.SECONDS);
     }
 
     private void stopRequestKey() {
         if (processRequestKey != null)
             processRequestKey.shutdownNow();
-    }
-
-    private void startCryptDBProcess() {
-        processCryptDB = Executors.newSingleThreadScheduledExecutor();
-        processCryptDB.scheduleWithFixedDelay(new CryptDBRunnable(), 60, TIME_DELAY_CRYPT_DB, TimeUnit.SECONDS);
     }
 
     private void stopCryptDBProcess() {
@@ -506,7 +494,7 @@ public class SpoMessagesService extends Service {
         processSendingTextMessages = Executors.newCachedThreadPool();
         processSendingFileMessages = Executors.newSingleThreadExecutor();
         List<SpoChatMessage> waitingMessages = Arrays.asList(DBUtils.getWaitingSpoChatMessages());
-        if (waitingMessages != null && waitingMessages.size() > 0) {
+        if (!waitingMessages.isEmpty()) {
             for (SpoChatMessage message: waitingMessages) {
                 if (message.getTypeContent() == SpoChatMessage.TEXT) {
                     Runnable task = new SendingTextMessageRunnable(message);
@@ -514,15 +502,13 @@ public class SpoMessagesService extends Service {
                     mWaitingMessages.add(msg);
                     processSendingTextMessages.submit(task);
                 } else {
-                    List<SpoFile> files = Arrays.asList(DBUtils.getSpoFiles(message.getId()));
-                    if (files != null) {
-                        for (SpoFile file : files) {
-                            if (file.getStatus() == SpoFile.STATUS_SEND_RECEIVE) {
-                                Runnable task = new SendReceiveFileMessageRunnable(file);
-                                Pair<Runnable, SpoFile> msg = new Pair<>(task, file);
-                                mWaitingFiles.add(msg);
-                                processSendingFileMessages.submit(task);
-                            }
+                    SpoFile[] files = DBUtils.getSpoFiles(message.getId());
+                    for (SpoFile file : files) {
+                        if (file.getStatus() == SpoFile.STATUS_SEND_RECEIVE) {
+                            Runnable task = new SendReceiveFileMessageRunnable(file);
+                            Pair<Runnable, SpoFile> msg = new Pair<>(task, file);
+                            mWaitingFiles.add(msg);
+                            processSendingFileMessages.submit(task);
                         }
                     }
                 }
@@ -601,14 +587,14 @@ public class SpoMessagesService extends Service {
         SpoChatMessage message = DBUtils.getChatMessageById(file.getIdMessage());
         List<SpoFile> files = Arrays.asList(DBUtils.getSpoFiles(message.getId()));
 
-        if (files.size() > 0) {
+        if (!files.isEmpty()) {
             for (SpoFile _file : files) {
                 if (_file.getStatus() == SpoFile.STATUS_SEND_RECEIVE || _file.getStatus() == SpoFile.STATUS_ERROR) {
                     isSendMessage = false;
                     break;
                 }
             }
-        } else if (message.getMessage() == null || message.getMessage().length() == 0) {
+        } else if (message.getMessage() == null || message.getMessage().isEmpty()) {
             isSendMessage = false;
             DBUtils.deleteMessage(message);
         }
@@ -708,14 +694,7 @@ public class SpoMessagesService extends Service {
     }
 
     private class RequestMessageRunnable implements Runnable {
-        private final String KEY_USER_ID = "id";
-        private final String KEY_TEXT = "text";
-        private final String KEY_FILE = "file";
-        private final String KEY_FILE_NAME = "fileName";
-        private final String KEY_FILE_LINK = "link";
-        private final String KEY_FILE_ID_SERVER = "idFile";
         private final String KEY_DATE = "dispatchTime";
-        private final String KEY_PHONE = "phone";
 
         @Override
         public void run() {
@@ -752,6 +731,8 @@ public class SpoMessagesService extends Service {
             ArrayList<SpoFile.FileInterface> filesInfo = null;
             String text = null;
 
+            String KEY_USER_ID = "id";
+            String KEY_PHONE = "phone";
             if (jsonMessage.has(KEY_USER_ID)) {
                 idUsers.add(jsonMessage.getString(KEY_USER_ID));
             } else if (jsonMessage.has(KEY_PHONE)) {
@@ -762,12 +743,16 @@ public class SpoMessagesService extends Service {
                 return null;
             }
 
+            String KEY_FILE = "file";
             if (jsonMessage.has(KEY_FILE)) {
                 filesInfo = new ArrayList<>();
                 JSONArray jsonFiles = jsonMessage.getJSONArray(KEY_FILE);
                 for (int i = 0; i < jsonFiles.length(); i++) {
                     JSONObject jsonFile = jsonFiles.getJSONObject(i);
                     SpoFile.FileInterface fileInfo;
+                    String KEY_FILE_NAME = "fileName";
+                    String KEY_FILE_ID_SERVER = "idFile";
+                    String KEY_FILE_LINK = "link";
                     if (jsonFile.has(KEY_FILE_ID_SERVER)) {
                         fileInfo = new SpoFile.FileInterface(jsonFile.getString(KEY_FILE_ID_SERVER), jsonFile.getString(KEY_FILE_NAME), jsonFile.getString(KEY_FILE_LINK));
                     } else {
@@ -777,10 +762,11 @@ public class SpoMessagesService extends Service {
                 }
             }
 
+            String KEY_TEXT = "text";
             if (jsonMessage.has(KEY_TEXT)) {
                 text = jsonMessage.getString(KEY_TEXT);
 
-                if (!text.equals("") && jsonMessage.has(KEY_USER_ID) && PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
+                if (!text.isEmpty() && jsonMessage.has(KEY_USER_ID) && PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
                     text = CryptUtils.decryptMessage(text, Integer.parseInt(idUsers.get(0)));
                 }
             }
@@ -816,7 +802,7 @@ public class SpoMessagesService extends Service {
 
             if (message.getTypeContent() == SpoChatMessage.FILE) {
                 ArrayList<SpoFile> files =  message.getSpoFiles();
-                if (files != null && files.size() > 0) {
+                if (files != null && !files.isEmpty()) {
                     for(SpoFile file : files) {
                         file.setIdMessage(message.getId());
                         file.setId(DBUtils.saveFile(file));
@@ -949,7 +935,7 @@ public class SpoMessagesService extends Service {
             return false;
         }
 
-        private boolean checkConnectionOnKey(VpnClient.KeyInf key) {
+        private boolean checkConnectionOnKey(VpnClient.KeyInf key) throws IOException {
             if (key == null) return false;
             Log.i(TAG, "checkConnectionOnKey  START");
             long time = System.currentTimeMillis();
@@ -981,67 +967,6 @@ public class SpoMessagesService extends Service {
                 tunnel.configureBlocking(false);
 
                 ByteBuffer packet = ByteBuffer.allocate(1500);
-                VpnClient vpnClient = VpnClient.ins();
-                VpnClient.KeyInf workKey = key;
-                short netNum = workKey.compl;
-
-                /** Попытка установки соединения на основном ключе **/
-                vpnClient.ikev2clear();
-                vpnClient.ikev2init(netNum, tunnel.socket().getLocalPort(), tunnel.socket().getLocalAddress().getAddress(),
-                        (short)0xF2D2, tunnel.socket().getPort(), tunnel.socket().getInetAddress().getAddress(),
-                        workKey.kd, workKey.ser, workKey.compl,
-                        workKey.numCompl, new Random().nextInt(), null, null);
-                ikesainit = vpnClient.ikev2getikesainit(lenData);
-                // Совершаем 3 попытки установления соединения
-                for (int i = 0; i < 2; i++) {
-                    packet.put(ikesainit).flip();
-                    packet.position(0);
-                    packet.limit(lenData[0]);
-                    tunnel.write(packet);
-                    packet.clear();
-                    lastSendTime = System.currentTimeMillis();
-                    Log.i(TAG, "IKE_SA_INIT -->");
-                    // 3 секунды на принятие правильного пакета только потом повторная передача
-                    while ((System.currentTimeMillis() - lastSendTime) < 3000) {
-                        Thread.sleep(100);
-                        length = tunnel.read(packet);
-                        if (length > 0) {
-                            Log.i(TAG, "IKE_SA_INIT <--");
-                            vpnClient.vpnprocessingdata(packet.array(), length, dataOut, lenData, target, err); // Обработка ответа на IKE_SA_INIT
-                            // Добавить проверку стадии
-                            if (err[0] == 0) {
-                                for (int j = 0; j < 2; j++) {
-                                    packet.clear();
-                                    packet.put(dataOut).flip();
-                                    packet.position(0);
-                                    packet.limit(lenData[0]);
-                                    tunnel.write(packet);
-                                    packet.clear();
-                                    lastSendTime = System.currentTimeMillis();
-                                    Log.i(TAG, "IKE_SA_AUTH -->");
-                                    // 3 секунды на принятие правильного пакета только потом повторная передача
-                                    while ((System.currentTimeMillis() - lastSendTime) < 3000) {
-                                        Thread.sleep(100);
-                                        length = tunnel.read(packet);
-                                        if (length > 0) {
-                                            Log.i(TAG, "IKE_SA_AUTH <--");
-                                            vpnClient.vpnprocessingdata(packet.array(), length, dataOut, lenData, target, err); // Обработка ответа на IKE_AUTH
-                                            if (err[0] == 0) {
-                                                return true;
-                                            } else {
-                                                Log.e(TAG, "ERR = " + err[0]);
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
 
             Log.i(TAG, "checkConnectionOnKey  STOP");
@@ -1049,16 +974,8 @@ public class SpoMessagesService extends Service {
         }
     }
 
-    private class CryptDBRunnable implements Runnable {
-
-        @Override
-        public void run() {
-            DBUtils.saveDataBase();
-        }
-    }
-
     private class SendReceiveFileMessageRunnable implements Runnable {
-        private SpoFile mFile;
+        private final SpoFile mFile;
         private IsRunThread isRun = null;
 
         public SendReceiveFileMessageRunnable(SpoFile file) {
@@ -1108,7 +1025,10 @@ public class SpoMessagesService extends Service {
 
                 try {
                     File downloadFile = Utils.createReceivedFile(mContext, fileName);
-                    OutputStream out = new FileOutputStream(downloadFile);
+                    OutputStream out = null;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        out = Files.newOutputStream(downloadFile.toPath());
+                    }
 
                     if (NetworkRequestUtils.downloadFile(mFile.getId(), urlDownload, out, isRun, Integer.parseInt(message.getIdUsers().get(0)))) {
                         mFile.setUri(Uri.fromFile(downloadFile).toString());
@@ -1139,7 +1059,7 @@ public class SpoMessagesService extends Service {
     }
 
     private class SendingTextMessageRunnable implements Runnable {
-        private SpoChatMessage mMessage;
+        private final SpoChatMessage mMessage;
         private boolean isRun;
 
         public SendingTextMessageRunnable(SpoChatMessage message) {
@@ -1157,7 +1077,7 @@ public class SpoMessagesService extends Service {
                     case SpoChatMessage.FILE : {
                         JSONObject result;
                         ArrayList<SpoFile> files = new ArrayList<>(Arrays.asList(DBUtils.getSpoFiles(mMessage.getId())));
-                        if (files.size() > 0) {
+                        if (!files.isEmpty()) {
                             mMessage.setSpoFiles(files);
                             String[] idFiles = new String[mMessage.getSpoFiles().size()];
                             int index = 0;

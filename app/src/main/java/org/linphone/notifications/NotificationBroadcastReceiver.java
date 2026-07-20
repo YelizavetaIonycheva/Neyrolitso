@@ -15,7 +15,6 @@ import org.pniei.portal.database.DBUtils;
 import org.pniei.portal.database.SpoContact;
 import org.pniei.portal.notification.SpoNotificationsManager;
 import org.pniei.portal.services.SpoMessagesService;
-import org.pniei.portal.utils.CryptUtils;
 import org.pniei.portal.utils.PrefsUtils;
 
 import static org.pniei.portal.notification.SpoNotificationsManager.CHAT_ID;

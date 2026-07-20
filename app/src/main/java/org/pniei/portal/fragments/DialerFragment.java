@@ -4,45 +4,47 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import org.linphone.LinphoneManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ObservableField;
 import androidx.fragment.app.Fragment;
 
-import org.linphone.StatusFragment;
-import org.linphone.core.LinphoneCore;
+import org.linphone.LinphoneManager;
 import org.linphone.core.LinphoneCore.RegistrationState;
 import org.pniei.portal.R;
-import org.pniei.portal.database.DBUtils;
-import org.pniei.portal.database.SpoContact;
 import org.pniei.portal.databinding.DialerFragmentBinding;
-import org.pniei.portal.vpn.VpnConnection;
 
 public class DialerFragment extends Fragment {
-    private static DialerFragment instance;
     private CallNumber callNumber;
     private DialerFragmentBinding mBinding;
 
-    public class CallNumber {
-        private ObservableField<String> number = new ObservableField<>();
+    public static class CallNumber {
+        private static final int MAX_DIGITS = 10;
+        private final ObservableField<String> number = new ObservableField<>();
 
         public CallNumber() {
             number.set("");
         }
 
         public void addDigit(String digit) {
-            if(number.get().length() < 10)
-                number.set(number.get()+digit);
+            if (digit == null || digit.isEmpty()) {
+                return;
+            }
+
+            String current = number.get();
+            if (current != null && current.length() < MAX_DIGITS) {
+                number.set(current + digit);
+            }
         }
 
         public void eraseDigit() {
-            if (number.get().length() > 0)
-                number.set(number.get().substring(0, number.get().length()-1));
+            String current = number.get();
+            if (current != null && !current.isEmpty()) {
+                number.set(current.substring(0, current.length() - 1));
+            }
         }
 
         public boolean erase() {
@@ -57,8 +59,7 @@ public class DialerFragment extends Fragment {
     }
 
     public static DialerFragment newInstance() {
-        DialerFragment fragment = new DialerFragment();
-        return fragment;
+        return new DialerFragment();
     }
 
     @Override
@@ -74,17 +75,17 @@ public class DialerFragment extends Fragment {
         mBinding.setCallnumber(callNumber);
 
         mBinding.btnAction.setOnClickListener(v -> {
-            if(mBinding.inputNumber.getText().length() > 0) {
+            if (mBinding.inputNumber.getText().length() > 0) {
                 callNumber.number.set("");
-                if(RegistrationState.flagRegistrationOk == true) {
+                if (RegistrationState.flagRegistrationOk) {
                     LinphoneManager.getInstance().newOutgoingCall(mBinding.inputNumber.getText().toString(), "");
-                }else{
-                    Toast.makeText(getActivity(),"Нет соединения с СКЗИ",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "Нет соединения с СКЗИ", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        instance = this;
+        DialerFragment instance = this;
 
         return mBinding.getRoot();
     }

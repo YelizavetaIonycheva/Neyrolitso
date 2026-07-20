@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
 import org.pniei.portal.R;
-import org.pniei.portal.utils.CryptUtils;
 import org.pniei.portal.utils.PrefsUtils;
 import org.pniei.portal.utils.Utils;
 import org.pniei.portal.activities.MainActivity;

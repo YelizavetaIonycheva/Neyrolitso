@@ -21,7 +21,6 @@ import org.pniei.portal.R;
 import org.pniei.portal.fragments.AuthenticationFragment;
 import org.pniei.portal.fragments.RegistrationFragment;
 import org.pniei.portal.services.SpoMessagesService;
-import org.pniei.portal.utils.CryptUtils;
 import org.pniei.portal.utils.PrefsUtils;
 import org.pniei.portal.utils.Utils;
 

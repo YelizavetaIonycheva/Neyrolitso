@@ -1,8 +1,10 @@
 package org.pniei.portal.utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Environment;
 import android.widget.Toast;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -19,23 +21,24 @@ import java.util.TimeZone;
 
 public class Logger {
     private static final String FILE_NAME = "vpn_log.txt";
-    private final int MAX_SIZE = 1048576;
     private File log_file = null;
     private DateFormat df = null;
     private Calendar mCalendar = null;
     private Context mContext;
+    @SuppressLint("StaticFieldLeak")
     private static Logger logger;
 
-    private Logger() {}
+    private Logger() {
+    }
 
     public static Logger inc() {
-        if(logger == null)
+        if (logger == null)
             logger = new Logger();
         return logger;
     }
 
     public void write(final String tag, final String message) {
-        if(log_file != null && message != null) {
+        if (log_file != null && message != null) {
             new Thread(() -> {
                 synchronized (log_file) {
                     try {
@@ -54,20 +57,21 @@ public class Logger {
                         e.printStackTrace();
                     }
                 }
-            }) .start();
+            }).start();
         }
     }
 
     private void checkSize() {
-        if(log_file != null) {
+        if (log_file != null) {
             try {
-                if(log_file.exists() && log_file.length() > MAX_SIZE) {
-                    File tempFile =  new File(mContext.getApplicationInfo().dataDir, "temp+"+FILE_NAME);
+                int MAX_SIZE = 1048576;
+                if (log_file.exists() && log_file.length() > MAX_SIZE) {
+                    File tempFile = new File(mContext.getApplicationInfo().dataDir, "temp+" + FILE_NAME);
                     BufferedReader br = new BufferedReader(new FileReader(log_file));
                     BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile));
                     String str = br.readLine();
 
-                    while((str = br.readLine()) != null) {
+                    while ((str = br.readLine()) != null) {
                         bw.write(str);
                         bw.write('\n');
                     }
@@ -85,10 +89,11 @@ public class Logger {
 
     }
 
+    @SuppressLint("SimpleDateFormat")
     public void init(Context context) {
         mContext = context;
 
-        if(log_file == null) {
+        if (log_file == null) {
             log_file = new File(mContext.getApplicationInfo().dataDir, FILE_NAME);
             df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss ");
         }
@@ -102,14 +107,14 @@ public class Logger {
         }
     }
 
-	public String getLogString() {
-        if(log_file != null) {
-            byte [] buffer = new byte [1024];
+    public String getLogString() {
+        if (log_file != null) {
+            byte[] buffer = new byte[1024];
             int len;
             try {
                 FileInputStream fr = new FileInputStream(log_file);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-                while((len = fr.read(buffer)) > 0) {
+                while ((len = fr.read(buffer)) > 0) {
                     out.write(buffer, 0, len);
                 }
                 fr.close();
@@ -123,20 +128,20 @@ public class Logger {
     }
 
     public void clear() {
-        if(log_file != null) {
+        if (log_file != null) {
             log_file.delete();
         }
     }
 
     public void exportLogFile() {
-        if(log_file != null) {
-            char [] buffer = new char [1024];
+        if (log_file != null) {
+            char[] buffer = new char[1024];
             int len;
             File export_log_file = new File(Environment.getExternalStorageDirectory(), FILE_NAME);
             try {
                 FileReader fr = new FileReader(log_file);
                 FileWriter fw = new FileWriter(export_log_file);
-                while((len = fr.read(buffer)) > 0) {
+                while ((len = fr.read(buffer)) > 0) {
                     fw.write(buffer, 0, len);
                 }
                 fr.close();
@@ -149,5 +154,4 @@ public class Logger {
 
         }
     }
-
 }

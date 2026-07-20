@@ -17,15 +17,10 @@
 
 	<string name="pref_codecs_key">pref_codecs_key</string>
 	<string name="pref_audio_codecs_key">pref_audio_codecs_key</string>
-	<string name="pref_video_codecs_key">pref_video_codecs_key</string>
 	<string name="pref_skzi_key">pref_skzi_key</string>
-	<string name="pref_gps_key">pref_gps_key</string>
 	<string name="pref_advanced_key">pref_advanced_key</string>
 	<string name="pref_biometry_settings_key">pref_biometry_settings_key</string>
 	<string name="pref_biometry_settings_cat_key">pref_biometry_settings_cat_key</string>
-	<string name="pref_echo_cancellation_key">pref_echo_cancellation_key</string>
-	<string name="pref_echo_canceller_calibration_key">pref_echo_canceller_calibration_key</string>
-	<string name="pref_echo_tester_key">pref_echo_tester_key</string>
 
 
 	<string-array name="limit_bitrate_entry_values">
@@ -45,29 +40,6 @@
 		<item>128 kbits/s</item>
 	</string-array>
 
-	<string-array name="gps_time_entry_values">
-		<item>5</item>
-		<item>15</item>
-		<item>30</item>
-		<item>60</item>
-		<item>300</item>
-		<item>600</item>
-	</string-array>
-
-	<string-array name="gps_time_entries">
-		<item>5 секунд</item>
-		<item>15 секунд</item>
-		<item>30 секунд</item>
-		<item>1 минута</item>
-		<item>5 минут</item>
-		<item>10 минут</item>
-	</string-array>
-
-	<string-array name="video_preset_entries">
-		<item>default</item>
-		<item>high-fps</item>
-		<item>custom</item>
-	</string-array>
 
 	<string name="pref_ip_address_key">pref_ip_address_key</string>
 	<string name="pref_id_name_key">pref_id_name_key</string>
@@ -85,7 +57,6 @@
 	<string name="pref_key_compl_key">pref_key_compl_key</string>
 	<string name="pref_connect_skzi_key">pref_connect_skzi_key</string>
 	<string name="pref_connect_skzi_time_error_key">pref_connect_skzi_time_error_key</string>
-	<string name="pref_work_with_vpn_key">pref_work_with_vpn_key</string>
 	<string name="pref_key_working_compl_key">pref_key_working_compl_key</string>
 	<string name="pref_key_next_compl_key">pref_key_next_compl_key</string>
 

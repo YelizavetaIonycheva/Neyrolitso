@@ -50,7 +50,6 @@ import org.pniei.portal.fragments.ChatListFragment;
 import org.pniei.portal.fragments.ContactsListFragment;
 import org.pniei.portal.fragments.HistoryListFragment;
 import org.pniei.portal.listener.SpoListenerManager;
-import org.pniei.portal.services.MonitoringService;
 import org.pniei.portal.services.SpoMessagesService;
 import org.pniei.portal.utils.MIUIUtils;
 import org.pniei.portal.utils.PrefsUtils;

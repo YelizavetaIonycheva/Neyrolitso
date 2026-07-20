@@ -1,5 +1,6 @@
 package org.pniei.portal.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -12,16 +13,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import org.linphone.LinphoneManager;
 import org.linphone.core.LinphoneCore;
 import org.linphone.core.LinphoneCoreListenerBase;
@@ -51,6 +55,7 @@ public class ContactsListFragment extends Fragment {
         return new ContactsListFragment();
     }
 
+    @SuppressLint("CheckResult")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -96,11 +101,11 @@ public class ContactsListFragment extends Fragment {
         mListener = new LinphoneCoreListenerBase() {
             @Override
             public void notifyPresenceReceived(LinphoneCore lc, LinphoneFriend lf) {
-                for(SpoContact contact : mContacts) {
-                    if (lf.getAddress() != null && lf.getAddress().getUserName() != null && contact!= null && lf.getAddress().getUserName().equals(contact.getSipNumber())) {
+                for (SpoContact contact : mContacts) {
+                    if (lf.getAddress() != null && lf.getAddress().getUserName() != null && contact != null && lf.getAddress().getUserName().equals(contact.getSipNumber())) {
                         PresenceModel presenceModel = lf.getPresenceModelForUri(lf.getAddress().asStringUriOnly());
                         if (presenceModel != null) {
-                            contact.setStatusNote(presenceModel.getNote("EN") == null? "" : presenceModel.getNote("EN").getContent());
+                            contact.setStatusNote(presenceModel.getNote("EN") == null ? "" : presenceModel.getNote("EN").getContent());
                             contact.setStatusInt(presenceModel.getBasicStatus().toInt());
                         }
                         break;
@@ -117,7 +122,7 @@ public class ContactsListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if(savedInstanceState != null)
+        if (savedInstanceState != null)
             mListState = savedInstanceState.getParcelable(LIST_STATE_KEY);
     }
 
@@ -125,29 +130,25 @@ public class ContactsListFragment extends Fragment {
         Log.d(TAG, "updateContacts");
         new Thread(() -> {
             mContacts = Arrays.asList(DBUtils.getContactList());
-
-            ////////
             updateStatusContacts(mContacts);
-            ////////
-
-            mHandler.postDelayed(() -> updateUI(), 200);
+            mHandler.postDelayed(this::updateUI, 200);
         }).start();
     }
 
     private static void updateStatusContacts(List<SpoContact> contacts) {
         LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
         if (lc != null) {
-            LinphoneFriend [] lfs = lc.getFriendList();
-            if (lfs.length > 0 && contacts.size() > 0) {
+            LinphoneFriend[] lfs = lc.getFriendList();
+            if (lfs.length > 0 && !contacts.isEmpty()) {
                 List<SpoContact> tmpList = new ArrayList<>(contacts);
                 for (LinphoneFriend lf : lfs) {
-                    if (tmpList.size() == 0)
+                    if (tmpList.isEmpty())
                         break;
-                    for(SpoContact contact : tmpList) {
-                        if (lf.getAddress() != null && lf.getAddress().getUserName() != null && contact!= null && lf.getAddress().getUserName().equals(contact.getSipNumber())) {
+                    for (SpoContact contact : tmpList) {
+                        if (lf.getAddress() != null && lf.getAddress().getUserName() != null && contact != null && lf.getAddress().getUserName().equals(contact.getSipNumber())) {
                             PresenceModel presenceModel = lf.getPresenceModelForUri(lf.getAddress().asStringUriOnly());
                             if (presenceModel != null) {
-                                contact.setStatusNote(presenceModel.getNote("EN") == null? "" : presenceModel.getNote("EN").getContent());
+                                contact.setStatusNote(presenceModel.getNote("EN") == null ? "" : presenceModel.getNote("EN").getContent());
                                 contact.setStatusInt(presenceModel.getBasicStatus().toInt());
                             }
                             tmpList.remove(contact);
@@ -161,7 +162,7 @@ public class ContactsListFragment extends Fragment {
 
     public void updateUI() {
         Log.d(TAG, "updateUI");
-        if (mContacts.size() > 0) {
+        if (!mContacts.isEmpty()) {
             mBinding.textEmptyContactList.setVisibility(View.GONE);
             mBinding.searchView.setVisibility(View.VISIBLE);
             if (mAdapter == null) {
@@ -179,9 +180,9 @@ public class ContactsListFragment extends Fragment {
         }
     }
 
-    private class ContactHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    private class ContactHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private SpoContact mContact;
-        private ContactCellBinding mBinding;
+        private final ContactCellBinding mBinding;
 
         public ContactHolder(View itemView) {
             super(itemView);
@@ -198,7 +199,7 @@ public class ContactsListFragment extends Fragment {
             if (mContact.getUriPhoto() != null) {
                 Bitmap bm = null;
                 try {
-                    bm = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), Uri.parse(mContact.getUriPhoto()));
+                    bm = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), Uri.parse(mContact.getUriPhoto()));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -278,8 +279,9 @@ public class ContactsListFragment extends Fragment {
             lc.addListener(mListener);
         }
 
-       // mBinding.contactList.scrollBy(0, 0);
+        // mBinding.contactList.scrollBy(0, 0);
         if (mListState != null) {
+            assert mBinding.contactList.getLayoutManager() != null;
             mBinding.contactList.getLayoutManager().onRestoreInstanceState(mListState);
         }
         mListState = null;
@@ -299,6 +301,7 @@ public class ContactsListFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        assert mBinding.contactList.getLayoutManager() != null;
         mListState = mBinding.contactList.getLayoutManager().onSaveInstanceState();
         outState.putParcelable(LIST_STATE_KEY, mListState);
     }

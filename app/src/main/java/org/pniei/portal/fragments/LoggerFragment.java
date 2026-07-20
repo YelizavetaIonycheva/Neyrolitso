@@ -10,15 +10,16 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import org.pniei.portal.R;
 import org.pniei.portal.utils.Logger;
 
 public class LoggerFragment extends Fragment {
     private TextView logTextView;
-    private Button button_back, button_clear;
     private ProgressBar progressBar;
     private ScrollView scrollView;
     private Handler mHandler;
@@ -48,8 +49,8 @@ public class LoggerFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         logTextView = view.findViewById(R.id.logTextView);
-        button_back = view.findViewById(R.id.button_back);
-        button_clear = view.findViewById(R.id.button_clear);
+        Button button_back = view.findViewById(R.id.button_back);
+        Button button_clear = view.findViewById(R.id.button_clear);
         progressBar = view.findViewById(R.id.progressBar);
         scrollView = view.findViewById(R.id.scrollView);
 
@@ -62,10 +63,10 @@ public class LoggerFragment extends Fragment {
     }
 
     private void backOrClose() {
-        if(getActivity().getSupportFragmentManager().getBackStackEntryCount() > 0)
-            getActivity().getSupportFragmentManager().popBackStack();
+        if (requireActivity().getSupportFragmentManager().getBackStackEntryCount() > 0)
+            requireActivity().getSupportFragmentManager().popBackStack();
         else
-            getActivity().finish();
+            requireActivity().finish();
     }
 
     private void showLog(String logString) {

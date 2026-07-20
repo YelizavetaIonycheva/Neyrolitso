@@ -20,7 +20,6 @@ import org.pniei.portal.fragments.ContactSelectFragment;
 import org.pniei.portal.fragments.ContactSyncFragment;
 import org.pniei.portal.fragments.HistoryDetailFragment;
 import org.pniei.portal.listener.OnBackClickListener;
-import org.pniei.portal.services.MonitoringService;
 import org.pniei.portal.services.SpoMessagesService;
 import org.pniei.portal.utils.PrefsUtils;
 import org.pniei.portal.utils.Utils;

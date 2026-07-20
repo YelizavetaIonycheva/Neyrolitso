@@ -47,15 +47,12 @@ import org.pniei.portal.activities.SecondaryActivity;
 import org.pniei.portal.database.DBUtils;
 import org.pniei.portal.fragments.LoggerFragment;
 import org.pniei.portal.fragments.UpdateFragment;
-import org.pniei.portal.liveData.ManagerLiveData;
-import org.pniei.portal.services.MonitoringService;
+
 import org.pniei.portal.services.SpoMessagesService;
-import org.pniei.portal.utils.CryptUtils;
 import org.pniei.portal.utils.Logger;
 import org.pniei.portal.utils.NetworkRequestUtils;
 import org.pniei.portal.utils.PrefsUtils;
 import org.pniei.portal.utils.Utils;
-import org.pniei.portal.vpn.VpnClient;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -88,7 +85,7 @@ import androidx.preference.SwitchPreferenceCompat;
 import static org.pniei.portal.utils.PrefsUtils.ExportImportPrefs;
 import static org.pniei.portal.utils.PrefsUtils.REGIME_P;
 
-public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
+public static class AllSettingsScreenFragment extends PreferenceFragmentCompat {
     private LinphonePreferences mPrefs;
     private ActivityResultLauncher<Intent> biometryResultLauncher;
     private ActivityResultLauncher<Intent> selectDirResultLauncher;
@@ -305,7 +302,6 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
             if (!PrefsUtils.ins().getIpSkzi().equals(newValue.toString())) {
                 PrefsUtils.ins().setIpSkzi(newValue.toString());
                 preference.setSummary(newValue.toString());
-                MonitoringService.stopMonitoringService(mContext);
             }
             return true;
         });
@@ -314,7 +310,6 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
             if (!PrefsUtils.ins().getIpMon().equals(newValue.toString())) {
                 PrefsUtils.ins().setIpMon(newValue.toString());
                 preference.setSummary(newValue.toString());
-                MonitoringService.stopMonitoringService(mContext);
             }
             return true;
         });
@@ -350,7 +345,6 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                 if (!PrefsUtils.ins().getIpDnsP().equals(newValue.toString())) {
                     PrefsUtils.ins().setIpDnsP(newValue.toString());
                     preference.setSummary(newValue.toString());
-                    MonitoringService.stopMonitoringService(mContext);
                 }
             }
             return true;
@@ -361,7 +355,6 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                 if (!PrefsUtils.ins().getIpDnsSecondP().equals(newValue.toString())) {
                     PrefsUtils.ins().setIpDnsSecondP(newValue.toString());
                     preference.setSummary(newValue.toString());
-                    MonitoringService.stopMonitoringService(mContext);
                 }
             }
             return true;
@@ -375,89 +368,11 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
             @Override
             public void ecCalibrationStatus(LinphoneCore lc, final LinphoneCore.EcCalibratorStatus status, final int delayMs, Object data) {
                 LinphoneManager.getInstance().routeAudioToReceiver();
-
-                CheckBoxPreference echoCancellation = findPreference(getString(R.string.pref_echo_cancellation_key));
-                Preference echoCancellerCalibration = findPreference(getString(R.string.pref_echo_canceller_calibration_key));
-
-                if (status == LinphoneCore.EcCalibratorStatus.DoneNoEcho) {
-                    assert echoCancellerCalibration != null;
-                    echoCancellerCalibration.setSummary(R.string.no_echo);
-                    assert echoCancellation != null;
-                    echoCancellation.setChecked(false);
-                    LinphonePreferences.instance().setEchoCancellation(false);
-                    ((AudioManager) requireActivity().getSystemService(Context.AUDIO_SERVICE)).setMode(AudioManager.MODE_NORMAL);
-                    Log.i("Set audio mode on 'Normal'");
-                } else if (status == LinphoneCore.EcCalibratorStatus.Done) {
-                    assert echoCancellerCalibration != null;
-                    echoCancellerCalibration.setSummary(String.format(getString(R.string.ec_calibrated), delayMs));
-                    assert echoCancellation != null;
-                    echoCancellation.setChecked(true);
-                    LinphonePreferences.instance().setEchoCancellation(true);
-                    ((AudioManager) requireActivity().getSystemService(Context.AUDIO_SERVICE)).setMode(AudioManager.MODE_NORMAL);
-                    Log.i("Set audio mode on 'Normal'");
-                } else if (status == LinphoneCore.EcCalibratorStatus.Failed) {
-                    assert echoCancellerCalibration != null;
-                    echoCancellerCalibration.setSummary(R.string.failed);
-                    assert echoCancellation != null;
-                    echoCancellation.setChecked(true);
-                    LinphonePreferences.instance().setEchoCancellation(true);
-                    ((AudioManager) requireActivity().getSystemService(Context.AUDIO_SERVICE)).setMode(AudioManager.MODE_NORMAL);
-                    Log.i("Set audio mode on 'Normal'");
-                }
             }
         };
 
-        CheckBoxPreference echoCancellation = findPreference(getString(R.string.pref_echo_cancellation_key));
-        assert echoCancellation != null;
-        echoCancellation.setChecked(mPrefs.isEchoCancellationEnabled());
-
-        if (mPrefs.isEchoCancellationEnabled()) {
-            Preference echoCalibration = findPreference(getString(R.string.pref_echo_canceller_calibration_key));
-            assert echoCalibration != null;
-            echoCalibration.setSummary(String.format(getString(R.string.ec_calibrated), mPrefs.getEchoCalibration()));
-        }
-
-
-        initializePreferredVideoSizePreferences(findPreference(getString(R.string.pref_preferred_video_size_key)));
-        updateVideoPreferencesAccordingToPreset();
-
         ((CheckBoxPreference) Objects.requireNonNull(findPreference(getString(R.string.pref_overlay_key)))).setChecked(mPrefs.isOverlayEnabled());
     }
-
-    private void updateVideoPreferencesAccordingToPreset() {
-    }
-
-    private void initializePreferredVideoSizePreferences(ListPreference pref) {
-        List<CharSequence> entries = new ArrayList<>();
-        List<CharSequence> values = new ArrayList<>();
-        for (String name : LinphoneManager.getLc().getSupportedVideoSizes()) {
-            entries.add(name);
-            values.add(name);
-        }
-
-        setListPreferenceValues(pref, entries, values);
-
-        String value = mPrefs.getPreferredVideoSize();
-        pref.setSummary(value);
-        pref.setValue(value);
-    }
-
-    private void initializePreferredVideoFpsPreferences(ListPreference pref) {
-        List<CharSequence> entries = new ArrayList<>();
-        List<CharSequence> values = new ArrayList<>();
-        entries.add(getString(R.string.pref_none));
-        values.add("0");
-        for (int i = 5; i <= 30; i += 5) {
-            String str = Integer.toString(i);
-            entries.add(str);
-            values.add(str);
-        }
-        setListPreferenceValues(pref, entries, values);
-        String value = Integer.toString(mPrefs.getPreferredVideoFps());
-        pref.setSummary(value);
-        pref.setValue(value);
-    }
-
     private static void setListPreferenceValues(ListPreference pref, List<CharSequence> entries, List<CharSequence> values) {
         CharSequence[] contents = new CharSequence[entries.size()];
         entries.toArray(contents);
@@ -476,7 +391,6 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
 
                     int recordAudio = requireActivity().getPackageManager().checkPermission(Manifest.permission.RECORD_AUDIO, requireActivity().getPackageName());
                     if (recordAudio == PackageManager.PERMISSION_GRANTED) {
-                        startEchoCancellerCalibration();
                     } else {
                         MainActivity.instance().checkAndRequestRecordAudioPermissionForEchoCanceller();
                     }
@@ -506,7 +420,6 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
         findPreference(getString(R.string.pref_preferred_video_size_key)).setOnPreferenceChangeListener((preference, newValue) -> {
             mPrefs.setPreferredVideoSize(newValue.toString());
             preference.setSummary(mPrefs.getPreferredVideoSize());
-            updateVideoPreferencesAccordingToPreset();
             return true;
         });
 
@@ -585,7 +498,6 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                         new Thread(() -> {
                             mContext.stopService(new Intent(Intent.ACTION_MAIN).setClass(mContext, LinphoneService.class));
                             if (PrefsUtils.ins().getRegimeSelected() == REGIME_P) {
-                                MonitoringService.stopMonitoringService(mContext);
                             }
                             SpoMessagesService.stop(mContext);
                             PrefsUtils.ins().setAuth(false);
@@ -694,7 +606,7 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                             }
                             mHandler.post(() -> {
                                 Utils.closeWaitDialog();
-                                Toast.makeText(mContext, getString(R.string.end_export_settings), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext,getString(R.string.end_export_settings), Toast.LENGTH_SHORT).show();
                             });
                         }).start();
                     })
@@ -776,7 +688,6 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                                 prefCrc = jsonObject.getString(ExportImportPrefs.PREF_CRC);
 
                                 byte[] configs = sb.toString().getBytes();
-                                int crc = CryptUtils.CRC32(configs, configs.length);
                                 if (!(prefCrc.equalsIgnoreCase(Utils.intToHexString(crc)))) {
                                     throw new Exception("Несовпала контрольная сумма");
                                 }
@@ -789,7 +700,6 @@ public class AllSettingsScreenFragment extends PreferenceFragmentCompat {
                                     prefs.setIpMon(ipMon);
                                     prefs.setIpDnsP(ipDns);
                                     prefs.setIpDnsSecondP(ipDnsSecond);
-                                    prefs.setVpnApps(vpnAppList);
                                 } else {
                                     prefs.setIpAtsTT(ipAts);
                                     prefs.setIpDnsTT(ipDns);

@@ -1,11 +1,13 @@
 package org.pniei.portal.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -17,6 +19,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import org.pniei.portal.R;
 import org.pniei.portal.activities.SecondaryActivity;
 import org.pniei.portal.database.SpoChatRoom;
@@ -27,6 +30,7 @@ import org.pniei.portal.databinding.CreateGroupFragmentBinding;
 
 public class CreateGroupFragment extends Fragment {
     private static final String ARG_CHAT_ROOM_ID = "id_chat_room";
+    @SuppressLint("StaticFieldLeak")
     private static Context mContext;
     private static boolean isNewGroup;
     private SpoChatRoom mChatRoom;
@@ -56,7 +60,8 @@ public class CreateGroupFragment extends Fragment {
         super.onCreate(savedInstanceState);
         idUsers = new LinkedList<>();
 
-        if(!isNewGroup) {
+        if (!isNewGroup) {
+            assert getArguments() != null;
             long idChatRoom = getArguments().getLong(ARG_CHAT_ROOM_ID);
             mChatRoom = DBUtils.getChatRoom(idChatRoom);
             idUsers.addAll(mChatRoom.getIdUsers());
@@ -66,7 +71,7 @@ public class CreateGroupFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mBinding = DataBindingUtil.inflate(inflater, R.layout.create_group_fragment, container, false);
@@ -85,16 +90,18 @@ public class CreateGroupFragment extends Fragment {
 
         mBinding.btnSave.setOnClickListener(v -> {
             String nameGroup = mBinding.nameGroup.getText().toString();
-            if (nameGroup.equals("")) {
+            if (nameGroup.isEmpty()) {
                 Toast.makeText(mContext, "Введите наименование рассылки", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             // Проверка, что были выбраны контакты
             int count = 0;
-            boolean [] selected = mAdapter.getChecked();
-            for(int i = 0; i < selected.length; i++) {
-                if (selected[i]) { count++;}
+            boolean[] selected = mAdapter.getChecked();
+            for (boolean b : selected) {
+                if (b) {
+                    count++;
+                }
             }
 
             if (count == 0) {
@@ -111,8 +118,7 @@ public class CreateGroupFragment extends Fragment {
             }
             mChatRoom.setNameChat(nameGroup);
             mChatRoom.setType(SpoChatRoom.MANY);
-            ArrayList<String> idSelectedUsers = new ArrayList<>();
-            idSelectedUsers.addAll(idUsers);
+            ArrayList<String> idSelectedUsers = new ArrayList<>(idUsers);
             mChatRoom.setIdUsers(idSelectedUsers);
 
             if (isNewGroup) {
@@ -122,14 +128,14 @@ public class CreateGroupFragment extends Fragment {
             }
 
             Fragment fragment = ChatFragment.newInstance(mContext, mChatRoom.getId());
-            ((SecondaryActivity)getActivity()).displayFragment(fragment, true);
+            ((SecondaryActivity) requireActivity()).displayFragment(fragment, true);
         });
 
         return mBinding.getRoot();
     }
 
     public void updateUI() {
-        if (contacts.size() > 0) {
+        if (!contacts.isEmpty()) {
             if (mAdapter == null) {
                 mAdapter = new ContactListAdapter(contacts);
             } else {
@@ -140,10 +146,10 @@ public class CreateGroupFragment extends Fragment {
     }
 
     private void backOrClose() {
-        if(getActivity().getSupportFragmentManager().getBackStackEntryCount() > 0)
-            getActivity().getSupportFragmentManager().popBackStack();
+        if (requireActivity().getSupportFragmentManager().getBackStackEntryCount() > 0)
+            requireActivity().getSupportFragmentManager().popBackStack();
         else
-            getActivity().finish();
+            requireActivity().finish();
     }
 
     @Override
@@ -166,7 +172,7 @@ public class CreateGroupFragment extends Fragment {
                 mBinding = DataBindingUtil.bind(itemView);
             }
 
-            public void bind(SpoContact contact ) {
+            public void bind(SpoContact contact) {
                 mContact = contact;
                 if (mContact != null) {
                     mBinding.contactFullName.setText(mContact.getFullName());
@@ -194,8 +200,8 @@ public class CreateGroupFragment extends Fragment {
 
             if (!isNewGroup) {
                 int i = 0;
-                for(SpoContact contact: mContacts) {
-                    for(String id : mChatRoom.getIdUsers()) {
+                for (SpoContact contact : mContacts) {
+                    for (String id : mChatRoom.getIdUsers()) {
                         if (contact.getIdUser().equals(id)) {
                             checked[i] = true;
                             break;

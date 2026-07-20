@@ -1,5 +1,6 @@
 package org.pniei.portal.web;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.webkit.WebSettings;
@@ -7,11 +8,15 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import org.pniei.portal.R;
+
+import java.util.Objects;
 
 public class WebviewActivity extends AppCompatActivity {
     public static final String EXTRA_URL = "extra.url";
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,17 +27,17 @@ public class WebviewActivity extends AppCompatActivity {
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         setTitle(url);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        assert url != null;
         webView.loadUrl(url);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                finish();
-                return true;
+        // Respond to the action bar's Up/Home button
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

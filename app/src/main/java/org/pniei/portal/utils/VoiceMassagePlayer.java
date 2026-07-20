@@ -2,6 +2,7 @@ package org.pniei.portal.utils;
 
 import android.media.MediaPlayer;
 import android.util.Log;
+
 import java.io.IOException;
 
 public class VoiceMassagePlayer {
@@ -15,29 +16,29 @@ public class VoiceMassagePlayer {
 
     private final static String TAG = "VoiceMassagePlayer";
     private static MediaPlayer player = null;
-    private static VoiceMassagePlayerListener mLintener = null;
+    private static VoiceMassagePlayerListener mListener = null;
     private static PlayingThread thread = null;
 
     public static void startPlaying(String filePath, VoiceMassagePlayerListener listener) {
 
         try {
             if (thread != null) thread.stopPlaying();
-            if (mLintener != null) mLintener.onCompletionPlay();
+            if (mListener != null) mListener.onCompletionPlay();
 
-            mLintener = listener;
+            mListener = listener;
 
             player = new MediaPlayer();
             player.setDataSource(filePath);
             player.setOnCompletionListener(mediaPlayer -> {
                 thread.stopPlaying();
                 thread = null;
-                mLintener.onCompletionPlay();
-                mLintener = null;
+                mListener.onCompletionPlay();
+                mListener = null;
             });
             player.prepare();
 
-            mLintener.onProgressPlay(player.getCurrentPosition());
-            mLintener.onDurationPlay(player.getDuration());
+            mListener.onProgressPlay(player.getCurrentPosition());
+            mListener.onDurationPlay(player.getDuration());
 
             thread = new PlayingThread(player);
             thread.start();
@@ -52,9 +53,9 @@ public class VoiceMassagePlayer {
             thread = null;
         }
 
-        if (mLintener != null) {
-            mLintener.onCompletionPlay();
-            mLintener = null;
+        if (mListener != null) {
+            mListener.onCompletionPlay();
+            mListener = null;
         }
     }
 
@@ -73,7 +74,7 @@ public class VoiceMassagePlayer {
             while (isPlaying) {
                 synchronized (player) {
                     if (mPlayer != null && mPlayer.isPlaying()) {
-                        mLintener.onProgressPlay(mPlayer.getCurrentPosition());
+                        mListener.onProgressPlay(mPlayer.getCurrentPosition());
                     }
                 }
                 try {

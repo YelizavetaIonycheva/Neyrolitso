@@ -5,6 +5,7 @@ import androidx.browser.customtabs.CustomTabsClient;
 public interface ServiceConnectionCallback {
     /**
      * Called when the service is connected.
+     *
      * @param client a CustomTabsClient
      */
     void onServiceConnected(CustomTabsClient client);

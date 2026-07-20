@@ -1,17 +1,19 @@
 package org.pniei.portal.listener;
 
 import android.util.Log;
+
 import org.pniei.portal.database.SpoChatMessage;
 import org.pniei.portal.database.SpoContact;
 import org.pniei.portal.database.SpoFile;
+
 import java.util.ArrayList;
 
 public class SpoListenerManager {
     private static final String TAG = "SpoListenerManager";
-    private static ArrayList<SpoChatMessageListener> mChatListeners = new ArrayList<>();
-    private static ArrayList<SpoContactListener> mContactListeners = new ArrayList<>();
-    private static Object syncChat = new Object();
-    private static Object syncContact = new Object();
+    private static final ArrayList<SpoChatMessageListener> mChatListeners = new ArrayList<>();
+    private static final ArrayList<SpoContactListener> mContactListeners = new ArrayList<>();
+    private static final Object syncChat = new Object();
+    private static final Object syncContact = new Object();
 
     public static void addListener(SpoChatMessageListener listener) {
         synchronized (syncChat) {

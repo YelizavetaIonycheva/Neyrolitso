@@ -1,5 +1,6 @@
 package org.pniei.portal.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
@@ -9,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.util.Log;
@@ -16,25 +18,30 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.documentfile.provider.DocumentFile;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import org.pniei.portal.R;
 import org.pniei.portal.database.SpoFile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Objects;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 public class Utils {
 
-    public static String getError(String error){
+    public static String getError(String error) {
         switch (error) {
             case "101":
                 return "Данные не получены";
@@ -86,8 +93,8 @@ public class Utils {
 
     public static String getMimeType(String nameFile) {
         String type = null;
-        if(nameFile.lastIndexOf(".") != -1) {
-            String ext = nameFile.substring(nameFile.lastIndexOf(".")+1);
+        if (nameFile.lastIndexOf(".") != -1) {
+            String ext = nameFile.substring(nameFile.lastIndexOf(".") + 1);
             MimeTypeMap mime = MimeTypeMap.getSingleton();
             type = mime.getMimeTypeFromExtension(ext);
         }
@@ -96,11 +103,11 @@ public class Utils {
     }
 
     public static int getTypeFile(String nameFile) {
-        String [] parts = nameFile.split("\\.");
+        String[] parts = nameFile.split("\\.");
         if (parts.length <= 1)
             return SpoFile.TYPE_OTHER;
 
-        String format = parts[parts.length-1];
+        String format = parts[parts.length - 1];
         if (format.equals("jpeg") || format.equals("jpg") || format.equals("png") || format.equals("bmp")) {
             return SpoFile.TYPE_IMAGE;
         } else if (format.equals("m4a")) {
@@ -110,8 +117,9 @@ public class Utils {
         }
     }
 
-    private static final String [] months = {"января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря" };
+    private static final String[] months = {"января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"};
 
+    @SuppressLint("SimpleDateFormat")
     public static String timestampToHumanDate(Context context, long timestamp) {
         try {
             Calendar cal = Calendar.getInstance();
@@ -142,20 +150,19 @@ public class Utils {
             } else if (isYesterday(cal)) {
                 return "вчера";
             } else {
-                StringBuilder sb = new StringBuilder();
-                sb.append(cal.get(Calendar.DAY_OF_MONTH));
-                sb.append(" ");
-                sb.append(months[cal.get(Calendar.MONTH)]);
-                sb.append(" ");
-                sb.append(cal.get(Calendar.YEAR));
-                sb.append(" Г.");
-                return sb.toString();
+                return cal.get(Calendar.DAY_OF_MONTH) +
+                        " " +
+                        months[cal.get(Calendar.MONTH)] +
+                        " " +
+                        cal.get(Calendar.YEAR) +
+                        " Г.";
             }
         } catch (NumberFormatException nfe) {
             return String.valueOf(timestamp);
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     public static String timeHistoryToHumanDate(long timestamp) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(timestamp);
@@ -177,7 +184,7 @@ public class Utils {
     }
 
     public static String secondsToDisplayableString(int secs) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Calendar cal = Calendar.getInstance();
         cal.set(0, 0, 0, 0, 0, secs);
         return dateFormat.format(cal.getTime());
@@ -192,7 +199,7 @@ public class Utils {
 
         return (cal1.get(Calendar.ERA) == cal2.get(Calendar.ERA) &&
                 cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.DAY_OF_YEAR)+1 == cal2.get(Calendar.DAY_OF_YEAR));
+                cal1.get(Calendar.DAY_OF_YEAR) + 1 == cal2.get(Calendar.DAY_OF_YEAR));
     }
 
     private static boolean isSameDay(Calendar cal1, Calendar cal2) {
@@ -212,15 +219,16 @@ public class Utils {
                 context.getResources().getDisplayMetrics());
     }
 
-    final protected static char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+    final protected static char[] hexArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
     public static String byteArrayToHexString(byte[] bytes) {
-        char[] hexChars = new char[bytes.length*2];
+        char[] hexChars = new char[bytes.length * 2];
         int v;
 
-        for(int j=0; j < bytes.length; j++) {
+        for (int j = 0; j < bytes.length; j++) {
             v = bytes[j] & 0xFF;
-            hexChars[j*2] = hexArray[v>>>4];
-            hexChars[j*2 + 1] = hexArray[v & 0x0F];
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
 
         return new String(hexChars);
@@ -230,21 +238,21 @@ public class Utils {
         if (s == null) return null;
 
         int len = s.length();
-        byte[] data = new byte[len/2];
+        byte[] data = new byte[len / 2];
 
-        for(int i = 0; i < len; i+=2){
-            data[i/2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i+1), 16));
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
         }
 
         return data;
     }
 
     public static byte[] intToByteArray(int value) {
-        byte [] buf = new byte[4];
-        buf[0] = (byte)(value & 0x000000FF);
-        buf[1] = (byte)(value >> 8 & 0x000000FF);
-        buf[2] = (byte)(value >> 16 & 0x000000FF);
-        buf[3] = (byte)(value >> 24 & 0x000000FF);
+        byte[] buf = new byte[4];
+        buf[0] = (byte) (value & 0x000000FF);
+        buf[1] = (byte) (value >> 8 & 0x000000FF);
+        buf[2] = (byte) (value >> 16 & 0x000000FF);
+        buf[3] = (byte) (value >> 24 & 0x000000FF);
 
         return buf;
     }
@@ -260,12 +268,11 @@ public class Utils {
     }
 
     public static String intToHexString(int a) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%02x", a >> 24 & 0xFF));
-        sb.append(String.format("%02x", a >> 16 & 0xFF));
-        sb.append(String.format("%02x", a >> 8 & 0xFF));
-        sb.append(String.format("%02x", a & 0xFF));
-        return sb.toString().toUpperCase();
+        String sb = String.format("%02x", a >> 24 & 0xFF) +
+                String.format("%02x", a >> 16 & 0xFF) +
+                String.format("%02x", a >> 8 & 0xFF) +
+                String.format("%02x", a & 0xFF);
+        return sb.toUpperCase();
     }
 
     public static int serArrayToInt(byte[] value) {
@@ -302,17 +309,16 @@ public class Utils {
 
     public static boolean checkIP(String ipAddress) {
         String[] fields = ipAddress.split("\\.");
-        if((fields.length == 1) && (fields[0].compareTo("") == 0))
+        if ((fields.length == 1) && (fields[0].compareTo("") == 0))
             return true;
-        if(fields.length != 4)
+        if (fields.length != 4)
             return false;
         try {
             for (int i = 0; i < 4; i++) {
-                if(Integer.valueOf(fields[i]) < 0 || Integer.valueOf(fields[i]) > 255)
+                if (Integer.parseInt(fields[i]) < 0 || Integer.parseInt(fields[i]) > 255)
                     return false;
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
         return true;
@@ -403,7 +409,7 @@ public class Utils {
 
     public static void deleteRecursive(File fileOrDirectory) {
         if (fileOrDirectory.isDirectory())
-            for (File child : fileOrDirectory.listFiles())
+            for (File child : Objects.requireNonNull(fileOrDirectory.listFiles()))
                 deleteRecursive(child);
 
         fileOrDirectory.delete();
@@ -412,7 +418,7 @@ public class Utils {
     public static void deleteRecursive(String path) {
         File fileOrDirectory = new File(path);
         if (fileOrDirectory.isDirectory())
-            for (File child : fileOrDirectory.listFiles())
+            for (File child : Objects.requireNonNull(fileOrDirectory.listFiles()))
                 deleteRecursive(child);
 
         fileOrDirectory.delete();
@@ -444,8 +450,7 @@ public class Utils {
         return path;
     }
 
-    public static void copyAssetsFiles(Context context, String copyDir, String dirIn)
-    {
+    public static void copyAssetsFiles(Context context, String copyDir, String dirIn) {
         if (context != null) {
             try {
                 String assets[] = context.getAssets().list(copyDir);
@@ -455,8 +460,8 @@ public class Utils {
                     File dir = new File(context.getApplicationInfo().dataDir + "/" + copyDir);
                     if (!dir.exists())
                         dir.mkdir();
-                    for (int i = 0; i < assets.length; ++i)
-                        copyAssetsFiles(context,copyDir + "/" + assets[i], dirIn);
+                    for (String asset : assets)
+                        copyAssetsFiles(context, copyDir + "/" + asset, dirIn);
                 }
             } catch (IOException ex) {
                 Log.e("", "I/O Exception", ex);
@@ -464,22 +469,26 @@ public class Utils {
         }
     }
 
-    private static void copyFile(Context context, String fileName, String dirIn)
-    {
+    private static void copyFile(Context context, String fileName, String dirIn) {
         if (context != null) {
             Log.i("", "Copying file " + fileName);
             try {
                 File file = new File(context.getApplicationInfo().dataDir + "/" + fileName);
                 if (!file.exists()) {
                     InputStream in = context.getAssets().open(fileName);
-                    OutputStream out = new FileOutputStream(file);
+                    OutputStream out = null;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        out = Files.newOutputStream(file.toPath());
+                    }
                     byte[] buffer = new byte[1024];
                     int read;
-                    while ((read = in.read(buffer)) != -1)
+                    while ((read = in.read(buffer)) != -1) {
+                        assert out != null;
                         out.write(buffer, 0, read);
+                    }
                 }
             } catch (Exception e) {
-                Log.e("", e.getMessage());
+                Log.e("", Objects.requireNonNull(e.getMessage()));
             }
         }
     }
@@ -494,37 +503,37 @@ public class Utils {
         paint.setColor(color);
         canvas.drawCircle(radius, radius, radius, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, -cx+radius, -cy+radius, paint);
+        canvas.drawBitmap(bitmap, -cx + radius, -cy + radius, paint);
         return targetBitmap;
     }
-    
+
     public static byte[] idUserToByteArray(int value) {
-        byte [] buf = new byte[10];
-        buf[0] = (byte)(value & 0x000000FF);
-        buf[1] = (byte)(value >> 8 & 0x000000FF);
-        buf[2] = (byte)(value >> 16 & 0x000000FF);
-        buf[3] = (byte)(value >> 24 & 0x000000FF);
+        byte[] buf = new byte[10];
+        buf[0] = (byte) (value & 0x000000FF);
+        buf[1] = (byte) (value >> 8 & 0x000000FF);
+        buf[2] = (byte) (value >> 16 & 0x000000FF);
+        buf[3] = (byte) (value >> 24 & 0x000000FF);
 
         return buf;
     }
 
-    public static String parsingDate(byte [] date) {
-        if(date.length < 3)
+    public static String parsingDate(byte[] date) {
+        if (date.length < 3)
             return "";
 
-        if(date[1] == 0 || date[2] == 0)
+        if (date[1] == 0 || date[2] == 0)
             return "";
 
         StringBuilder sb = new StringBuilder();
-        if(date[2] < 10)
+        if (date[2] < 10)
             sb.append("0");
         sb.append(date[2]);
         sb.append(".");
-        if(date[1] < 10)
+        if (date[1] < 10)
             sb.append("0");
         sb.append(date[1]);
         sb.append(".");
-        if(date[0] < 10)
+        if (date[0] < 10)
             sb.append("0");
         sb.append(date[0]);
         return sb.toString();
@@ -541,14 +550,15 @@ public class Utils {
     }
 
     private static AlertDialog mWaitDialog = null;
+
     public static void showWaitDialog(Context context, String title) {
         closeWaitDialog();
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         if (title != null)
             builder.setTitle(title);
         mWaitDialog = builder.setView(R.layout.dialog_wait)
-            .setCancelable(false)
-            .show();
+                .setCancelable(false)
+                .show();
     }
 
     public static void closeWaitDialog() {
@@ -558,14 +568,14 @@ public class Utils {
         }
     }
 
-    public static byte [] readFileFromZip(Context context, DocumentFile zipFile, String suffix) {
+    public static byte[] readFileFromZip(Context context, DocumentFile zipFile, String suffix) {
         byte[] buffer = new byte[1024];
         byte[] data;
         try {
             ZipInputStream zis = new ZipInputStream(context.getContentResolver().openInputStream(zipFile.getUri()));
             ZipEntry zipEntry = zis.getNextEntry();
 
-            while(zipEntry != null) {
+            while (zipEntry != null) {
                 if (!zipEntry.isDirectory()) {
                     if (zipEntry.getName().endsWith(suffix)) {
                         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -573,7 +583,6 @@ public class Utils {
                         while ((len = zis.read(buffer)) > 0) {
                             bos.write(buffer, 0, len);
                         }
-
 
                         data = bos.toByteArray();
                         bos.close();

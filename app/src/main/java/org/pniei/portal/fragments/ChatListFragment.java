@@ -2,6 +2,7 @@ package org.pniei.portal.fragments;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -63,8 +64,7 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
     private LinphoneCoreListenerBase mListener;
 
     public static ChatListFragment newInstance() {
-        ChatListFragment fragment = new ChatListFragment();
-        return fragment;
+        return new ChatListFragment();
     }
 
     @Override
@@ -83,7 +83,6 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
         setStateActionButton(stateActionButton, false);
         mSpoNotificationsManager = SpoNotificationsManager.ins(getContext());
 
-        ////////////
         mListener = new LinphoneCoreListenerBase() {
             @Override
             public void notifyPresenceReceived(LinphoneCore lc, LinphoneFriend lf) {
@@ -105,8 +104,6 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
                 mHandler.post(() -> updateUI());
             }
         };
-        ////////////
-
         return mBinding.getRoot();
     }
 
@@ -122,12 +119,12 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
                     if (selected[i]) {
                         // Сначала удаление сообщений ожидающих отправки
                         List<SpoChatMessage> waitingMessages = Arrays.asList(DBUtils.getWaitingSpoChatMessagesForCharRoom(mChatRooms.get(i-countDeleted).getId()));
-                        if (waitingMessages != null && waitingMessages.size() > 0) {
+                        if (!waitingMessages.isEmpty()) {
                             for (SpoChatMessage message: waitingMessages) {
                                 Intent intent = new Intent(getContext(), SpoMessagesService.class);
                                 intent.setAction(SpoMessagesService.ACTION_STOP_SENDING_MESSAGE);
                                 intent.putExtra(SpoMessagesService.MESSAGE_ID_KEY, message.getId());
-                                getContext().startService(intent);
+                                requireContext().startService(intent);
                                 DBUtils.deleteMessage(message);
                             }
                         }
@@ -149,7 +146,7 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
         } else if (id == R.id.selectAll) {
             if (mAdapter != null) {
                 mBinding.checkBox.setChecked(!mBinding.checkBox.isChecked());
-                mAdapter.setAllCheked(mBinding.checkBox.isChecked());
+                mAdapter.setAllChecked(mBinding.checkBox.isChecked());
 
                 if (mBinding.checkBox.isChecked()) {
                     setStateActionButton(STATE.DELETE, true);
@@ -165,20 +162,18 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
 
         new Thread(() -> {
             mChatRooms = new ArrayList<>(Arrays.asList(DBUtils.getChatList()));
-            if (mChatRooms.size() > 0)
+            if (!mChatRooms.isEmpty())
                 Collections.sort(mChatRooms);
 
-            /////////////
             updateStatusContactChat(mChatRooms);
-            /////////////
 
-            mHandler.postDelayed(() -> updateUI(), 200);
+            mHandler.postDelayed(this::updateUI, 200);
         }).start();
     }
 
     public void updateUI() {
         Log.d(TAG, "updateUI");
-        if (mChatRooms.size() > 0) {
+        if (!mChatRooms.isEmpty()) {
             mBinding.textEmptyChatList.setVisibility(View.GONE);
             if (mAdapter == null) {
                 mAdapter = new ChatListAdapter(mChatRooms);
@@ -196,9 +191,9 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
         LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
         if (lc != null) {
             LinphoneFriend [] lfs = lc.getFriendList();
-            if (lfs.length > 0 && mChatRooms.size() > 0) {
+            if (lfs.length > 0 && !mChatRooms.isEmpty()) {
                 List<SpoChatRoom> tmpList = new ArrayList<>(mChatRooms);
-                if (tmpList.size() == 0)
+                if (tmpList.isEmpty())
                     return;
                 for(SpoChatRoom chat : tmpList) {
                     List<String> id_users = chat.getIdUsers();
@@ -231,17 +226,17 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
         int idImage;
 
         switch (state) {
-            case NEW_CHAT:
-            default: {
-                idImage = R.drawable.ic_new_chat;
-                break;
-            }
             case CLOSE: {
                 idImage = R.drawable.ic_close;
                 break;
             }
             case DELETE: {
                 idImage = R.drawable.ic_delete;
+                break;
+            }
+            case NEW_CHAT:
+            default: {
+                idImage = R.drawable.ic_new_chat;
                 break;
             }
         }
@@ -314,7 +309,7 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
 
         class ChatRoomHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
             private SpoChatRoom mChatRoom;
-            private ChatCellBinding mBinding;
+            private final ChatCellBinding mBinding;
             private int mPosition;
 
             public ChatRoomHolder(View itemView) {
@@ -324,6 +319,7 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
                 itemView.setOnLongClickListener(this);
             }
 
+            @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
             public void bind(SpoChatRoom chatRoom, boolean isLast, int position) {
                 mChatRoom = chatRoom;
                 mPosition = position;
@@ -352,12 +348,12 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
 
                 List<SpoChatMessage> messages = Arrays.asList(DBUtils.getSpoChatMessagesRange(mChatRoom.getId(), 1, true));
 
-                if(messages.size() > 0) {
+                if(!messages.isEmpty()) {
                     SpoChatMessage message = messages.get(0);
 
                     switch (message.getTypeContent()) {
                         case SpoChatMessage.TEXT: {
-                            if (message.getMessage() != null && message.getMessage().length() > 0) {
+                            if (message.getMessage() != null && !message.getMessage().isEmpty()) {
                                 mBinding.lastMessage.setText(message.getMessage());
                             } else {
                                 mBinding.lastMessage.setText("");
@@ -365,12 +361,12 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
                             break;
                         }
                         case SpoChatMessage.FILE: {
-                            if (message.getMessage() != null && message.getMessage().length() > 0) {
+                            if (message.getMessage() != null && !message.getMessage().isEmpty()) {
                                 mBinding.lastMessage.setText(message.getMessage());
                             } else {
                                 mBinding.lastMessage.setText("");
                                 List<SpoFile> files = Arrays.asList(DBUtils.getSpoFiles(message.getId()));
-                                if (files != null && files.size() > 0) {
+                                if (!files.isEmpty()) {
                                     mBinding.lastMessage.setText(Utils.getFileName(files.get(0).getName()));
                                 }
                             }
@@ -392,7 +388,7 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
                     if (mContact != null && mContact.getUriPhoto() != null) {
                         Bitmap bm = null;
                         try {
-                            bm = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), Uri.parse(mContact.getUriPhoto()));
+                            bm = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), Uri.parse(mContact.getUriPhoto()));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -418,7 +414,7 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
                             break;
                     }
                 } else {
-                    mBinding.chatPicture.setImageDrawable(getContext().getDrawable(R.drawable.ic_avatar_many));
+                    mBinding.chatPicture.setImageDrawable(requireContext().getDrawable(R.drawable.ic_avatar_many));
                     mBinding.contactStatus.setVisibility(View.GONE);
                 }
 
@@ -434,25 +430,23 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
             @Override
             public void onClick(View v) {
                 if (stateEdit) {
-                    checked[mPosition] = !checked[mPosition];
+                    // Запоминаем старое состояние
+                    boolean wasChecked = checked[mPosition];
+
+                    checked[mPosition] = !wasChecked;
                     mBinding.select.setChecked(checked[mPosition]);
 
                     if (checked[mPosition]) {
                         countSetChecked++;
-                        if (countSetChecked == 1)
+                        if (countSetChecked == 1) {
                             setStateActionButton(STATE.DELETE, true);
+                        }
                     } else {
                         countSetChecked--;
-                        if (countSetChecked == 0)
-                        setStateActionButton(STATE.CLOSE, true);
-                    
+                        if (countSetChecked == 0) {
+                            setStateActionButton(STATE.CLOSE, true);
+                        }
                     }
-                } else {
-                    SpoListenerManager.removeListener(ChatListFragment.this);
-                    Intent intent = new Intent(getContext(), SecondaryActivity.class);
-                    intent.putExtra(SecondaryActivity.TYPE_FRAGMENT_KEY, SecondaryActivity.CHAT_FRAGMENT);
-                    intent.putExtra(SecondaryActivity.CHAT_ROOM_ID_KEY, mChatRoom.getId());
-                    startActivity(intent);
                 }
             }
 
@@ -488,6 +482,7 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
             mChatRooms = chatRooms;
         }
 
+        @SuppressLint("NotifyDataSetChanged")
         public void setShowCheckbox(boolean show){
             isShowCheckbox = show;
             if (isShowCheckbox) {
@@ -501,9 +496,8 @@ public class ChatListFragment extends Fragment implements SpoChatMessageListener
             return checked;
         }
 
-        public void setAllCheked(boolean value) {
-            for (int i = 0; i < checked.length; i++)
-                checked[i] = value;
+        public void setAllChecked(boolean value) {
+            Arrays.fill(checked, value);
             updateUI();
         }
     }

@@ -197,32 +197,6 @@ public class PrefsUtils {
         return isAppBackground;
     }
 
-    public String getIpGps() {
-        return mIpGps;
-    }
-
-    public void setIpGps(String ipGps) {
-        mIpGps= ipGps;
-        prefs.edit().putString(Prefs.IP_GPS, mIpGps).apply();
-    }
-
-    public boolean isSendGPS() {
-        return isSendGPS;
-    }
-
-    public void setSendGPS(boolean sendGPS) {
-        isSendGPS = sendGPS;
-        prefs.edit().putBoolean(Prefs.SEND_GPS, isSendGPS).apply();
-    }
-
-    public int getTimeIntervalSendGPS() {
-        return timeIntervalSendGPS;
-    }
-
-    public void setTimeIntervalSendGPS(int time) {
-        timeIntervalSendGPS = time;
-        prefs.edit().putInt(Prefs.TIME_GPS, timeIntervalSendGPS).apply();
-    }
 
     /** Режим Портал **/
 
@@ -311,11 +285,6 @@ public class PrefsUtils {
         isVpnEnable = enable;
         prefs.edit().putBoolean(Prefs.VPN_ENABLE, isVpnEnable).apply();
     }
-
-    public boolean isVpnEnable() {
-        return isVpnEnable;
-    }
-
     public boolean isKeyEnter() {
         return isKeyEnter;
     }
@@ -325,17 +294,6 @@ public class PrefsUtils {
         prefs.edit().putBoolean(Prefs.KEY_ENTER, isKeyEnter).apply();
     }
 
-    public void setVpnApps(Set<String> appList) {
-        app_vpn_list.clear();
-        app_vpn_list = appList;
-        prefs.edit()
-                .putStringSet(Prefs.BROWSER_LIST, app_vpn_list)
-                .apply();
-    }
-
-    public Set<String> getVpnApps() {
-        return app_vpn_list;
-    }
 
     /** Режим Точка-Точка **/
 
@@ -416,14 +374,6 @@ public class PrefsUtils {
         isSelectCodecs      = prefs.getBoolean(Prefs.SELECT_CODEC, false);
         isAuth              = false;
         isAppBackground     = false;
-        app_vpn_list        = prefs.getStringSet(Prefs.BROWSER_LIST, null);
-        if (app_vpn_list != null)
-            app_vpn_list    = new HashSet <>(app_vpn_list);
-        else
-            app_vpn_list    = new HashSet <>();
-        mIpGps              = prefs.getString(Prefs.IP_GPS, "");
-        isSendGPS           = prefs.getBoolean(Prefs.SEND_GPS, false);
-        timeIntervalSendGPS = prefs.getInt(Prefs.TIME_GPS, 15);
 
         serverDomainName    = prefs.getString(Prefs.SERVER_DOMAIN, "impulse.ru");
 
@@ -437,7 +387,6 @@ public class PrefsUtils {
         mIpDnsSecondP       = prefs.getString(Prefs.IP_DNS_SECOND_P, "");
         mIpSkzi             = prefs.getString(Prefs.IP_SKZI, "");
         mIpMon              = prefs.getString(Prefs.IP_MON, "");
-        isVpnEnable         = prefs.getBoolean(Prefs.VPN_ENABLE, true);
         isKeyEnter          = prefs.getBoolean(Prefs.KEY_ENTER, false);
 
         /** Режим Точка-Точка **/
@@ -451,7 +400,7 @@ public class PrefsUtils {
 
     public void deleteConfig(Context context) {
         mHashPass = null;
-        prefs.edit().clear().commit();
+        prefs.edit().clear().apply();
         /*File file = new File(context.getApplicationInfo().dataDir + "/shared_prefs/" + Prefs.NAME_FILE_PREFS + ".xml");
         file.delete();*/
     }

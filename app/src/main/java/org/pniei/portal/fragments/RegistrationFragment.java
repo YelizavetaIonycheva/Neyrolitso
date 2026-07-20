@@ -1,5 +1,6 @@
 package org.pniei.portal.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -23,18 +24,19 @@ import org.pniei.dwface.biometry.BiometryUtils;
 import org.pniei.portal.R;
 import org.pniei.portal.activities.LoginActivity;
 import org.pniei.portal.databinding.RegistrationFragmentBinding;
-import org.pniei.portal.utils.CryptUtils;
 import org.pniei.portal.utils.PrefsUtils;
 
 import java.util.ArrayList;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
 public class RegistrationFragment extends Fragment {
     private ActivityResultLauncher<Intent> biometryResultLauncher;
+    @SuppressLint("StaticFieldLeak")
     private static Context mContext;
     private RegistrationFragmentBinding mBinding;
     private Handler mHandler;
@@ -46,7 +48,7 @@ public class RegistrationFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mHandler = new Handler(Looper.getMainLooper());
@@ -91,36 +93,6 @@ public class RegistrationFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mBinding.password.setText("");
-    }
-
-    private void checkPass() {
-        mBinding.password.setEnabled(false);
-        mBinding.repeatPassword.setEnabled(false);
-        mBinding.btnEnter.setEnabled(false);
-        mBinding.passwordLayout.setError(null);
-        mBinding.repeatPasswordLayout.setError(null);
-
-        String pas1 = mBinding.password.getText().toString();
-        String pas2 = mBinding.repeatPassword.getText().toString();
-
-        if (pas1.length() == 0) {
-            showError(getString(R.string.err_empty_password), mBinding.passwordLayout);
-            return;
-        } else if (pas1.length() < 4) {
-            showError(getString(R.string.err_lenght_password), mBinding.passwordLayout);
-            return;
-        } else if (pas1.length() != pas2.length() || !pas1.equals(pas2)) {
-            showError(getString(R.string.err_not_match_password), mBinding.repeatPasswordLayout);
-            return;
-        }
-
-        if (BiometryPrefs.ins().isInitBiometryLib()) {
-            mPassTemp = pas1;
-            showBiometryDialog();
-        } else {
-            PrefsUtils.ins().setHashPass(CryptUtils.getHash(pas1.getBytes()));
-            ((LoginActivity) requireActivity()).displayFragment(ModeSelectFragment.newInstance(mContext), false);
-        }
     }
 
     private void showBiometryDialog() {

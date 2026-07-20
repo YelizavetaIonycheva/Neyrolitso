@@ -1,9 +1,6 @@
 package org.pniei.portal.database;
 
-import android.net.Uri;
-
 import java.io.Serializable;
-import java.util.UUID;
 
 public class SpoContact implements Serializable {
     private long mId;

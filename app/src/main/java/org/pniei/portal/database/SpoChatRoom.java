@@ -3,40 +3,27 @@ package org.pniei.portal.database;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SpoChatRoom implements Comparable{
-    @Override
-    public int compareTo(Object o) {
-        return Long.compare(((SpoChatRoom)o).mTimeLastMessage, this.mTimeLastMessage);
-        //return (int)(this.mTimeLastMessage - ((SpoChatRoom)o).mTimeLastMessage);
-        //return (int)(((SpoChatRoom)o).mTimeLastMessage - this.mTimeLastMessage);
-    }
+public class SpoChatRoom implements Comparable<SpoChatRoom> {
 
     public static final int ONE = 0;
     public static final int MANY = 1;
 
-    private long mId;                 // ID чата
-    private int mType;                // Тип чата (один на один или рассылка
-    private List<String> mIdUsers;    // ID пользователей с кем идет общение (Если type == ONE, то ID дного пользователя, иначе ID всех кому рассылается сообщение
-    private String mNameChat;         // Наименование чата
-    private long mTimeLastMessage;    // Время последнего отправленного или принятого сообщения
+    private long mId;
+    private int mType;
+    private List<String> mIdUsers;
+    private String mNameChat;
+    private long mTimeLastMessage;
     private String mIdUsersStr;
-
     private String statusNote;
     private int statusInt;
 
     public SpoChatRoom(long id, int type, List<String> idUsers, String nameChat, long timeLastMessage) {
         mId = id;
         mType = type;
-        mIdUsers = idUsers;
+        mIdUsers = idUsers != null ? new ArrayList<>(idUsers) : new ArrayList<>();
         mNameChat = nameChat;
         mTimeLastMessage = timeLastMessage;
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < idUsers.size()-1; i++) {
-            sb.append(idUsers.get(i));
-            sb.append(",");
-        }
-        sb.append(idUsers.get(idUsers.size()-1));
-        mIdUsersStr = sb.toString();
+        mIdUsersStr = convertListToString(mIdUsers);
         statusNote = "";
         statusInt = 2;
     }
@@ -46,26 +33,55 @@ public class SpoChatRoom implements Comparable{
         mType = type;
         mNameChat = nameChat;
         mTimeLastMessage = timeLastMessage;
-        mIdUsersStr = idUsersStr;
-
-        mIdUsers = new ArrayList<>();
-        if (mIdUsersStr.contains(",")) {
-            String [] list = mIdUsersStr.split(",");
-            for (String num : list) {
-                mIdUsers.add(num);
-            }
-        } else {
-            mIdUsers.add(mIdUsersStr);
-        }
+        mIdUsersStr = idUsersStr != null ? idUsersStr : "";
+        mIdUsers = convertStringToList(mIdUsersStr);
         statusNote = "";
         statusInt = 2;
     }
 
     public SpoChatRoom() {
+        mIdUsers = new ArrayList<>();
+        mIdUsersStr = "";
         statusNote = "";
         statusInt = 2;
     }
 
+    @Override
+    public int compareTo(SpoChatRoom other) {
+        return Long.compare(other.mTimeLastMessage, this.mTimeLastMessage);
+    }
+
+    private String convertListToString(List<String> list) {
+        if (list == null || list.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < list.size() - 1; i++) {
+            sb.append(list.get(i)).append(",");
+        }
+        sb.append(list.get(list.size() - 1));
+        return sb.toString();
+    }
+
+    private List<String> convertStringToList(String str) {
+        List<String> list = new ArrayList<>();
+        if (str == null || str.isEmpty()) {
+            return list;
+        }
+        if (str.contains(",")) {
+            String[] parts = str.split(",");
+            for (String part : parts) {
+                if (!part.isEmpty()) {
+                    list.add(part);
+                }
+            }
+        } else {
+            list.add(str);
+        }
+        return list;
+    }
+
+    // Геттеры и сеттеры
     public long getId() {
         return mId;
     }
@@ -74,19 +90,21 @@ public class SpoChatRoom implements Comparable{
         mId = id;
     }
 
+    public int getType() {
+        return mType;
+    }
+
     public void setType(int type) {
-        this.mType = type;
+        mType = type;
+    }
+
+    public List<String> getIdUsers() {
+        return mIdUsers;
     }
 
     public void setIdUsers(List<String> idUsers) {
-        this.mIdUsers = idUsers;
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < idUsers.size()-1; i++) {
-            sb.append(idUsers.get(i));
-            sb.append(",");
-        }
-        sb.append(idUsers.get(idUsers.size()-1));
-        mIdUsersStr = sb.toString();
+        this.mIdUsers = idUsers != null ? new ArrayList<>(idUsers) : new ArrayList<>();
+        mIdUsersStr = convertListToString(this.mIdUsers);
     }
 
     public String getNameChat() {
@@ -94,15 +112,7 @@ public class SpoChatRoom implements Comparable{
     }
 
     public void setNameChat(String nameChat) {
-        this.mNameChat = nameChat;
-    }
-
-    public int getType() {
-        return mType;
-    }
-
-    public List<String> getIdUsers() {
-        return mIdUsers;
+        mNameChat = nameChat;
     }
 
     public long getTimeLastMessage() {

@@ -1,6 +1,7 @@
 package org.pniei.portal.fragments;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -13,10 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -26,25 +24,31 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import org.pniei.portal.R;
-import org.pniei.portal.utils.Utils;
 import org.pniei.portal.activities.SecondaryActivity;
+import org.pniei.portal.database.DBUtils;
 import org.pniei.portal.database.SpoChatRoom;
 import org.pniei.portal.database.SpoContact;
-import org.pniei.portal.database.DBUtils;
 import org.pniei.portal.databinding.ContactSelectCellBinding;
 import org.pniei.portal.databinding.ContactSelectFragmentBinding;
+import org.pniei.portal.utils.Utils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ContactSelectFragment extends Fragment {
     private static final String ARG_IS_PNONE_CONT = "is_phone_contacts";
     private ActivityResultLauncher<String> permissionReadContactsResult;
+    @SuppressLint("StaticFieldLeak")
     private static Context mContext;
     private boolean isPhoneContacts;
     private ContactSelectFragmentBinding mBinding;
     private ContactListAdapter mAdapter;
     private PhoneContactListAdapter mPhoneAdapter;
     private ArrayList<String> listPhoneContactName = null;
-    private Cursor phones;
 
     public static ContactSelectFragment newInstance(Context context, boolean value) {
         mContext = context;
@@ -59,11 +63,12 @@ public class ContactSelectFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        assert getArguments() != null;
         isPhoneContacts = getArguments().getBoolean(ARG_IS_PNONE_CONT);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mBinding = DataBindingUtil.inflate(inflater, R.layout.contact_select_fragment, container, false);
@@ -84,7 +89,7 @@ public class ContactSelectFragment extends Fragment {
             showPhoneContacts();
         } else {
             List<SpoContact> contacts = Arrays.asList(DBUtils.getContactList());
-            if (contacts.size() > 0) {
+            if (!contacts.isEmpty()) {
                 if (mAdapter == null) {
                     mAdapter = new ContactListAdapter(contacts);
                 } else {
@@ -100,19 +105,20 @@ public class ContactSelectFragment extends Fragment {
             requestReadContactsPermission();
         } else {
             if (listPhoneContactName == null) {
-                phones = mContext.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,
+                @SuppressLint("Recycle") Cursor phones = mContext.getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,
                         null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
                 listPhoneContactName = new ArrayList<>();
 
-                List<SpoContact> contacts = Arrays.asList(DBUtils.getContactList());
+                SpoContact[] contacts = DBUtils.getContactList();
                 boolean flag;
 
+                assert phones != null;
                 if (phones.getCount() > 0) {
                     phones.moveToFirst();
                     while (!phones.isAfterLast()) {
-                        String nameCPhoneContact = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                        @SuppressLint("Range") String nameCPhoneContact = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                         flag = false;
-                        for (SpoContact contact: contacts) {
+                        for (SpoContact contact : contacts) {
                             if (contact.getFullName().equals(nameCPhoneContact)) {
                                 flag = true;
                                 break;
@@ -137,9 +143,9 @@ public class ContactSelectFragment extends Fragment {
         }
     }
 
-    private class PhoneContactHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    private class PhoneContactHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private String mNameContact;
-        private ContactSelectCellBinding mBinding;
+        private final ContactSelectCellBinding mBinding;
 
         public PhoneContactHolder(View itemView) {
             super(itemView);
@@ -160,7 +166,7 @@ public class ContactSelectFragment extends Fragment {
             args.putString(ContactChangeFragment.ARG_FULL_NAME, mNameContact);
             fragment.setArguments(args);
             if (getActivity() != null)
-                ((SecondaryActivity)getActivity()).displayFragment(fragment, false);
+                ((SecondaryActivity) getActivity()).displayFragment(fragment, false);
         }
     }
 
@@ -194,7 +200,7 @@ public class ContactSelectFragment extends Fragment {
 
     }
 
-    private class ContactHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    private class ContactHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private SpoContact mContact;
         private ContactSelectCellBinding mBinding;
 
@@ -205,7 +211,7 @@ public class ContactSelectFragment extends Fragment {
             itemView.setOnClickListener(this);
         }
 
-        public void bind(SpoContact contact ) {
+        public void bind(SpoContact contact) {
             mContact = contact;
             if (mContact != null) {
                 mBinding.contactFullName.setText(mContact.getFullName());
@@ -214,7 +220,7 @@ public class ContactSelectFragment extends Fragment {
                 if (mContact.getUriPhoto() != null) {
                     Bitmap bm = null;
                     try {
-                        bm = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), Uri.parse(mContact.getUriPhoto()));
+                        bm = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), Uri.parse(mContact.getUriPhoto()));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -248,11 +254,11 @@ public class ContactSelectFragment extends Fragment {
                 }
                 fragment = ChatFragment.newInstance(mContext, DBUtils.getChatRoomForIdUser(mContact.getIdUser()).getId());
 
-                ((SecondaryActivity)getActivity()).displayFragment(fragment, false);
+                ((SecondaryActivity) requireActivity()).displayFragment(fragment, false);
             } else {
                 // Открытие окна создания рассылки
                 Fragment fragment = CreateGroupFragment.newInstance(mContext, 0);
-                ((SecondaryActivity)getActivity()).displayFragment(fragment, false);
+                ((SecondaryActivity) requireActivity()).displayFragment(fragment, false);
             }
         }
     }
@@ -313,10 +319,10 @@ public class ContactSelectFragment extends Fragment {
     }
 
     private void backOrClose() {
-        if(getActivity().getSupportFragmentManager().getBackStackEntryCount() > 0)
-            getActivity().getSupportFragmentManager().popBackStack();
+        if (requireActivity().getSupportFragmentManager().getBackStackEntryCount() > 0)
+            requireActivity().getSupportFragmentManager().popBackStack();
         else
-            getActivity().finish();
+            requireActivity().finish();
     }
 
     private void requestReadContactsPermission() {

@@ -1,7 +1,7 @@
 package org.pniei.portal.notification;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -11,12 +11,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.util.Log;
+
 import org.linphone.compatibility.Compatibility;
 import org.linphone.mediastream.Version;
 import org.pniei.portal.R;
 import org.pniei.portal.activities.MainActivity;
 import org.pniei.portal.database.SpoChatMessage;
 import org.pniei.portal.database.SpoChatRoom;
+
 import java.util.ArrayList;
 
 public class SpoNotificationsManager {
@@ -25,13 +27,14 @@ public class SpoNotificationsManager {
     public static final String INTENT_REPLY_NOTIF_ACTION = "REPLY_ACTION";
     public static final String INTENT_MARK_AS_READ_ACTION = "MARK_AS_READ_ACTION";
     public static final String CHAT_ID = "CHAT_ID";
+    @SuppressLint("StaticFieldLeak")
     private static SpoNotificationsManager instance;
     private final static int NOTIF_ID = 1;
     private final static int MESSAGE_NOTIF_ID = 3;
-    private NotificationManager mNotificationManager;
-    private Context mContext;
-    private Notification mNotif;
-    private ArrayList<Service> mServices;
+    private final NotificationManager mNotificationManager;
+    private final Context mContext;
+    private final Notification mNotif;
+    private final ArrayList<Service> mServices;
     public static int notifcationsPriority = (Version.sdkAboveOrEqual(Version.API16_JELLY_BEAN_41) ? Notification.PRIORITY_MIN : 0);
 
     private SpoNotificationsManager(Context context) {
@@ -44,7 +47,7 @@ public class SpoNotificationsManager {
         Intent notifIntent = new Intent(context, MainActivity.class);
         notifIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         notifIntent.putExtra("Notification", true);
-        
+
         PendingIntent mNotifContentIntent;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             mNotifContentIntent = PendingIntent.getActivity(context, 0, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
@@ -55,14 +58,15 @@ public class SpoNotificationsManager {
         Bitmap bm = null;
         try {
             bm = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
 
         mNotif = Compatibility.createNotification(context, mNotificationTitle, "", R.drawable.ic_notify, R.mipmap.ic_launcher, bm, mNotifContentIntent, notifcationsPriority, true);
     }
 
     public static synchronized SpoNotificationsManager ins(Context context) {
         if (instance == null) {
-            Log.d(TAG, "SpoNotificationsManager Create");
+            Log.d(TAG, "SpotNotificationsManager Create");
             instance = new SpoNotificationsManager(context);
         }
         return instance;
@@ -72,6 +76,7 @@ public class SpoNotificationsManager {
         Compatibility.CreateChannel(context);
     }
 
+    @SuppressLint("ForegroundServiceType")
     public void startForeground(Service service) {
         Log.d(TAG, "startForeground " + service);
         service.startForeground(NOTIF_ID, mNotif);
@@ -107,9 +112,11 @@ public class SpoNotificationsManager {
     }
 
     private Notification createMessageNotification(SpoChatMessage message, PendingIntent notifContentIntent, SpoChatRoom chatRoom) {
-        Notification notification;
+        Notification notification = new Notification();
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-            notification = Api26Notification.createMessageNotification(mContext, chatRoom, message, notifContentIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                notification = Api26Notification.createMessageNotification(mContext, chatRoom, message, notifContentIntent);
+            }
         } else {
             notification = Api28Notification.createMessageNotification(mContext, chatRoom, message, notifContentIntent);
         }

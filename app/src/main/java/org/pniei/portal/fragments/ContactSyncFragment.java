@@ -1,5 +1,6 @@
 package org.pniei.portal.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,8 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +19,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import org.pniei.portal.R;
 import org.pniei.portal.listener.OnBackClickListener;
 import org.pniei.portal.listener.SpoContactListener;
@@ -26,6 +30,7 @@ import org.pniei.portal.databinding.ContactSyncFragmentBinding;
 import org.pniei.portal.services.SpoMessagesService;
 
 public class ContactSyncFragment extends Fragment implements SpoContactListener, OnBackClickListener {
+    @SuppressLint("StaticFieldLeak")
     private static Context mContext;
     private ContactSyncFragmentBinding mBinding;
     private ArrayList<SpoContact> mAddContacts;
@@ -34,8 +39,7 @@ public class ContactSyncFragment extends Fragment implements SpoContactListener,
 
     public static ContactSyncFragment newInstance(Context context) {
         mContext = context;
-        ContactSyncFragment fragment = new ContactSyncFragment();
-        return fragment;
+        return new ContactSyncFragment();
     }
 
     @Override
@@ -44,7 +48,7 @@ public class ContactSyncFragment extends Fragment implements SpoContactListener,
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mBinding = DataBindingUtil.inflate(inflater, R.layout.contact_sync_fragment, container, false);
@@ -83,7 +87,7 @@ public class ContactSyncFragment extends Fragment implements SpoContactListener,
     }
 
     public void updateUI() {
-        if (mAddContacts != null && mAddContacts.size() > 0) {
+        if (mAddContacts != null && !mAddContacts.isEmpty()) {
             if (mAddAdapter == null) {
                 mAddAdapter = new ContactListAdapter(mAddContacts);
             } else {
@@ -92,7 +96,7 @@ public class ContactSyncFragment extends Fragment implements SpoContactListener,
             mBinding.listAddContact.setAdapter(mAddAdapter);
         }
 
-        if (mChangedContacts != null && mChangedContacts.size() > 0) {
+        if (mChangedContacts != null && !mChangedContacts.isEmpty()) {
             if (mChangeAdapter == null) {
                 mChangeAdapter = new ContactListAdapter(mChangedContacts);
             } else {
@@ -103,30 +107,29 @@ public class ContactSyncFragment extends Fragment implements SpoContactListener,
     }
 
     private void backOrClose() {
-        if(getActivity().getSupportFragmentManager().getBackStackEntryCount() > 0)
-            getActivity().getSupportFragmentManager().popBackStack();
+        if (requireActivity().getSupportFragmentManager().getBackStackEntryCount() > 0)
+            requireActivity().getSupportFragmentManager().popBackStack();
         else
-            getActivity().finish();
+            requireActivity().finish();
     }
 
-    private class ContactHolder extends RecyclerView.ViewHolder {
-        private SpoContact mContact;
-        private ContactSyncCellBinding mBinding;
+    private static class ContactHolder extends RecyclerView.ViewHolder {
+        private final ContactSyncCellBinding mBinding;
 
         public ContactHolder(View itemView) {
             super(itemView);
             mBinding = DataBindingUtil.bind(itemView);
         }
-        public void bind(SpoContact contact ) {
-            mContact = contact;
-            if (mContact != null) {
-                mBinding.contactFullName.setText(mContact.getFullName());
-                mBinding.sipNumber.setText(mContact.getSipNumber());
+
+        public void bind(SpoContact contact) {
+            if (contact != null) {
+                mBinding.contactFullName.setText(contact.getFullName());
+                mBinding.sipNumber.setText(contact.getSipNumber());
             }
         }
     }
 
-    private class ContactListAdapter extends RecyclerView.Adapter<ContactHolder> {
+    private static class ContactListAdapter extends RecyclerView.Adapter<ContactHolder> {
         List<SpoContact> mContacts;
 
         public ContactListAdapter(List<SpoContact> contacts) {
@@ -180,7 +183,7 @@ public class ContactSyncFragment extends Fragment implements SpoContactListener,
 
                     if (addContacts != null) {
                         mBinding.countAddContacts.setText(mContext.getResources().getQuantityString(R.plurals.info_num_add_contacts, addContacts.size(), addContacts.size()));
-                        if (addContacts.size() > 0) {
+                        if (!addContacts.isEmpty()) {
                             //mBinding.listAddContact.setVisibility(View.VISIBLE);
                             mAddContacts = addContacts;
                         }
@@ -188,7 +191,7 @@ public class ContactSyncFragment extends Fragment implements SpoContactListener,
 
                     if (changedContacts != null) {
                         mBinding.countChangeContacts.setText(mContext.getResources().getQuantityString(R.plurals.info_num_change_contacts, changedContacts.size(), changedContacts.size()));
-                        if (changedContacts.size() > 0) {
+                        if (!changedContacts.isEmpty()) {
                             //mBinding.listChangeContact.setVisibility(View.VISIBLE);
                             mChangedContacts = changedContacts;
                         }

@@ -1,5 +1,6 @@
 package org.pniei.portal.fragments;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,26 +8,26 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import org.linphone.LinphoneManager;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import org.linphone.LinphoneManager;
 import org.linphone.core.LinphoneCore;
 import org.pniei.portal.R;
-import org.pniei.portal.utils.Utils;
 import org.pniei.portal.activities.SecondaryActivity;
 import org.pniei.portal.database.DBUtils;
-import org.pniei.portal.databinding.HistoryInfoFragmentBinding;
 import org.pniei.portal.database.SpoChatRoom;
 import org.pniei.portal.database.SpoContact;
-import org.pniei.portal.vpn.VpnConnection;
+import org.pniei.portal.databinding.HistoryInfoFragmentBinding;
+import org.pniei.portal.utils.Utils;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 public class HistoryDetailFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "HistoryDetailFragment";
@@ -36,7 +37,6 @@ public class HistoryDetailFragment extends Fragment implements View.OnClickListe
     private static final String ARG_DATE = "date";
 
     private String number, status, callDate, callTime;
-    private HistoryInfoFragmentBinding mBinding;
     private SpoContact mContact;
 
     public static HistoryDetailFragment newInstance(String number, String status, String callDate, String callTime) {
@@ -55,17 +55,19 @@ public class HistoryDetailFragment extends Fragment implements View.OnClickListe
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        assert getArguments() != null;
         number = getArguments().getString(ARG_NUMBER);
         status = getArguments().getString(ARG_STATUS);
         callDate = getArguments().getString(ARG_TIME);
         callTime = getArguments().getString(ARG_DATE);
     }
 
+    @SuppressLint("SimpleDateFormat")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.history_info_fragment, container, false);
+        HistoryInfoFragmentBinding mBinding = DataBindingUtil.inflate(inflater, R.layout.history_info_fragment, container, false);
 
         mContact = DBUtils.getContactForNumber(number);
 
@@ -84,7 +86,7 @@ public class HistoryDetailFragment extends Fragment implements View.OnClickListe
         if (mContact != null && mContact.getUriPhoto() != null) {
             Bitmap bm = null;
             try {
-                bm = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), Uri.parse(mContact.getUriPhoto()));
+                bm = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), Uri.parse(mContact.getUriPhoto()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -138,34 +140,32 @@ public class HistoryDetailFragment extends Fragment implements View.OnClickListe
             }
 
             Fragment fragment = ChatFragment.newInstance(getContext(), DBUtils.getChatRoomForIdUser(mContact.getIdUser()).getId());
-            ((SecondaryActivity)getActivity()).displayFragment(fragment, true);
+            ((SecondaryActivity) requireActivity()).displayFragment(fragment, true);
         } else if (id == R.id.btnCall) {
-            if(LinphoneCore.RegistrationState.flagRegistrationOk == true) {
+            if (LinphoneCore.RegistrationState.flagRegistrationOk) {
                 if (mContact != null) {
                     LinphoneManager.getInstance().newOutgoingCall(mContact.getSipNumber(), "");
 
                 } else {
                     LinphoneManager.getInstance().newOutgoingCall(number, "");
                 }
-            }else{
-                Toast.makeText(getActivity(),"Нет соединения с СКЗИ",Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getActivity(), "Нет соединения с СКЗИ", Toast.LENGTH_SHORT).show();
             }
         } else if (id == R.id.btnAddContact) {
             Bundle args = new Bundle();
             args.putString(ContactChangeFragment.ARG_NUMBER, number);
             Fragment fragment = ContactChangeFragment.newInstance(getContext(), true, 0);
             fragment.setArguments(args);
-            ((SecondaryActivity)getActivity()).displayFragment(fragment, false);
+            ((SecondaryActivity) requireActivity()).displayFragment(fragment, false);
         }
     }
 
 
-
-
     private void backOrClose() {
-        if(getActivity().getSupportFragmentManager().getBackStackEntryCount() > 0)
-            getActivity().getSupportFragmentManager().popBackStack();
+        if (requireActivity().getSupportFragmentManager().getBackStackEntryCount() > 0)
+            requireActivity().getSupportFragmentManager().popBackStack();
         else
-            getActivity().finish();
+            requireActivity().finish();
     }
 }

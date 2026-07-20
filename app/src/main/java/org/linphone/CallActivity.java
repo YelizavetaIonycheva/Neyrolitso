@@ -27,7 +27,6 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ObservableField;
 import org.pniei.portal.R;
-import org.pniei.portal.utils.CryptUtils;
 import org.pniei.portal.utils.PrefsUtils;
 import org.pniei.portal.utils.Utils;
 import org.pniei.portal.database.DBUtils;

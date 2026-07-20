@@ -18,9 +18,6 @@ public class MIUIUtils {
 
 
     public static boolean canDrawOverlayViews(Context context) {
-        if (Build.VERSION.SDK_INT < 21) {
-            return true;
-        }
         try {
             return Settings.canDrawOverlays(context) && isFloatWindowOptionAllowed(context) && canBackgroundStart(context) && canShowWhenLocked(context);
         } catch (NoSuchMethodError e) {
@@ -49,7 +46,7 @@ public class MIUIUtils {
             Method method = ops.getClass().getMethod("checkOpNoThrow", new Class[]
                     {int.class, int.class, String.class}
             );
-            Integer result = (Integer) method.invoke(ops, op, Integer.valueOf(Binder.getCallingUid()), context.getPackageName());
+            Integer result = (Integer) method.invoke(ops, op, Binder.getCallingUid(), context.getPackageName());
             return result == AppOpsManager.MODE_ALLOWED;
         } catch (Exception e) {
             //Log.e(TAG, "not support", e);
@@ -74,7 +71,7 @@ public class MIUIUtils {
     }
 
     public static boolean isMIUI() {
-        return !TextUtils.isEmpty(getSystemProperty("ro.miui.ui.version.name"));
+        return !TextUtils.isEmpty(getSystemProperty());
     }
 
     public static boolean isXiaomi() {
@@ -111,11 +108,11 @@ public class MIUIUtils {
         context.startActivity(intent);
     }
 
-    private static String getSystemProperty(String propName) {
+    private static String getSystemProperty() {
         String line;
         BufferedReader input = null;
         try {
-            java.lang.Process p = Runtime.getRuntime().exec("getprop " + propName);
+            java.lang.Process p = Runtime.getRuntime().exec("get prop " + "ro.miui.ui.version.name");
             input = new BufferedReader(new InputStreamReader(p.getInputStream()), 1024);
             line = input.readLine();
             input.close();
@@ -136,7 +133,7 @@ public class MIUIUtils {
     private static boolean canDrawOverlaysUsingReflection(Context context) {
         try {
             AppOpsManager manager = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
-            Class clazz = AppOpsManager.class;
+            Class<AppOpsManager> clazz = AppOpsManager.class;
             Method dispatchMethod = clazz.getMethod("checkOp", new Class[] { int.class, int.class, String.class });
             int mode = (Integer) dispatchMethod.invoke(manager, new Object[] { 24, Binder.getCallingUid(), context.getApplicationContext().getPackageName() });
 
