@@ -113,7 +113,6 @@ public class HistoryDetailFragment extends Fragment implements View.OnClickListe
         mBinding.durationCall.setText(callTime);
 
         mBinding.btnClose.setOnClickListener(this);
-        mBinding.btnVideoCall.setOnClickListener(this);
         mBinding.btnCall.setOnClickListener(this);
 
         return mBinding.getRoot();

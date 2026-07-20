@@ -7,6 +7,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -18,25 +25,13 @@ import org.linphone.core.LinphoneCoreException;
 import org.linphone.core.PayloadType;
 import org.linphone.mediastream.Version;
 import org.pniei.portal.R;
-import org.pniei.portal.fragments.AuthenticationFragment;
-import org.pniei.portal.fragments.RegistrationFragment;
 import org.pniei.portal.services.SpoMessagesService;
 import org.pniei.portal.utils.PrefsUtils;
 import org.pniei.portal.utils.Utils;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import static android.content.Intent.ACTION_MAIN;
 
 public class LoginActivity extends AppCompatActivity {
-    private static final String TAG  = "LoginActivity";
     private Handler mHandler;
     private ServiceWaitThread mServiceThread;
 
@@ -47,51 +42,29 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         mHandler = new Handler(Looper.getMainLooper());
 
-		if (checkAndRequestNotifyPermission()) {
-            fragmentShow();
+        if (checkAndRequestNotifyPermission()) {
+            if (PrefsUtils.ins().isAuth()) {
+                loginOk();
+            } else {
+                Toast.makeText(this, "Ошибка загрузки конфигурации", Toast.LENGTH_LONG).show();
+                finish();
+            }
         }
-    }
-	
-	void fragmentShow() {
-        boolean isRegistered = PrefsUtils.ins().getHashPass() != null /*& VpnClient.keyFileExists(this)*/;
-        FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment = isRegistered ? AuthenticationFragment.newInstance(this) : RegistrationFragment.newInstance(this);
-        fm.beginTransaction()
-                .add(R.id.fragmentContainer, fragment)
-                .commit();
-    }
-
-    public void displayFragment(Fragment fragment, boolean toBackStack) {
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-
-        if (toBackStack)
-            transaction.addToBackStack(null);
-
-        transaction.replace(R.id.fragmentContainer, fragment);
-        transaction.commit();
     }
 
     public void loginOk() {
         PrefsUtils.ins().setAuth(true);
-
         if (LinphoneService.isReady()) {
             onServicesReady();
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(new Intent(ACTION_MAIN).setClass(this, LinphoneService.class));
             } else {
                 startService(new Intent(ACTION_MAIN).setClass(this, LinphoneService.class));
             }
-
             SpoMessagesService.start(getApplicationContext(),
-                    PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_P ? PrefsUtils.ins().getIdP() : PrefsUtils.ins().getIdTT(),
-                    PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_P ? PrefsUtils.ins().getSignatureP() : PrefsUtils.ins().getSignatureTT());
-
-            if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
-                CryptUtils.initCryptTT(CryptUtils.getKeyForIdUser(Integer.parseInt(PrefsUtils.ins().getIdTT())), Integer.parseInt(PrefsUtils.ins().getIdTT()));
-            }
-
+                    PrefsUtils.ins().getIdP(),
+                    PrefsUtils.ins().getSignatureP());
             mServiceThread = new ServiceWaitThread();
             mServiceThread.start();
         }
@@ -117,49 +90,36 @@ public class LoginActivity extends AppCompatActivity {
                     throw new RuntimeException("waiting thread sleep() has been interrupted");
                 }
             }
-
             boolean isSelected = PrefsUtils.ins().isSelectCodecs();
-
             LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
-            if(!isSelected) {
-
+            if (!isSelected) {
                 assert lc != null;
                 for (PayloadType pt : lc.getAudioCodecs()) {
                     try {
                         lc.enablePayloadType(pt, false);
-                    } catch (LinphoneCoreException ignored) { }
+                    } catch (LinphoneCoreException ignored) {
+                    }
                 }
-
                 PayloadType pt3 = lc.getAudioCodecs()[0];
                 try {
                     lc.enablePayloadType(pt3, true);
-                } catch (LinphoneCoreException ignored) { }
-
-
-                for (PayloadType pt : lc.getVideoCodecs()) {
-                    try {
-                        lc.enablePayloadType(pt, false);
-                    } catch (LinphoneCoreException ignored) { }
+                } catch (LinphoneCoreException ignored) {
                 }
-                PayloadType pt4 = lc.getVideoCodecs()[0];
-                try {
-                    lc.enablePayloadType(pt4, true);
-                } catch (LinphoneCoreException ignored) { }
                 PrefsUtils.ins().setSelectCodecs(true);
             }
-
             onServicesReady();
             mServiceThread = null;
         }
     }
-	
-	private boolean checkAndRequestNotifyPermission() {
+
+    private boolean checkAndRequestNotifyPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 permissionsResultCallback.launch(Manifest.permission.POST_NOTIFICATIONS);
                 return false;
-            } else
+            } else {
                 return true;
+            }
         } else {
             return true;
         }
@@ -168,15 +128,19 @@ public class LoginActivity extends AppCompatActivity {
     private final ActivityResultLauncher<String> permissionsResultCallback =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
-                    fragmentShow();
+                    if (PrefsUtils.ins().isAuth()) {
+                        loginOk();
+                    } else {
+                        Toast.makeText(this, "Ошибка загрузки конфигурации", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
                 } else {
                     new MaterialAlertDialogBuilder(this)
-                            .setTitle("Запрос разрешения")
-                            .setMessage("Для работы приложения необходимо предоставить разрешение создавать уведомления")
-                            .setNegativeButton("Отмена", (dialog, which) -> {})
-                            .setPositiveButton("Предоставить", (dialog, which) -> {
-                                checkAndRequestNotifyPermission();
+                            .setTitle("Внимание")
+                            .setMessage("Для работы приложения необходимо разрешение на показ уведомлений. Пожалуйста, предоставьте его в настройках.")
+                            .setNegativeButton("Отмена", (dialog, which) -> {
                             })
+                            .setPositiveButton("Разрешить", (dialog, which) -> checkAndRequestNotifyPermission())
                             .show();
                 }
             });
