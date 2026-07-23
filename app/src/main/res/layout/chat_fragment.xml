@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/chat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- topBar -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="?android:attr/colorPrimary"
+            android:elevation="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <FrameLayout
+                android:id="@+id/btnBack"
+                android:layout_width="44dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/btn_ripple"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/ic_arrow_back"
+                    app:tint="@android:color/white" />
+            </FrameLayout>
+
+            <ImageView
+                android:id="@+id/contactStatus"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_state_offline"
+                app:layout_constraintStart_toEndOf="@id/btnBack"
+                app:layout_constraintTop_toTopOf="@id/chatLabel"
+                app:layout_constraintBottom_toBottomOf="@id/chatLabel"/>
+
+            <TextView
+                android:id="@+id/chatLabel"
+                style="@style/fontLabelChat"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/btn_ripple_name"
+                android:clickable="true"
+                android:ellipsize="end"
+                android:gravity="start|center_vertical"
+                android:maxLines="1"
+                android:text="@string/label_select_contact"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btnCall"
+                app:layout_constraintStart_toEndOf="@id/contactStatus"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Иванов Иван Иванович" />
+
+            <FrameLayout
+                android:id="@+id/btnCall"
+                android:layout_width="44dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/btn_ripple"
+                tools:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/chatLabel"
+                app:layout_constraintEnd_toStartOf="@id/btnDeleteMessage"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/ic_phone"
+                    app:tint="@android:color/white" />
+            </FrameLayout>
+
+
+            <!--<FrameLayout
+                android:id="@+id/btnVideoCall"
+                android:layout_width="44dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/btn_ripple"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btnCall"
+                app:layout_constraintEnd_toStartOf="@id/btnBackToCall"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/ic_videocam"
+                    app:tint="@android:color/white" />
+            </FrameLayout>-->
+
+            <FrameLayout
+                android:id="@+id/btnDeleteMessage"
+                android:layout_width="44dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/btn_ripple"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btnCall"
+                app:layout_constraintEnd_toStartOf="@id/btnCancelSelect"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/ic_delete"
+                    app:tint="@android:color/white" />
+            </FrameLayout>
+
+            <!--<FrameLayout
+                android:id="@+id/btnBackToCall"
+                android:layout_width="44dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/btn_ripple"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btnVideoCall"
+                app:layout_constraintEnd_toStartOf="@id/btnAddContact"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/ic_phone_callback"
+                    app:tint="@android:color/white" />
+            </FrameLayout>-->
+
+            <FrameLayout
+                android:id="@+id/btnCancelSelect"
+                android:layout_width="44dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/btn_ripple"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btnDeleteMessage"
+                app:layout_constraintEnd_toStartOf="@id/btnAddContact">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/ic_close"
+                    app:tint="@android:color/white" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/btnAddContact"
+                android:layout_width="44dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/btn_ripple"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/ic_contact_add"
+                    app:tint="@android:color/white" />
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- chatMessageList -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/chatMessageList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/topBar"
+            app:layout_constraintBottom_toTopOf="@+id/bottomBar"/>
+
+        <!-- bottomBar -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bottomBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:visibility="visible"
+            tools:visibility="visible">
+
+            <!-- messageInputContainer -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/messageInputContainer"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/message_input_container_background"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btnSend"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:elevation="2dp">
+
+                <EditText
+                    android:id="@+id/messageInput"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@android:color/transparent"
+                    android:hint="Введите текст"
+                    android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
+                    android:gravity="center_vertical|start"
+                    android:textColor="@android:color/black"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/addAttachment"
+                    tools:layout_editor_absoluteY="4dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:visibility="visible"/>
+
+                <ImageButton
+                    android:id="@+id/addAttachment"
+                    android:layout_width="24dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/btn_ripple_gray"
+                    android:src="@drawable/ic_attach_file"
+                    app:tint="@color/colorB"
+                    app:layout_constraintStart_toEndOf="@+id/messageInput"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/takePicture"/>
+
+                <ImageButton
+                    android:id="@+id/takePicture"
+                    android:layout_width="24dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/btn_ripple_gray"
+                    android:src="@drawable/ic_camera"
+                    app:tint="@color/colorB"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/addAttachment"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btnSend"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:elevation="2dp"
+                android:src="@drawable/ic_mic"
+                app:backgroundTint="?attr/colorAccent"
+                app:fabCustomSize="48dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:tint="#FFFFFF"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- recordVoiceBar -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/recordVoiceBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:visibility="invisible"
+            tools:visibility="visible">
+
+            <LinearLayout
+                android:id="@+id/recordLockLayout"
+                android:layout_width="48dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginEnd="4dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <ImageView
+                    android:id="@+id/imgLock"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_lock"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="4dp"/>
+
+                <ImageView
+                    android:id="@+id/imgArrowUp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_arrows_up"
+                    android:layout_gravity="center_horizontal"/>
+
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/recordLayout"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginEnd="64dp"
+                android:background="@drawable/message_input_container_background"
+                app:layout_constraintTop_toBottomOf="@id/recordLockLayout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:elevation="2dp">
+
+                <ImageView
+                    android:id="@+id/imgRecord"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_marginStart="20dp"
+                    android:src="@drawable/ic_record"
+                    app:tint="@color/colorRed"/>
+
+                <TextView
+                    android:id="@+id/timeRecord"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="4dp"
+                    app:layout_constraintStart_toEndOf="@id/imgRecord"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:gravity="center_vertical"
+                    tools:text="00:00"/>
+
+                <ImageButton
+                    android:id="@+id/btnCancelRecordVoice"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/btn_ripple_gray"
+                    android:src="@drawable/ic_stop"
+                    app:tint="@color/colorB"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:visibility="gone"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <LinearLayout
+                android:id="@+id/recordCancelLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:orientation="horizontal"
+                android:layout_marginEnd="96dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:elevation="2dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="4dp"
+                    android:gravity="center_vertical"
+                    android:text="Отмена"/>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_arrows_left"
+                    android:layout_gravity="center_horizontal"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/imgMic"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintTop_toBottomOf="@id/recordLockLayout"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:background="@drawable/background_action_button"
+                android:src="@drawable/ic_mic"
+                app:tint="#FFFFFF"
+                android:padding="10dp"
+                android:elevation="2dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- button scroll to end -->
+        <FrameLayout
+            android:id="@+id/btnGoToEnd"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/btn_go_to_end_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/bottomBar"
+            android:elevation="4dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_arrow_down"
+                app:tint="#C0566365" />
+        </FrameLayout>
+
+        <!-- fileInputContainer -->
+        <FrameLayout
+            android:id="@+id/fileInputContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/file_input_container_background"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/bottomBar"
+            android:elevation="2dp"
+            android:visibility="gone"
+            android:padding="2dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/fileList"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

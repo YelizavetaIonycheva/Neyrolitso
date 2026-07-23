@@ -1,0 +1,26 @@
+
+
+[sip]
+contact="Sip Client" <sip:sip.client@unknown-host>
+use_info=0
+use_ipv6=0
+keepalive_period=30000
+sip_port=-1
+sip_tcp_port=-1
+sip_tls_port=-1
+
+[video]
+size=480p
+
+[app]
+tunnel=disabled
+push_notification=0
+auto_start=0
+
+[tunnel]
+host=
+port=443
+
+[misc]
+log_collection_upload_server_url=https://www.linphone.org:444/lft.php
+file_transfer_server_url=https://www.linphone.org:444/lft.php

@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools">
+
+	<data>
+		<variable
+			name="dtmfnumber"
+			type="org.linphone.CallActivity.Dtmf" />
+	</data>
+
+	<RelativeLayout
+		android:id="@+id/topLayout"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+		<!--
+		<androidx.drawerlayout.widget.DrawerLayout
+			android:id="@+id/side_menu"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+-->
+			<RelativeLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_below="@id/status">
+
+				<LinearLayout
+					android:id="@+id/fragmentContainer"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:orientation="horizontal"/>
+
+				<RelativeLayout
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:layout_above="@+id/menu"
+					android:layout_marginTop="40dp">
+
+					<androidx.constraintlayout.widget.ConstraintLayout
+						android:id="@+id/active_call"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:visibility="visible">
+
+						<FrameLayout
+							android:id="@+id/avatar_layout"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_marginTop="32dp"
+							android:visibility="visible"
+							app:layout_constraintEnd_toEndOf="parent"
+							app:layout_constraintStart_toStartOf="parent"
+							app:layout_constraintTop_toTopOf="parent">
+
+							<ImageView
+								android:id="@+id/contactPicture"
+								android:layout_width="200dp"
+								android:layout_height="wrap_content"
+								android:layout_gravity="center"
+								android:adjustViewBounds="true"
+								android:src="@drawable/ic_avatar_one" />
+
+						</FrameLayout>
+
+						<TextView
+							android:id="@+id/contactName"
+							style="@style/font5"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_below="@id/avatar_layout"
+							android:layout_marginTop="4dp"
+							android:gravity="center_vertical|center_horizontal"
+							app:layout_constraintEnd_toEndOf="parent"
+							app:layout_constraintStart_toStartOf="parent"
+							app:layout_constraintTop_toBottomOf="@id/avatar_layout"
+							tools:text="Иванов Иван Иванович  0000000000000000000000 0000000000" />
+
+						<TextView
+							android:id="@+id/contactNumber"
+							style="@style/font2"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_below="@id/contactName"
+							app:layout_constraintEnd_toEndOf="parent"
+							app:layout_constraintStart_toStartOf="parent"
+							app:layout_constraintTop_toBottomOf="@id/contactName"
+							tools:text="1001" />
+
+						<Chronometer
+							android:id="@+id/currentCallTimer"
+							style="@style/font2"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_below="@id/contactNumber"
+							app:layout_constraintEnd_toEndOf="parent"
+							app:layout_constraintStart_toStartOf="parent"
+							app:layout_constraintTop_toBottomOf="@id/contactNumber" />
+
+						<LinearLayout
+							android:id="@+id/remotePause"
+							android:layout_width="match_parent"
+							android:layout_height="0dp"
+							android:alpha="0.9"
+							android:background="?attr/colorPrimaryLite"
+							android:gravity="center"
+							android:orientation="vertical"
+							android:visibility="gone"
+							app:layout_constraintBottom_toBottomOf="parent"
+							app:layout_constraintEnd_toEndOf="parent"
+							app:layout_constraintStart_toStartOf="parent"
+							app:layout_constraintTop_toTopOf="parent"
+							tools:visibility="gone">
+
+							<ImageView
+								android:layout_width="120dp"
+								android:layout_height="120dp"
+								android:layout_gravity="center"
+								android:src="@drawable/waiting_time"
+								app:tint="@android:color/white" />
+
+							<TextView
+								style="@style/font16"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:layout_gravity="center"
+								android:text="@string/call_paused_by_remote" />
+
+						</LinearLayout>
+
+						<com.google.android.material.floatingactionbutton.FloatingActionButton
+							android:id="@+id/pause"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_below="@+id/contactName"
+							android:layout_alignParentEnd="true"
+							android:layout_marginTop="4dp"
+							android:layout_marginEnd="24dp"
+							android:layout_marginBottom="4dp"
+							android:visibility="gone"
+							app:backgroundTint="?attr/colorAccent"
+							app:fabSize="mini"
+							app:layout_constraintEnd_toEndOf="parent"
+							app:layout_constraintTop_toBottomOf="@id/contactName"
+							app:srcCompat="@drawable/ic_pause"
+							app:tint="@android:color/white" />
+
+						<com.google.android.material.floatingactionbutton.FloatingActionButton
+							android:id="@+id/switchCamera"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_below="@+id/contactName"
+							android:layout_alignParentStart="true"
+							android:layout_marginStart="24dp"
+							android:layout_marginTop="4dp"
+							android:layout_marginBottom="4dp"
+							android:visibility="gone"
+							app:backgroundTint="?attr/colorAccent"
+							app:fabSize="mini"
+							app:layout_constraintStart_toStartOf="parent"
+							app:layout_constraintTop_toBottomOf="@id/contactName"
+							app:srcCompat="@drawable/ic_switch_video"
+							app:tint="@android:color/white"
+							tools:visibility="gone" />
+					</androidx.constraintlayout.widget.ConstraintLayout>
+
+					<LinearLayout
+						android:id="@+id/calls_list"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_alignParentBottom="true"
+						android:layout_gravity="bottom"
+						android:orientation="vertical" />
+
+					<LinearLayout
+						android:id="@+id/no_current_call"
+						android:layout_width="match_parent"
+						android:layout_height="match_parent"
+						android:layout_above="@id/calls_list"
+						android:background="@color/colorB"
+						android:gravity="center_vertical"
+						android:orientation="vertical"
+						android:visibility="gone">
+
+						<ImageView
+							android:layout_width="120dp"
+							android:layout_height="120dp"
+							android:layout_gravity="center"
+							android:src="@drawable/waiting_time"
+							app:tint="@android:color/white" />
+
+						<TextView
+							style="@style/font16"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:layout_gravity="center"
+							android:text="@string/no_current_call" />
+					</LinearLayout>
+
+				</RelativeLayout>
+
+				<androidx.constraintlayout.widget.ConstraintLayout
+					android:id="@+id/menu"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_alignParentBottom="true">
+
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:id="@+id/hang_up"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginBottom="32dp"
+						android:layout_marginTop="4dp"
+						app:backgroundTint="@color/colorAttention"
+						app:layout_constraintBottom_toBottomOf="parent"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toTopOf="parent"
+						app:srcCompat="@drawable/ic_call_end"
+						app:tint="@android:color/white" />
+
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:id="@+id/dialer"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginStart="26dp"
+						android:layout_marginBottom="26dp"
+						app:backgroundTint="?attr/colorPrimaryLite"
+						app:fabSize="mini"
+						app:layout_constraintBottom_toBottomOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:srcCompat="@drawable/ic_dialpad"
+						app:tint="@android:color/white" />
+
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:id="@+id/micro"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginStart="16dp"
+						android:layout_marginBottom="26dp"
+						android:layout_toEndOf="@+id/dialer"
+						app:backgroundTint="?attr/colorPrimaryLite"
+						app:fabSize="mini"
+						app:layout_constraintBottom_toBottomOf="parent"
+						app:layout_constraintStart_toEndOf="@id/dialer"
+						app:srcCompat="@drawable/ic_mic_off"
+						app:tint="@android:color/white" />
+
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:id="@+id/speaker"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginEnd="26dp"
+						android:layout_marginBottom="26dp"
+						app:backgroundTint="?attr/colorPrimaryLite"
+						app:fabSize="mini"
+						app:layout_constraintBottom_toBottomOf="parent"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:srcCompat="@drawable/ic_volume_up"
+						app:tint="@android:color/white" />
+
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:id="@+id/audio_route"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginEnd="26dp"
+						android:layout_marginBottom="26dp"
+						android:visibility="gone"
+						app:backgroundTint="?attr/colorPrimaryLite"
+						app:fabSize="mini"
+						app:layout_constraintBottom_toBottomOf="parent"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:srcCompat="@drawable/ic_routes_default"
+						app:tint="@android:color/white" />
+
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:id="@+id/video"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginEnd="16dp"
+						android:layout_marginBottom="26dp"
+						android:layout_toStartOf="@+id/speaker"
+						app:backgroundTint="?attr/colorPrimaryLite"
+						app:fabSize="mini"
+						app:layout_constraintBottom_toBottomOf="parent"
+						app:layout_constraintEnd_toStartOf="@id/speaker"
+						app:srcCompat="@drawable/ic_videocam"
+						app:tint="@android:color/white" />
+
+					<ProgressBar
+						android:id="@+id/video_progress"
+						style="?android:attr/progressBarStyle"
+						android:layout_width="50dp"
+						android:layout_height="50dp"
+						android:layout_marginEnd="16dp"
+						android:layout_marginBottom="26dp"
+						android:visibility="invisible"
+						app:layout_constraintBottom_toBottomOf="parent"
+						app:layout_constraintEnd_toStartOf="@id/speaker" />
+
+
+
+				</androidx.constraintlayout.widget.ConstraintLayout>
+
+				<androidx.constraintlayout.widget.ConstraintLayout
+					android:id="@+id/menu_audio_route"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_above="@id/menu"
+					android:visibility="gone">
+
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:id="@+id/route_speaker"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginEnd="26dp"
+						android:visibility="visible"
+						app:backgroundTint="?attr/colorPrimaryLite"
+						app:fabSize="mini"
+						app:layout_constraintBottom_toTopOf="@id/route_earpiece"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:srcCompat="@drawable/ic_volume_up"
+						app:tint="@android:color/white" />
+
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:id="@+id/route_earpiece"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginEnd="26dp"
+						android:visibility="visible"
+						app:backgroundTint="?attr/colorPrimaryLite"
+						app:fabSize="mini"
+						app:layout_constraintBottom_toTopOf="@id/route_bluetooth"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:srcCompat="@drawable/ic_route_earpiece"
+						app:tint="@android:color/white" />
+
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:id="@+id/route_bluetooth"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginEnd="26dp"
+						android:visibility="visible"
+						app:backgroundTint="?attr/colorPrimaryLite"
+						app:fabSize="mini"
+						app:layout_constraintBottom_toBottomOf="parent"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:srcCompat="@drawable/ic_route_bluetooth"
+						app:tint="@android:color/white" />
+
+				</androidx.constraintlayout.widget.ConstraintLayout>
+
+				<RelativeLayout
+					android:id="@+id/numpad"
+					android:layout_width="220dp"
+					android:layout_height="wrap_content"
+					android:layout_centerHorizontal="true"
+					android:layout_above="@+id/menu"
+					android:background="@color/colorB"
+					android:visibility="gone">
+
+					<TextView
+						android:id="@+id/inputNumber"
+						style="@style/DtmfNumber"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:background="@null"
+						android:layout_alignParentTop="true"
+						android:layout_centerHorizontal="true"
+						android:layout_margin="4dp"
+						android:gravity="center"
+						android:ellipsize="start"
+						android:singleLine="true"
+						android:text="@{dtmfnumber.number}"/>
+
+					<TableLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_below="@+id/inputNumber">
+
+						<TableRow android:layout_weight="1" android:gravity="center">
+							<ImageButton
+								style="@style/NumpadButtonDtmf"
+								android:src="@drawable/numpad_1"
+								android:onClick='@{(view) -> dtmfnumber.sendDtmf("1")}'/>
+
+							<ImageButton
+								style="@style/NumpadButtonDtmf"
+								android:src="@drawable/numpad_2"
+								android:onClick='@{(view) -> dtmfnumber.sendDtmf("2")}'/>
+
+							<ImageButton
+								style="@style/NumpadButtonDtmf"
+								android:src="@drawable/numpad_3"
+								android:onClick='@{(view) -> dtmfnumber.sendDtmf("3")}'/>
+						</TableRow>
+
+						<TableRow android:layout_weight="1" android:gravity="center">
+							<ImageButton
+								style="@style/NumpadButtonDtmf"
+								android:src="@drawable/numpad_4"
+								android:onClick='@{(view) -> dtmfnumber.sendDtmf("4")}'/>
+
+							<ImageButton
+								style="@style/NumpadButtonDtmf"
+								android:src="@drawable/numpad_5"
+								android:onClick='@{(view) -> dtmfnumber.sendDtmf("5")}'/>
+
+							<ImageButton
+								style="@style/NumpadButtonDtmf"
+								android:src="@drawable/numpad_6"
+								android:onClick='@{(view) -> dtmfnumber.sendDtmf("6")}'/>
+						</TableRow>
+
+						<TableRow android:layout_weight="1" android:gravity="center">
+							<ImageButton
+								style="@style/NumpadButtonDtmf"
+								android:src="@drawable/numpad_7"
+								android:onClick='@{(view) -> dtmfnumber.sendDtmf("7")}'/>
+
+							<ImageButton
+								style="@style/NumpadButtonDtmf"
+								android:src="@drawable/numpad_8"
+								android:onClick='@{(view) -> dtmfnumber.sendDtmf("8")}'/>
+
+							<ImageButton
+								style="@style/NumpadButtonDtmf"
+								android:src="@drawable/numpad_9"
+								android:onClick='@{(view) -> dtmfnumber.sendDtmf("9")}'/>
+						</TableRow>
+
+						<TableRow android:layout_weight="1" android:gravity="center">
+							<ImageButton
+								style="@style/NumpadButtonDtmf"
+								android:src="@drawable/numpad_star"
+								android:onClick='@{(view) -> dtmfnumber.sendDtmf("*")}'/>
+
+							<ImageButton
+								style="@style/NumpadButtonDtmf"
+								android:src="@drawable/numpad_0"
+								android:onClick='@{(view) -> dtmfnumber.sendDtmf("0")}'/>
+
+							<ImageButton
+								style="@style/NumpadButtonDtmf"
+								android:src="@drawable/numpad_sharp"
+								android:onClick='@{(view) -> dtmfnumber.sendDtmf("#")}'/>
+						</TableRow>
+
+					</TableLayout>
+
+				</RelativeLayout>
+
+			</RelativeLayout>
+		<!--
+                    <RelativeLayout
+                        android:id="@+id/side_menu_content"
+                        android:layout_marginTop="40dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="left">
+
+                    <include layout="@layout/incall_stats" android:id="@+id/incall_stats"/>
+
+                    </RelativeLayout>
+
+                </androidx.drawerlayout.widget.DrawerLayout>
+        -->
+                <fragment
+                    android:id="@+id/status"
+                    android:name="org.linphone.StatusFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    tools:layout="@layout/status" />
+
+            </RelativeLayout>
+
+        </layout>

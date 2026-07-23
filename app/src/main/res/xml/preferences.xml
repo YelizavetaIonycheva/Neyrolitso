@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?><PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto">
+
+<PreferenceCategory android:title="@string/pref_preferences_title">
+
+    <PreferenceScreen
+        android:title="@string/pref_ip_address_title"
+        android:key="@string/pref_ip_address_key"
+        android:icon="@drawable/ic_ip_address"
+        android:persistent="false">
+
+        <PreferenceCategory android:title="@string/pref_ip_address_title">
+
+            <EditTextPreference
+                android:title="@string/pref_ip_skzi_title"
+                android:key="@string/pref_ip_skzi_key"
+                android:persistent="false" />
+
+            <EditTextPreference
+                android:title="@string/pref_ip_mon_title"
+                android:key="@string/pref_ip_mon_key"
+                android:persistent="false" />
+
+            <EditTextPreference
+                android:title="@string/pref_ip_ats_title"
+                android:key="@string/pref_ip_ats_key"
+                android:persistent="false" />
+
+            <EditTextPreference
+                android:title="@string/pref_domain_name_title"
+                android:key="@string/pref_domain_name_key"
+                android:defaultValue="impulse.ru"
+                android:persistent="false" />
+
+            <EditTextPreference
+                android:title="@string/pref_ip_dns_title"
+                android:key="@string/pref_ip_dns_key"
+                android:persistent="false" />
+
+            <EditTextPreference
+                android:title="@string/pref_ip_dns_second_title"
+                android:key="@string/pref_ip_dns_second_key"
+                android:persistent="false" />
+
+        </PreferenceCategory>
+
+    </PreferenceScreen>
+
+
+
+    <PreferenceScreen
+        android:title="@string/pref_advanced_title"
+        android:key="@string/pref_advanced_key"
+        android:icon="@drawable/ic_more">
+
+        <PreferenceCategory android:title="@string/pref_advanced_title">
+
+            <Preference
+                android:title="@string/pref_export_logs_title"
+                android:key="@string/pref_export_logs_key"
+                android:persistent="false"
+                android:icon="@drawable/ic_book" />
+
+            <Preference
+                android:title="@string/pref_update_po_title"
+                android:key="@string/pref_update_po_key"
+                android:persistent="false"
+                android:icon="@drawable/ic_update" />
+
+            <Preference
+                android:title="@string/pref_reset_config_title"
+                android:key="@string/pref_reset_spomp_key"
+                android:persistent="false"
+                android:icon="@drawable/ic_delete" />
+
+            <Preference
+                android:title="@string/pref_background_work_title"
+                android:key="@string/pref_background_work_key"
+                android:persistent="false"
+                android:icon="@drawable/ic_battery" />
+
+            <Preference
+                android:title="@string/pref_export_settings_title"
+                android:key="@string/pref_export_settings_key"
+                android:persistent="false"
+                android:icon="@drawable/ic_file_upload" />
+
+            <Preference
+                android:title="@string/pref_import_settings_title"
+                android:key="@string/pref_import_settings_key"
+                android:persistent="false"
+                android:icon="@drawable/ic_file_download" />
+        </PreferenceCategory>
+
+    </PreferenceScreen>
+
+</PreferenceCategory>
+
+</PreferenceScreen>
+

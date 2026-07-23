@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="callnumber"
+            type="org.pniei.portal.fragments.DialerFragment.CallNumber" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/numberBar"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="32dp">
+
+            <ImageButton
+                android:id="@+id/erase"
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="32dp"
+                android:background="@drawable/numpad_background"
+                android:onClick="@{(view) -> callnumber.eraseDigit()}"
+                android:onLongClick="@{(view) -> callnumber.erase()}"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_backspace"
+                app:tint="?android:attr/colorPrimaryDark" />
+
+            <TextView
+                android:id="@+id/inputNumber"
+                style="@style/font5_large"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="102dp"
+                android:layout_toStartOf="@id/erase"
+                android:background="@null"
+                android:ellipsize="start"
+                android:gravity="center"
+                android:text="@{callnumber.number}" />
+
+        </RelativeLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btn_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabCustomSize="64dp"
+            app:maxImageSize="32dp"
+            android:layout_marginBottom="40dp"
+            app:backgroundTint="?android:attr/colorAccent"
+            app:srcCompat="@drawable/ic_call"
+            app:tint="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/numberBar"
+            app:layout_constraintBottom_toTopOf="@+id/btn_action"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+
+            <TableRow android:layout_weight="1" android:gravity="center">
+                <ImageButton
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:scaleType="fitCenter"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/numpad_background"
+                    android:src="@drawable/numpad_1"
+                    app:tint="?android:attr/colorPrimaryDark"
+                    android:onClick='@{(view) -> callnumber.addDigit("1")}'/>
+
+                <ImageButton
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:scaleType="fitCenter"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/numpad_background"
+                    android:src="@drawable/numpad_2"
+                    app:tint="?android:attr/colorPrimaryDark"
+                    android:onClick='@{(view) -> callnumber.addDigit("2")}'/>
+
+                <ImageButton
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:scaleType="fitCenter"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/numpad_background"
+                    android:src="@drawable/numpad_3"
+                    app:tint="?android:attr/colorPrimaryDark"
+                    android:onClick='@{(view) -> callnumber.addDigit("3")}'/>
+            </TableRow>
+
+            <TableRow android:layout_weight="1" android:gravity="center">
+                <ImageButton
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:scaleType="fitCenter"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/numpad_background"
+                    android:src="@drawable/numpad_4"
+                    app:tint="?android:attr/colorPrimaryDark"
+                    android:onClick='@{(view) -> callnumber.addDigit("4")}'/>
+
+                <ImageButton
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:scaleType="fitCenter"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/numpad_background"
+                    android:src="@drawable/numpad_5"
+                    app:tint="?android:attr/colorPrimaryDark"
+                    android:onClick='@{(view) -> callnumber.addDigit("5")}'/>
+
+                <ImageButton
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:scaleType="fitCenter"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/numpad_background"
+                    android:src="@drawable/numpad_6"
+                    app:tint="?android:attr/colorPrimaryDark"
+                    android:onClick='@{(view) -> callnumber.addDigit("6")}'/>
+            </TableRow>
+
+            <TableRow android:layout_weight="1" android:gravity="center">
+                <ImageButton
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:scaleType="fitCenter"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/numpad_background"
+                    android:src="@drawable/numpad_7"
+                    app:tint="?android:attr/colorPrimaryDark"
+                    android:onClick='@{(view) -> callnumber.addDigit("7")}'/>
+
+                <ImageButton
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:scaleType="fitCenter"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/numpad_background"
+                    android:src="@drawable/numpad_8"
+                    app:tint="?android:attr/colorPrimaryDark"
+                    android:onClick='@{(view) -> callnumber.addDigit("8")}'/>
+
+                <ImageButton
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:scaleType="fitCenter"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/numpad_background"
+                    android:src="@drawable/numpad_9"
+                    app:tint="?android:attr/colorPrimaryDark"
+                    android:onClick='@{(view) -> callnumber.addDigit("9")}'/>
+            </TableRow>
+
+            <TableRow android:layout_weight="1" android:gravity="center">
+                <ImageButton
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:scaleType="fitCenter"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/numpad_background"
+                    android:src="@drawable/numpad_star"
+                    app:tint="?android:attr/colorPrimaryDark"
+                    android:onClick='@{(view) -> callnumber.addDigit("*")}'/>
+
+                <ImageButton
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:scaleType="fitCenter"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/numpad_background"
+                    android:src="@drawable/numpad_0"
+                    app:tint="?android:attr/colorPrimaryDark"
+                    android:onClick='@{(view) -> callnumber.addDigit("0")}'/>
+
+                <ImageButton
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:scaleType="fitCenter"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/numpad_background"
+                    android:src="@drawable/numpad_sharp"
+                    app:tint="?android:attr/colorPrimaryDark"
+                    android:onClick='@{(view) -> callnumber.addDigit("#")}'/>
+            </TableRow>
+
+        </TableLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

@@ -1,0 +1,147 @@
+package org.pniei.portal.activities;
+
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import org.linphone.BluetoothManager;
+import org.linphone.LinphoneManager;
+import org.linphone.LinphoneService;
+import org.linphone.core.LinphoneCore;
+import org.linphone.core.LinphoneCoreException;
+import org.linphone.core.PayloadType;
+import org.linphone.mediastream.Version;
+import org.pniei.portal.R;
+import org.pniei.portal.services.SpoMessagesService;
+import org.pniei.portal.utils.PrefsUtils;
+import org.pniei.portal.utils.Utils;
+
+import static android.content.Intent.ACTION_MAIN;
+
+public class LoginActivity extends AppCompatActivity {
+    private Handler mHandler;
+    private ServiceWaitThread mServiceThread;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        Utils.initTheme(this);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+        mHandler = new Handler(Looper.getMainLooper());
+
+        if (checkAndRequestNotifyPermission()) {
+            if (PrefsUtils.ins().isAuth()) {
+                loginOk();
+            } else {
+                Toast.makeText(this, "Ошибка загрузки конфигурации", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }
+    }
+
+    public void loginOk() {
+        PrefsUtils.ins().setAuth(true);
+        if (LinphoneService.isReady()) {
+            onServicesReady();
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(new Intent(ACTION_MAIN).setClass(this, LinphoneService.class));
+            } else {
+                startService(new Intent(ACTION_MAIN).setClass(this, LinphoneService.class));
+            }
+            SpoMessagesService.start(getApplicationContext(),
+                    PrefsUtils.ins().getIdP(),
+                    PrefsUtils.ins().getSignatureP());
+            mServiceThread = new ServiceWaitThread();
+            mServiceThread.start();
+        }
+    }
+
+    protected void onServicesReady() {
+        if (Version.sdkAboveOrEqual(Version.API11_HONEYCOMB_30)) {
+            BluetoothManager.getInstance().initBluetooth();
+        }
+        mHandler.post(() -> {
+            Intent newIntent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(newIntent);
+            finish();
+        });
+    }
+
+    private class ServiceWaitThread extends Thread {
+        public void run() {
+            while (!(LinphoneService.isReady() && SpoMessagesService.isReady())) {
+                try {
+                    sleep(30);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException("waiting thread sleep() has been interrupted");
+                }
+            }
+            boolean isSelected = PrefsUtils.ins().isSelectCodecs();
+            LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
+            if (!isSelected) {
+                assert lc != null;
+                for (PayloadType pt : lc.getAudioCodecs()) {
+                    try {
+                        lc.enablePayloadType(pt, false);
+                    } catch (LinphoneCoreException ignored) {
+                    }
+                }
+                PayloadType pt3 = lc.getAudioCodecs()[0];
+                try {
+                    lc.enablePayloadType(pt3, true);
+                } catch (LinphoneCoreException ignored) {
+                }
+                PrefsUtils.ins().setSelectCodecs(true);
+            }
+            onServicesReady();
+            mServiceThread = null;
+        }
+    }
+
+    private boolean checkAndRequestNotifyPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                permissionsResultCallback.launch(Manifest.permission.POST_NOTIFICATIONS);
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    private final ActivityResultLauncher<String> permissionsResultCallback =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    if (PrefsUtils.ins().isAuth()) {
+                        loginOk();
+                    } else {
+                        Toast.makeText(this, "Ошибка загрузки конфигурации", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                } else {
+                    new MaterialAlertDialogBuilder(this)
+                            .setTitle("Внимание")
+                            .setMessage("Для работы приложения необходимо разрешение на показ уведомлений. Пожалуйста, предоставьте его в настройках.")
+                            .setNegativeButton("Отмена", (dialog, which) -> {
+                            })
+                            .setPositiveButton("Разрешить", (dialog, which) -> checkAndRequestNotifyPermission())
+                            .show();
+                }
+            });
+}

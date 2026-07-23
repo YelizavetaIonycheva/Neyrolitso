@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Цвета для режима Точка-Точка -->
+    <color name="colorPrimary_t">#847553</color>
+    <color name="colorPrimaryLite_t">#b4a480</color>
+    <color name="colorPrimaryDark_t">#564a2a</color>
+    <color name="colorPrimaryVariant_t">#b29e70</color> <!-- not def -->
+    <color name="colorPrimaryVariantLite_t">#e5cf9f</color> <!-- not def -->
+    <color name="colorPrimaryVariantDark_t">#817044</color> <!-- not def -->
+    <color name="colorOnPrimary_t">#ffffff</color>
+    <color name="colorSecondary_t">#4fa7ff</color>
+    <color name="colorSecondaryLight_t">#8bd8ff</color>
+    <color name="colorSecondaryDark_t">#0079cb</color>
+    <color name="textColorPrimary_t">@color/colorPrimaryDark_t</color>
+    <color name="colorTextPrimaryDark_t">#393019</color>
+    <color name="textColorSecondary_t">#0B0B0B</color>
+    <color name="colorBackground_t">#F6F6F6</color>
+    <color name="colorOnBackground_t">#0B0B0B</color>
+    <color name="colorSurface_t">#ECECEC</color>
+    <color name="colorOnSurface_t">@color/colorPrimaryDark_t</color>
+    <color name="colorAccent_t">@color/colorSecondary_t</color>
+
+    <!-- Цвета для режима Портал -->
+    <color name="colorPrimary_p">#546E7A</color>
+    <color name="colorPrimaryLite_p">#819CA9</color>
+    <color name="colorPrimaryDark_p">#29434E</color>
+    <color name="colorPrimaryVariant_p">#204F63</color>
+    <color name="colorPrimaryVariantLite_p">#88AFBF</color>
+    <color name="colorPrimaryVariantDark_p">#113240</color>
+    <color name="colorOnPrimary_p">#ffffff</color>
+    <color name="colorSecondary_p">#FFB300</color>
+    <color name="colorSecondaryLight_p">#FFE54C</color>
+    <color name="colorSecondaryDark_p">#C68400</color>
+    <color name="colorOnSecondary_p">#000000</color>
+    <color name="textColorPrimary_p">@color/colorPrimaryDark_p</color>
+    <color name="textColorPrimaryDark_p">#172830</color>
+    <color name="textColorSecondary_p">#0B0B0B</color>
+    <color name="colorBackground_p">#FAFAFA</color>
+    <color name="colorOnBackground_p">#0B0B0B</color>
+    <color name="colorSurface_p">#ECECEC</color>
+    <color name="colorOnSurface_p">@color/colorPrimaryDark_p</color>
+    <color name="colorAccent_p">@color/colorSecondary_p</color>
+    <color name="design_default_color_error">#B00020</color>
+
+    <!-- Общие цвета -->
+    <color name='link_color'>#000039</color>
+    <color name="colorBtnCallSecondary">#006064</color>
+    <color name="colorAttentionDark">#B71C1C</color>
+    <color name="colorAttention">#E53935</color>
+    <color name="colorGreen">#43A047</color>
+    <color name="colorBundleUnread">#2ADA03</color>
+    <color name="busy_background">#90000000</color>
+    <color name="colorTextInfo">#323232</color>
+    <color name="colorDivider">#AFAFAF</color>
+    <color name="colorTextNameChatRoom">#000000</color>
+    <color name="colorTextDateChat">#606060</color>
+    <color name="colorText">#1C1C1C</color>
+
+    <color name="colorA">#FFFFFF</color>
+    <color name="colorB">#566365</color>
+    <color name="colorB_lite">#ACACAC</color>
+    <color name="colorC">#E0F7FA</color>
+    <color name="colorD">#B2EBF2</color>
+
+    <color name="colorTextNameChat">#FFFFFF</color>
+    <color name="colorTextChatDate">#7C7C7C</color>
+    <color name="colorTextChatMessage">#000000</color>
+    <color name="colorBackgroundBubbleOut">#C8E6C9</color>
+    <color name="colorBackgroundBubbleIn">#FFFFFF</color>
+
+    <color name="colorChatDateDivider">#B0C7FD</color>
+    <color name="colorTextChatDateDivider">#7C7C7C</color>
+    <color name="colorLoadingBackground">#E6000000</color>
+    <color name="colorError">#950101</color>
+
+    <color name="colorRed">#A30000</color>
+    <color name="colorSelectMessage">#2C29434E</color>
+
+
+
+
+
+
+
+
+    <!--  Linphone  -->
+
+    <color name="notification_color_led">#FF8000</color>
+    <color name="colorE">#5b5050</color>    <!-- Вспомогательный текст и тонкие полоски -->
+    <color name="colorF">#A59E8D</color>
+    <color name="colorI">#9F0000</color>
+    <color name="colorK">#5b5050</color>    <!-- Текст сообщения, что Сообщение доставлено -->
+    <color name="colorL">#5E402B</color>    <!-- Цвет кнопки вызова при нажатии -->
+    <color name="colorTextOnRed">#FFD747</color>
+    <color name="notification_led_color">#ff8000</color>
+
+</resources>

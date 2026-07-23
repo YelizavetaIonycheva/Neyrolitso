@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   	<!-- Do not translate any of the strings below -->
+	<bool name="isTablet">false</bool>
+	<string name="tunnel_mode_entry_value_auto">auto</string>
+	<string name="pref_media_key">pref_video_key</string>
+	<string name="pref_video_key">pref_video_key</string>
+    <string name="pref_overlay_key">pref_overlay_key</string>
+	<string name="pref_preferred_video_size_key">pref_preferred_video_size_key</string>
+	<string name="pref_export_logs_key">pref_export_logs_key</string>
+	<string name="pref_update_po_key">pref_update_po_key</string>
+	<string name="pref_reset_spomp_key">pref_reset_spomp_key</string>
+	<string name="pref_background_work_key">pref_background_work_key</string>
+	<string name="pref_export_settings_key">pref_export_settings_key</string>
+	<string name="pref_import_settings_key">pref_import_settings_key</string>
+
+	<string name="pref_codecs_key">pref_codecs_key</string>
+	<string name="pref_audio_codecs_key">pref_audio_codecs_key</string>
+	<string name="pref_skzi_key">pref_skzi_key</string>
+	<string name="pref_advanced_key">pref_advanced_key</string>
+
+
+
+	<string-array name="limit_bitrate_entry_values">
+		<item>10</item>
+		<item>15</item>
+		<item>20</item>
+		<item>36</item>
+		<item>64</item>
+		<item>128</item>
+	</string-array>
+	<string-array name="limit_bitrate_entries">
+		<item>10 kbits/s</item>
+		<item>15 kbits/s</item>
+		<item>20 kbits/s</item>
+		<item>36 kbits/s</item>
+		<item>64 kbits/s</item>
+		<item>128 kbits/s</item>
+	</string-array>
+
+
+	<string name="pref_ip_address_key">pref_ip_address_key</string>
+	<string name="pref_id_name_key">pref_id_name_key</string>
+	<string name="pref_ip_skzi_key">pref_ip_skzi_key</string>
+	<string name="pref_ip_mon_key">pref_ip_mon_key</string>
+	<string name="pref_ip_dns_key">pref_ip_dns_key</string>
+	<string name="pref_ip_dns_second_key">pref_ip_dns_second_key</string>
+	<string name="pref_ip_db_key">pref_ip_db_key</string>
+	<string name="pref_domain_name_key">pref_domain_name_key</string>
+	<string name="pref_ip_ats_key">pref_ip_ats_key</string>
+	<string name="pref_num_skzi_key">pref_num_skzi_key</string>
+	<string name="pref_vpn_info_key">pref_key_info_key</string>
+	<string name="pref_key_compl_key">pref_key_compl_key</string>
+	<string name="pref_connect_skzi_key">pref_connect_skzi_key</string>
+	<string name="pref_connect_skzi_time_error_key">pref_connect_skzi_time_error_key</string>
+	<string name="pref_key_working_compl_key">pref_key_working_compl_key</string>
+	<string name="pref_key_next_compl_key">pref_key_next_compl_key</string>
+
+	<string name="pref_key_w_name_komplect_key">pref_key_w_name_komplect_key</string>
+	<string name="pref_key_w_num_serial_key">pref_key_w_num_serial_key</string>
+	<string name="pref_key_w_num_komplect_key">pref_key_w_num_komplect_key</string>
+	<string name="pref_key_w_num_of_keys_key">pref_key_w_num_of_keys_key</string>
+	<string name="pref_key_w_date_begin_key">pref_key_w_date_begin_key</string>
+	<string name="pref_key_w_date_end_key">pref_key_w_date_end_key</string>
+
+	<string name="pref_key_n_name_komplect_key">pref_key_n_name_komplect_key</string>
+	<string name="pref_key_n_num_serial_key">pref_key_n_num_serial_key</string>
+	<string name="pref_key_n_num_komplect_key">pref_key_n_num_komplect_key</string>
+	<string name="pref_key_n_num_of_keys_key">pref_key_n_num_of_keys_key</string>
+	<string name="pref_key_n_date_begin_key">pref_key_n_date_begin_key</string>
+	<string name="pref_key_n_date_end_key">pref_key_n_date_end_key</string>
+
+	<string name="pref_number_gsm_key">pref_number_gsm_key</string>
+
+</resources>

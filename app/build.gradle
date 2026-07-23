@@ -1,0 +1,110 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+//// Submodule Dir /////
+def submoduleDir = ['../submodules/mediastreamer2/java/src',
+                    '../submodules/linphone/java/j2se',
+                    '../submodules/linphone/java/common',
+                    '../submodules/linphone/java/impl']
+
+android {
+    compileSdk 36
+    buildToolsVersion '37.0.0'
+    namespace 'org.pniei.portal'
+    ndkVersion '25.2.9519653'
+
+    signingConfigs {
+        release {
+            storeFile file('D:\\Khanbekova\\keys\\key.jks')
+            storePassword '12345678'
+            keyAlias 'key0'
+            keyPassword '12345678'
+        }
+    }
+
+    defaultConfig {
+        applicationId "org.pniei.impulsGPS"
+        minSdk 23
+        targetSdk 36
+        versionCode 109
+        versionName "109"
+
+        ndk {
+            abiFilters 'arm64-v8a', 'armeabi-v7a'
+        }
+
+        externalNativeBuild {
+            ndkBuild {
+                arguments '-j8'
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            jniDebuggable false
+        }
+    }
+
+    buildFeatures {
+        viewBinding = true
+        dataBinding = true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    externalNativeBuild {
+        ndkBuild {
+            path 'jni/Android.mk'
+        }
+    }
+
+    sourceSets {
+        main {
+            def srcDirs = submoduleDir
+            srcDirs.addAll(['src/main/java/'])
+            java.srcDirs = srcDirs
+            aidl.srcDirs = srcDirs
+            renderscript.srcDirs = srcDirs
+        }
+    }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging true
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'com.google.android.material:material:1.14.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
+    implementation 'org.jetbrains:annotations:26.1.0'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'androidx.browser:browser:1.10.0'
+    implementation 'androidx.viewpager2:viewpager2:1.1.0'
+    implementation 'com.github.clans:fab:1.6.4'
+    implementation 'androidx.documentfile:documentfile:1.1.0'
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
+    implementation 'com.github.kevinsawicki:http-request:6.0'
+
+}
