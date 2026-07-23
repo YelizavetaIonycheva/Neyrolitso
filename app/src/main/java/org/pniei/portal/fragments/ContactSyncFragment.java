@@ -9,6 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+<<<<<<< HEAD
+=======
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -17,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.pniei.portal.R;
+<<<<<<< HEAD
 import org.pniei.portal.database.SpoContact;
 import org.pniei.portal.databinding.ContactSyncCellBinding;
 import org.pniei.portal.databinding.ContactSyncFragmentBinding;
@@ -28,6 +36,16 @@ import org.pniei.portal.services.SpoMessagesService;
 import java.util.ArrayList;
 import java.util.List;
 
+=======
+import org.pniei.portal.listener.OnBackClickListener;
+import org.pniei.portal.listener.SpoContactListener;
+import org.pniei.portal.listener.SpoListenerManager;
+import org.pniei.portal.database.SpoContact;
+import org.pniei.portal.databinding.ContactSyncCellBinding;
+import org.pniei.portal.databinding.ContactSyncFragmentBinding;
+import org.pniei.portal.services.SpoMessagesService;
+
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 public class ContactSyncFragment extends Fragment implements SpoContactListener, OnBackClickListener {
     @SuppressLint("StaticFieldLeak")
     private static Context mContext;

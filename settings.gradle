@@ -10,4 +10,9 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Neyrolitso"
+<<<<<<< HEAD
 include ':app'
+=======
+include ':app'
+include ':DWFace'
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db

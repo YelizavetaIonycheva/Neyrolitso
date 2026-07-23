@@ -20,7 +20,13 @@ public class NetworkManager extends BroadcastReceiver {
         if (lNoConnectivity) {
             SpoMessagesService.stop(context);
         } else {
+<<<<<<< HEAD
             SpoMessagesService.start(context, PrefsUtils.ins().getIdP(), PrefsUtils.ins().getSignatureP());
+=======
+            SpoMessagesService.start(context,
+                    PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_P ? PrefsUtils.ins().getIdP() : PrefsUtils.ins().getIdTT(),
+                    PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_P ? PrefsUtils.ins().getSignatureP() : PrefsUtils.ins().getSignatureTT());
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
         }
     }
 }

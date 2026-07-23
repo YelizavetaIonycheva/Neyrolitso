@@ -6,6 +6,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+<<<<<<< HEAD
+=======
+import org.pniei.dwface.biometry.DWFace;
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 import org.pniei.portal.R;
 import org.pniei.portal.utils.ConfigLoader;
 import org.pniei.portal.utils.PrefsUtils;
@@ -25,6 +29,10 @@ public class LauncherActivity extends AppCompatActivity {
     private void initApp() {
         new Thread(() -> {
             PrefsUtils.ins().load(this);
+<<<<<<< HEAD
+=======
+            DWFace.Init(getApplicationContext());
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
             // Автоматическая загрузка конфига
             if (!ConfigLoader.loadConfigFromDownloads(this)) {
                 runOnUiThread(() -> {

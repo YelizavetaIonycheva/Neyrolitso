@@ -76,6 +76,14 @@
 
 
         <activity
+<<<<<<< HEAD
+=======
+            android:name="org.pniei.dwface.biometry.BiometryActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustResize"></activity>
+
+        <activity
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
             android:name=".web.WebviewActivity"
             android:parentActivityName=".activities.MainActivity">
             <meta-data

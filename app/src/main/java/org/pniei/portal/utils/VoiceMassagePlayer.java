@@ -15,7 +15,11 @@ public class VoiceMassagePlayer {
     }
 
     private final static String TAG = "VoiceMassagePlayer";
+<<<<<<< HEAD
     private static MediaPlayer player;
+=======
+    private static MediaPlayer player = null;
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     private static VoiceMassagePlayerListener mListener = null;
     private static PlayingThread thread = null;
 

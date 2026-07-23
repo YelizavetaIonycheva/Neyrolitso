@@ -1,9 +1,17 @@
 package org.pniei.portal.fragments;
 
+<<<<<<< HEAD
+=======
+import android.annotation.SuppressLint;
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+<<<<<<< HEAD
+=======
+import android.graphics.BitmapFactory;
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -43,6 +51,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+<<<<<<< HEAD
+=======
+import java.util.Objects;
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
 public class ContactChangeFragment extends Fragment implements SpoContactListener, OnBackClickListener {
 
@@ -449,7 +461,25 @@ public class ContactChangeFragment extends Fragment implements SpoContactListene
             float originalHeight = image.getHeight();
             Canvas canvas = new Canvas(background);
 
+<<<<<<< HEAD
             Matrix transformation = getMatrix(originalHeight, originalWidth);
+=======
+            float scale;
+            float xTranslation = 0.0f;
+            float yTranslation = 0.0f;
+
+            if (originalHeight > originalWidth) {
+                scale = PHOTO_SIZE / originalWidth;
+                yTranslation = (PHOTO_SIZE - originalHeight * scale) / 2.0f;
+            } else {
+                scale = PHOTO_SIZE / originalHeight;
+                xTranslation = (PHOTO_SIZE - originalWidth * scale) / 2.0f;
+            }
+
+            Matrix transformation = new Matrix();
+            transformation.postTranslate(xTranslation, yTranslation);
+            transformation.preScale(scale, scale);
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
             Paint paint = new Paint();
             paint.setFilterBitmap(true);
@@ -478,6 +508,7 @@ public class ContactChangeFragment extends Fragment implements SpoContactListene
         }
     }
 
+<<<<<<< HEAD
     @NonNull
     private static Matrix getMatrix(float originalHeight, float originalWidth) {
         float scale;
@@ -498,6 +529,8 @@ public class ContactChangeFragment extends Fragment implements SpoContactListene
         return transformation;
     }
 
+=======
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     private void backOrClose() {
         if (getActivity() != null) {
             if (getActivity().getSupportFragmentManager().getBackStackEntryCount() > 0) {

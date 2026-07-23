@@ -1,5 +1,21 @@
 package org.linphone;
 
+<<<<<<< HEAD
+=======
+import org.linphone.compatibility.Compatibility;
+import org.linphone.core.LinphoneAddress;
+import org.linphone.core.LinphoneCall;
+import org.linphone.core.LinphoneCall.State;
+import org.linphone.core.LinphoneCallLog.CallStatus;
+import org.linphone.core.LinphoneCore;
+import org.linphone.core.LinphoneCoreFactory;
+import org.linphone.core.LinphoneCoreListenerBase;
+import org.linphone.core.LinphoneProxyConfig;
+import org.linphone.mediastream.Version;
+import org.linphone.notifications.NotificationsManager;
+import org.linphone.ui.LinphoneOverlay;
+import android.annotation.TargetApi;
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Application;
@@ -15,6 +31,7 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.WindowManager;
+<<<<<<< HEAD
 
 import org.linphone.compatibility.Compatibility;
 import org.linphone.core.LinphoneAddress;
@@ -28,13 +45,19 @@ import org.linphone.core.LinphoneProxyConfig;
 import org.linphone.mediastream.Version;
 import org.linphone.notifications.NotificationsManager;
 import org.linphone.ui.LinphoneOverlay;
+=======
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 import org.pniei.portal.R;
 import org.pniei.portal.activities.MainActivity;
 import org.pniei.portal.database.DBUtils;
 import org.pniei.portal.database.SpoContact;
 import org.pniei.portal.notification.SpoNotificationsManager;
+<<<<<<< HEAD
 
 import java.util.Objects;
+=======
+import org.pniei.portal.utils.PrefsUtils;
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
 public final class LinphoneService extends Service {
 	public static final String TAG = "LinphoneService";
@@ -66,7 +89,13 @@ public final class LinphoneService extends Service {
 	private Notification mIncallNotif;
 	private Notification mMsgNotif;
 	private int mMsgNotifCount;
+<<<<<<< HEAD
     private LinphoneCoreListenerBase mListener;
+=======
+	private PendingIntent mNotifContentIntent;
+	private String mNotificationTitle;
+	private LinphoneCoreListenerBase mListener;
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 	public static int notifcationsPriority = (Version.sdkAboveOrEqual(Version.API16_JELLY_BEAN_41) ? Notification.PRIORITY_MIN : 0);
 	private WindowManager mWindowManager;
 	private LinphoneOverlay mOverlay;
@@ -82,9 +111,15 @@ public final class LinphoneService extends Service {
 		Log.i(TAG, "CREATE");
 		super.onCreate();
 
+<<<<<<< HEAD
         getString(R.string.service_name);
 
         // Needed in order for the two next calls to succeed, libraries must have been loaded first
+=======
+		mNotificationTitle = getString(R.string.service_name);
+
+		// Needed in order for the two next calls to succeed, libraries must have been loaded first
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 		LinphonePreferences.instance().setContext(getBaseContext());
 		LinphoneCoreFactory.instance().setLogCollectionPath(getFilesDir().getAbsolutePath());
 		boolean isDebugEnabled = LinphonePreferences.instance().isDebugEnabled();
@@ -120,6 +155,16 @@ public final class LinphoneService extends Service {
 
 				LinphoneAddress address = call.getRemoteAddress();
 				SpoContact contact = DBUtils.getContactForNumber(address.getUserName());
+<<<<<<< HEAD
+=======
+				if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
+					if (contact == null) {
+						LinphoneManager.getLc().terminateCall(call);
+						return;
+					}
+				}
+
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 				mNotificationManager.displayCallNotification(call, state);
 
 				if (state == LinphoneCall.State.IncomingReceived) {
@@ -138,7 +183,11 @@ public final class LinphoneService extends Service {
 				}
 
 				if (state == State.CallEnd && call.getCallLog().getStatus() == CallStatus.Missed) {
+<<<<<<< HEAD
 					int missedCallCount = Objects.requireNonNull(LinphoneManager.getLcIfManagerNotDestroyedOrNull()).getMissedCallsCount();
+=======
+					int missedCallCount = LinphoneManager.getLcIfManagerNotDestroyedOrNull().getMissedCallsCount();
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 					String body;
 					if (missedCallCount > 1) {
 						body = getString(R.string.missed_calls_notif_body).replace("%i", String.valueOf(missedCallCount));
@@ -163,7 +212,11 @@ public final class LinphoneService extends Service {
 					}
 
 					Notification notif = Compatibility.createMissedCallNotification(instance, getString(R.string.missed_calls_notif_title), body, intent);
+<<<<<<< HEAD
 					notifyWrapper(notif);
+=======
+					notifyWrapper(MISSED_NOTIF_ID, notif);
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 				}
 			}
 
@@ -198,7 +251,11 @@ public final class LinphoneService extends Service {
 		}
 
 		Intent intent = new Intent(this, KeepAliveReceiver.class);
+<<<<<<< HEAD
 		PendingIntent keepAlivePendingIntent;
+=======
+		PendingIntent keepAlivePendingIntent = null;
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 		keepAlivePendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_ONE_SHOT|PendingIntent.FLAG_MUTABLE);
 		AlarmManager alarmManager = ((AlarmManager) this.getSystemService(Context.ALARM_SERVICE));
 		Compatibility.scheduleAlarm(alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 600000, keepAlivePendingIntent);
@@ -206,6 +263,22 @@ public final class LinphoneService extends Service {
 		mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 	}
 
+<<<<<<< HEAD
+=======
+	public void createOverlay() {
+		if (mOverlay != null) destroyOverlay();
+
+		LinphoneCall call = LinphoneManager.getLc().getCurrentCall();
+		if (call == null || !call.getCurrentParams().getVideoEnabled()) return;
+
+		mOverlay = new LinphoneOverlay(this);
+		WindowManager.LayoutParams params = mOverlay.getWindowManagerLayoutParams();
+		params.x = 0;
+		params.y = 0;
+		mWindowManager.addView(mOverlay, params);
+	}
+
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 	public void destroyOverlay() {
 		if (mOverlay != null) {
 			mWindowManager.removeViewImmediate(mOverlay);
@@ -231,9 +304,15 @@ public final class LinphoneService extends Service {
 	 * present despite the service is not running. To trigger it one could
 	 * stop linphone as soon as it is started. Transport configured with TLS.
 	 */
+<<<<<<< HEAD
 	private synchronized void notifyWrapper(Notification notification) {
 		if (instance != null && notification != null) {
 			mNM.notify(LinphoneService.MISSED_NOTIF_ID, notification);
+=======
+	private synchronized void notifyWrapper(int id, Notification notification) {
+		if (instance != null && notification != null) {
+			mNM.notify(id, notification);
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 		} else {
 			Log.i(TAG,"Service not ready, discarding notification");
 		}
@@ -244,6 +323,10 @@ public final class LinphoneService extends Service {
 		return null;
 	}
 
+<<<<<<< HEAD
+=======
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 	@Override
 	public void onTaskRemoved(Intent rootIntent) {
 		if (getResources().getBoolean(R.bool.kill_service_with_task_manager)) {
@@ -261,7 +344,11 @@ public final class LinphoneService extends Service {
 
 	@Override
 	public synchronized void onDestroy() {
+<<<<<<< HEAD
 		Log.i(TAG, "onDestroy");
+=======
+        Log.i(TAG, "onDestroy");
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 		if (activityCallbacks != null){
 			getApplication().unregisterActivityLifecycleCallbacks(activityCallbacks);
 			activityCallbacks = null;
@@ -276,10 +363,17 @@ public final class LinphoneService extends Service {
 		instance = null;
 		LinphoneManager.destroy();
 
+<<<<<<< HEAD
 		// Make sure our notification is gone.
 		stopForegroundCompat();
 		mNM.cancel(INCALL_NOTIF_ID);
 		mNM.cancel(MESSAGE_NOTIF_ID);
+=======
+	    // Make sure our notification is gone.
+	    stopForegroundCompat();
+	    mNM.cancel(INCALL_NOTIF_ID);
+	    mNM.cancel(MESSAGE_NOTIF_ID);
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
 		super.onDestroy();
 	}
@@ -298,6 +392,7 @@ public final class LinphoneService extends Service {
 
 	private void resetIntentLaunchedOnNotificationClick() {
 		Intent notifIntent = new Intent(this, incomingReceivedActivity);
+<<<<<<< HEAD
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 			PendingIntent.getActivity(this, 0, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 		} else {
@@ -306,6 +401,16 @@ public final class LinphoneService extends Service {
 	}
 
 	private void onIncomingReceived() {
+=======
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+			mNotifContentIntent = PendingIntent.getActivity(this, 0, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+		} else {
+		    mNotifContentIntent = PendingIntent.getActivity(this, 0, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		}
+	}
+
+	protected void onIncomingReceived() {
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 		//wakeup linphone
 		Log.e(TAG, "onIncomingReceived");
 
@@ -316,4 +421,9 @@ public final class LinphoneService extends Service {
 		}
 	}
 
+<<<<<<< HEAD
 }
+=======
+}
+
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db

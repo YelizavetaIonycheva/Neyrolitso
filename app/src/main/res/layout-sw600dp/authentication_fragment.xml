@@ -22,7 +22,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+<<<<<<< HEAD
                 android:text="@string/registration_info"
+=======
+                android:text="@string/authentication"
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
@@ -59,6 +63,24 @@
                 android:textSize="22sp"
                 style="@style/Widget.MaterialComponents.Button.TextButton" />
 
+<<<<<<< HEAD
+=======
+            <ImageButton
+                android:id="@+id/btnBiometry"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@null"
+                android:src="@drawable/ic_face"
+                android:scaleType="centerCrop"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintEnd_toStartOf="@id/btnEnter"
+                app:layout_constraintTop_toBottomOf="@id/passwordLayout"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:visibility="gone"/>
+
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout

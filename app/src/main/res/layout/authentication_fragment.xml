@@ -17,7 +17,11 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:gravity="center"
+<<<<<<< HEAD
             android:text="@string/registration_info"
+=======
+            android:text="@string/authentication"
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
             app:layout_constraintBottom_toTopOf="@+id/passwordLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -58,6 +62,36 @@
             app:layout_constraintEnd_toEndOf="@+id/passwordLayout"
             app:layout_constraintTop_toBottomOf="@+id/passwordLayout" />
 
+<<<<<<< HEAD
+=======
+        <ImageButton
+            android:id="@+id/btnBiometry"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:background="@null"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_face"
+            android:padding="4dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/btnEnter"
+            app:layout_constraintEnd_toStartOf="@id/btnEnter"
+            app:layout_constraintTop_toTopOf="@+id/btnEnter"
+            tools:ignore="SpeakableTextPresentCheck"
+            tools:visibility="visible" />
+
+        <ProgressBar
+            android:id="@+id/progressPar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="8dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/btnBiometry"
+            app:layout_constraintEnd_toStartOf="@id/btnBiometry"
+            app:layout_constraintTop_toTopOf="@id/btnBiometry"
+            tools:visibility="visible" />
+
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
         <androidx.constraintlayout.widget.Group
             android:id="@+id/group"
             android:layout_width="wrap_content"

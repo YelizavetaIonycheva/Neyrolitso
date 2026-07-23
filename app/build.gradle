@@ -91,6 +91,11 @@ android {
 }
 
 dependencies {
+<<<<<<< HEAD
+=======
+    implementation project(path: ':DWFace')
+
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'com.google.android.material:material:1.14.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
@@ -106,5 +111,14 @@ dependencies {
     implementation 'androidx.documentfile:documentfile:1.1.0'
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
     implementation 'com.github.kevinsawicki:http-request:6.0'
+<<<<<<< HEAD
 
+=======
+    implementation 'androidx.camera:camera-core:1.6.1'
+    implementation 'androidx.camera:camera-camera2:1.6.1'
+    implementation 'androidx.camera:camera-lifecycle:1.6.1'
+    implementation 'androidx.camera:camera-view:1.6.1'
+    implementation 'androidx.camera:camera-extensions:1.6.1'
+    implementation 'com.google.mlkit:barcode-scanning:17.3.0'
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 }

@@ -44,7 +44,11 @@ public class HistoryListFragment extends Fragment implements View.OnClickListene
 
     private enum STATE {GONE, CLOSE, DELETE};
     private static final String LIST_STATE_KEY = "list_state_key";
+<<<<<<< HEAD
     private ArrayList mLogs;
+=======
+    private ArrayList<LinphoneCallLog> mLogs;
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     private HistoryListAdapter mAdapter;
     private Parcelable mListState;
     private HistoryListFragmentBinding mBinding;

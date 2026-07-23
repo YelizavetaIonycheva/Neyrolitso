@@ -6,8 +6,13 @@ include $(app-root-dir)/submodules/bcunit/build/Android/Android.mk
 include $(app-root-dir)/submodules/bctoolbox/build/Android/Android-mbedtls.mk
 #libbelr
 include $(app-root-dir)/submodules/belr/build/Android/Android.mk
+<<<<<<< HEAD
 ##libsqlite3 - using system sqlite3 via LOCAL_LDLIBS in submodules
 #include $(app-root-dir)/submodules/externals/sqlite3/build/Android/Android.mk
+=======
+#libsqlite3
+include $(app-root-dir)/submodules/externals/sqlite3/build/Android/Android.mk
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
 
 
@@ -62,8 +67,29 @@ include $(app-root-dir)/submodules/spmemvfs/Android.mk
 #libspodb
 include $(app-root-dir)/submodules/SpoDB/build/Android/Android.mk
 
+<<<<<<< HEAD
+=======
+BUILD_MAGMA := true
+ifeq ($(BUILD_MAGMA), true)
+    #libmagma
+    include $(app-root-dir)/submodules/magma/build/Android/Android.mk
+else
+    #libgost28147
+    include $(app-root-dir)/submodules/gost28147/build/Android/Android.mk
+endif
+
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 #libhesh341112
 include $(app-root-dir)/submodules/hesh341112/Android.mk
 
 #libupdsch
 include $(app-root-dir)/submodules/updsch/Android.mk
+<<<<<<< HEAD
+=======
+
+#libcryptutils
+include $(app-root-dir)/submodules/CryptUtils/Android.mk
+
+#libvpnclient
+include $(app-root-dir)/submodules/VpnClient/Android.mk
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db

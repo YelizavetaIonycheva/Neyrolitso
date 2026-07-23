@@ -327,7 +327,10 @@ public class ChatFragment extends Fragment implements View.OnClickListener, SpoC
         });
     }
 
+<<<<<<< HEAD
     @SuppressLint("ClickableViewAccessibility")
+=======
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     private void setupRecordVoiceUI() {
         Context context = getContextSafe();
         if (context == null) return;

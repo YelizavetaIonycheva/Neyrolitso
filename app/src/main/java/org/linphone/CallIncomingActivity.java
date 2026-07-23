@@ -59,6 +59,10 @@ public class CallIncomingActivity extends AppCompatActivity {
 		}
 
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+<<<<<<< HEAD
+=======
+		//setContentView(R.layout.call_incoming);
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 		mBinding = DataBindingUtil.setContentView(this, R.layout.call_incoming);
 
 		// set this flag so this activity will stay in front of the keyguard
@@ -193,17 +197,39 @@ public class CallIncomingActivity extends AppCompatActivity {
 
 		if (params != null) {
 			params.enableLowBandwidth(isLowBandwidthConnection);
+<<<<<<< HEAD
 		} else {
+=======
+		}else {
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 			Log.e("Could not create call params for call");
 		}
 
 		if (params == null || !LinphoneManager.getInstance().acceptCallWithParams(mCall, params)) {
+<<<<<<< HEAD
+=======
+			// the above method takes care of Samsung Galaxy S
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 			Toast.makeText(this, R.string.couldnt_accept_call, Toast.LENGTH_LONG).show();
 		} else {
 			if (!MainActivity.isInstanciated()) {
 				return;
 			}
 			LinphoneManager.getInstance().routeAudioToReceiver();
+<<<<<<< HEAD
+=======
+
+			if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_TT) {
+				LinphoneAddress address = mCall.getRemoteAddress();
+				SpoContact contact = DBUtils.getContactForNumber(address.getUserName());
+				if (contact != null)
+					CryptUtils.initCryptSound(Integer.parseInt(PrefsUtils.ins().getIdTT()), Integer.parseInt(contact.getIdUser()), true);
+				else
+					CryptUtils.initCryptSound(0, 0, false);
+			} else {
+				CryptUtils.initCryptSound(0, 0, false);
+			}
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 			MainActivity.instance().startIncallActivity(mCall);
 		}
 	}
@@ -213,6 +239,11 @@ public class CallIncomingActivity extends AppCompatActivity {
 
 		int recordAudio = getPackageManager().checkPermission(Manifest.permission.RECORD_AUDIO, getPackageName());
 		Log.i("[Permission] Record audio permission is " + (recordAudio == PackageManager.PERMISSION_GRANTED ? "granted" : "denied"));
+<<<<<<< HEAD
+=======
+		int camera = getPackageManager().checkPermission(Manifest.permission.CAMERA, getPackageName());
+		Log.i("[Permission] Camera permission is " + (camera == PackageManager.PERMISSION_GRANTED ? "granted" : "denied"));
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
 		if (recordAudio != PackageManager.PERMISSION_GRANTED) {
 			if (LinphonePreferences.instance().firstTimeAskingForPermission(Manifest.permission.RECORD_AUDIO) || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
@@ -220,6 +251,17 @@ public class CallIncomingActivity extends AppCompatActivity {
 				permissionsList.add(Manifest.permission.RECORD_AUDIO);
 			}
 		}
+<<<<<<< HEAD
+=======
+		if (LinphonePreferences.instance().shouldInitiateVideoCall() || LinphonePreferences.instance().shouldAutomaticallyAcceptVideoRequests()) {
+			if (camera != PackageManager.PERMISSION_GRANTED) {
+				if (LinphonePreferences.instance().firstTimeAskingForPermission(Manifest.permission.CAMERA) || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+					Log.i("[Permission] Asking for camera");
+					permissionsList.add(Manifest.permission.CAMERA);
+				}
+			}
+		}
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
 		if (permissionsList.size() > 0) {
 			String[] permissions = new String[permissionsList.size()];

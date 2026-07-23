@@ -20,7 +20,11 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 public class Logger {
+<<<<<<< HEAD
     private static final String FILE_NAME = "app_log.txt";
+=======
+    private static final String FILE_NAME = "vpn_log.txt";
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     private File log_file = null;
     private DateFormat df = null;
     private Calendar mCalendar = null;

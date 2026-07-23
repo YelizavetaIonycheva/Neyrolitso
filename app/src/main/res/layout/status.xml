@@ -76,7 +76,11 @@
                 style="@style/font16"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+<<<<<<< HEAD
                 android:layout_alignParentEnd="true"
+=======
+                android:layout_toStartOf="@id/gpsStatus"
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
                 android:layout_marginStart="2dp"
                 android:layout_marginEnd="4dp"
                 android:layout_centerVertical="true"
@@ -85,7 +89,66 @@
                 tools:visibility="gone"
                 android:visibility="gone" />
 
+<<<<<<< HEAD
 
+=======
+            <ImageView
+                android:id="@+id/gpsStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/content_description_vpn_status"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
+                android:src="@drawable/ic_gps_off"
+                tools:visibility="visible"
+                android:layout_toStartOf="@id/vpnStatus"
+                android:visibility="gone"
+                app:tint="@android:color/white"/>
+
+            <!--<LinearLayout
+                android:id="@+id/speed"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_toStartOf="@+id/vpnStatus"
+                android:layout_centerVertical="true"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/speedIn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/font1"
+                    tools:text="10.12"/>
+
+                <TextView
+                    android:id="@+id/speedOut"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/font1"
+                    tools:text="10.12"/>
+            </LinearLayout>-->
+
+            <ImageView
+                android:id="@+id/vpnStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:adjustViewBounds="true"
+                android:paddingStart="2dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="4dp"
+                android:src="@drawable/ic_vpn_quality_high"
+                app:tint="@android:color/white"/>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
         </RelativeLayout>
 

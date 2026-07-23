@@ -21,7 +21,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+<<<<<<< HEAD
 import java.util.Objects;
+=======
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
@@ -142,7 +145,11 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                 final PackageManager pm = mContext.getPackageManager();
                 PackageInfo info = pm.getPackageArchiveInfo(file.getAbsolutePath(), 0);
 
+<<<<<<< HEAD
                 if (info == null || Objects.equals(info.versionName, BuildConfig.VERSION_NAME)) {
+=======
+                if (info == null || info.versionName.equals(BuildConfig.VERSION_NAME)) {
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
                     file.delete();
                     isShowBtnUpdate = false;
                     mHandler.post(() -> {

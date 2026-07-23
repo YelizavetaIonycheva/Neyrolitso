@@ -76,7 +76,15 @@ public class Utils {
     }
 
     public static String getContactPhotoDir(Context context) {
+<<<<<<< HEAD
         return context.getApplicationInfo().dataDir + "/contact_photo_p/";
+=======
+        if (PrefsUtils.ins().getRegimeSelected() == PrefsUtils.REGIME_P) {
+            return context.getApplicationInfo().dataDir + "/contact_photo_p/";
+        } else {
+            return context.getApplicationInfo().dataDir + "/contact_photo_tt/";
+        }
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     }
 
     public static String getAppDataDir(Context context) {
@@ -359,13 +367,24 @@ public class Utils {
         if (android.os.Build.VERSION.SDK_INT < 29) {
             rootDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), context.getString(R.string.app_name) + "/Sended");
             //rootDir = new File(Environment.getExternalStorageDirectory(), context.getString(R.string.app_name) + "/Sended");
+<<<<<<< HEAD
+=======
+            if (!rootDir.exists())
+                rootDir.mkdirs();
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
         } else {
             rootDir = new File(context.getExternalMediaDirs()[0].getAbsolutePath(), "/Sended");
             //rootDir = new File(context.getExternalFilesDir(null).getAbsolutePath(), context.getString(R.string.app_name) + "/Sended");
+<<<<<<< HEAD
         }
         if (!rootDir.exists())
             rootDir.mkdirs();
+=======
+            if (!rootDir.exists())
+                rootDir.mkdirs();
+        }
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
         return new File(rootDir.getAbsolutePath(), fileName);
     }
 
@@ -447,8 +466,12 @@ public class Utils {
     public static void copyAssetsFiles(Context context, String copyDir, String dirIn) {
         if (context != null) {
             try {
+<<<<<<< HEAD
                 String[] assets = context.getAssets().list(copyDir);
                 assert assets != null;
+=======
+                String assets[] = context.getAssets().list(copyDir);
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
                 if (assets.length == 0) {
                     copyFile(context, copyDir, dirIn);
                 } else {
@@ -535,7 +558,17 @@ public class Utils {
     }
 
     public static void initTheme(Activity activity) {
+<<<<<<< HEAD
         activity.setTheme(R.style.AppThemeP);
+=======
+        int regime = PrefsUtils.ins().getRegimeSelected();
+
+        if (regime == PrefsUtils.REGIME_TT) {
+            activity.setTheme(R.style.AppThemeTT);
+        } else {
+            activity.setTheme(R.style.AppThemeP);
+        }
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     }
 
     private static AlertDialog mWaitDialog = null;
@@ -586,4 +619,9 @@ public class Utils {
         }
         return null;
     }
+<<<<<<< HEAD
 }
+=======
+
+}
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db

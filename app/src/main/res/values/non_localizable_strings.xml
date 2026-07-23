@@ -10,6 +10,10 @@
 	<string name="pref_export_logs_key">pref_export_logs_key</string>
 	<string name="pref_update_po_key">pref_update_po_key</string>
 	<string name="pref_reset_spomp_key">pref_reset_spomp_key</string>
+<<<<<<< HEAD
+=======
+	<string name="pref_change_regime_key">pref_change_regime_key</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 	<string name="pref_background_work_key">pref_background_work_key</string>
 	<string name="pref_export_settings_key">pref_export_settings_key</string>
 	<string name="pref_import_settings_key">pref_import_settings_key</string>
@@ -18,7 +22,12 @@
 	<string name="pref_audio_codecs_key">pref_audio_codecs_key</string>
 	<string name="pref_skzi_key">pref_skzi_key</string>
 	<string name="pref_advanced_key">pref_advanced_key</string>
+<<<<<<< HEAD
 
+=======
+	<string name="pref_biometry_settings_key">pref_biometry_settings_key</string>
+	<string name="pref_biometry_settings_cat_key">pref_biometry_settings_cat_key</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
 
 	<string-array name="limit_bitrate_entry_values">
@@ -45,6 +54,11 @@
 	<string name="pref_ip_mon_key">pref_ip_mon_key</string>
 	<string name="pref_ip_dns_key">pref_ip_dns_key</string>
 	<string name="pref_ip_dns_second_key">pref_ip_dns_second_key</string>
+<<<<<<< HEAD
+=======
+	<string name="pref_send_gps_key">pref_send_gps_key</string>
+	<string name="pref_gps_time_key">pref_gps_time_key</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 	<string name="pref_ip_db_key">pref_ip_db_key</string>
 	<string name="pref_domain_name_key">pref_domain_name_key</string>
 	<string name="pref_ip_ats_key">pref_ip_ats_key</string>

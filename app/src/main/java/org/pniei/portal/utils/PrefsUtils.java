@@ -2,16 +2,28 @@ package org.pniei.portal.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+<<<<<<< HEAD
+=======
+import android.util.Log;
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
 public class PrefsUtils {
     private static final String TAG = "PrefsUtils";
 
+<<<<<<< HEAD
+=======
+    // Режимы (оставлен только Portal, но константа не используется)
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     public static final int REGIME_P = 1;
 
     private static PrefsUtils instance;
     private SharedPreferences prefs;
 
+<<<<<<< HEAD
     // Конфигурационные данные (из файла конфигурации)
+=======
+    // Конфигурационные данные SIP (из файла конфигурации)
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     private String mIdP;
     private String mSignatureP;
     private String mPhoneP;
@@ -39,8 +51,12 @@ public class PrefsUtils {
         String SELECT_CODEC = "select_codec";
     }
 
+<<<<<<< HEAD
     private PrefsUtils() {
     }
+=======
+    private PrefsUtils() { }
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
     public static synchronized PrefsUtils ins() {
         if (instance == null) {
@@ -51,6 +67,10 @@ public class PrefsUtils {
 
     /**
      * Загрузка сохранённых настроек из SharedPreferences.
+<<<<<<< HEAD
+=======
+     * Вызывается при запуске приложения (в LauncherActivity).
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
      */
     public void load(Context context) {
         prefs = context.getApplicationContext().getSharedPreferences(Prefs.NAME_FILE_PREFS, Context.MODE_PRIVATE);
@@ -67,7 +87,12 @@ public class PrefsUtils {
     }
 
     /**
+<<<<<<< HEAD
      * Сохранение параметров конфигурации.
+=======
+     * Сохранение параметров конфигурации (после успешной загрузки из файла).
+     * Автоматически устанавливает флаг isAuth = true.
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
      */
     public void saveConfig(String id, String signature, String phone, String ipAts, String ipDns, String ipDnsSecond) {
         prefs.edit()
@@ -128,6 +153,7 @@ public class PrefsUtils {
         return isSelectCodecs;
     }
 
+<<<<<<< HEAD
     public int getRegimeSelected() {
         return REGIME_P;
     }
@@ -146,6 +172,8 @@ public class PrefsUtils {
         mIpDnsSecondP = ipDnsSecond;
         prefs.edit().putString(Prefs.IP_DNS_SECOND_P, ipDnsSecond).apply();
     }
+=======
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
     public void setAuth(boolean auth) {
         isAuth = auth;

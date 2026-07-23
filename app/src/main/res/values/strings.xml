@@ -1,7 +1,22 @@
 <resources>
+<<<<<<< HEAD
     <string name="app_name">Импульс</string>
     <string name="create_safe">Создать</string>
 
+=======
+    <string name="app_name">Импульс GPS</string>
+    <string name="create_safe">Создать</string>
+
+    <string name="scan_qrcode_info">Или отсканируйте QR-код лицензии</string>
+    <string name="select_qrcode_file_info">Для регистрации приложения выберите файл-архив конфигурации</string>
+    <string name="scan">Сканировать</string>
+    <string name="select">Выбрать</string>
+    <string name="dialog_reg_license_title">Данные лицензии</string>
+	
+
+
+
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="tab1">ЧАТЫ</string>
     <string name="tab2">ЗВОНОК</string>
     <string name="tab3">КОНТАКТЫ</string>
@@ -80,7 +95,10 @@
         <item quantity="one">%1$d непрочитанное сообщение</item>
         <item quantity="few">%1$d непрочитанных сообщения</item>
         <item quantity="many">%1$d непрочитанных сообщений</item>
+<<<<<<< HEAD
         <item quantity="zero">%1$d непрочитанных сообщений</item>
+=======
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     </plurals>
 
     <string name="in_call">Входящий вызов</string>
@@ -89,6 +107,10 @@
 
 
     <string name="info_open_file_title">Открытие файла</string>
+<<<<<<< HEAD
+=======
+    <string name="info_open_file">Выбранный файл будет расшифрован\n(результат записывается в каталог SPO_MP_Files)</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="info_open_file_chek_title">Больше не показывать</string>
 
 
@@ -114,6 +136,10 @@
     <string name="dialog_export_images">Экспорт изображений</string>
     <string name="dialog_select_config_file">Выберите файл конфигурации</string>
     <string name="dialog_select_key_file">Выберите ключевой файл</string>
+<<<<<<< HEAD
+=======
+    <string name="dialog_select_qr_file">Выберите файл qr-кода</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="dialog_enter_pass">Введите пароль</string>
     <string name="dialog_select_zip_file">Выберите архив конфигурации</string>
     <string name="dialog_wait">Пожалуйста подождите</string>
@@ -129,10 +155,19 @@
     <string name="pref_ip_dns_title">DNS</string>
     <string name="pref_ip_dns_second_title">DNS дополнительный</string>
 
+<<<<<<< HEAD
+=======
+        <!-- VPN Соединение -->
+    <string name="pref_vpn_info_title">VPN соединение</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
             <!-- СКЗИ -->
     <string name="pref_skzi_title">СКЗИ</string>
     <string name="pref_connect_skzi_title">Соединение с СКЗИ</string>
     <string name="pref_connect_skzi_time_error">Ошибка синхронизации времени</string>
+<<<<<<< HEAD
+=======
+    <string name="pref_work_with_vpn_title">Работают через VPN</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
             <!-- Комплекты ключей -->
     <string name="pref_key_compl_title">Комплекты ключей</string>
     <string name="key_working_settings_title">Комплект ключей (действующий)</string>
@@ -145,14 +180,47 @@
     <string name="key_date_end_title">Дата конца действия комплекта</string>
 
         <!-- Биометрия -->
+<<<<<<< HEAD
+=======
+    <string name="biometry_settings">Биометрия</string>
+    <string name="new_biometry_title">Удалить биометрический контейнер</string>
+    <string name="create_biometry_title">Создать биометрический контейнер</string>
+    <string name="update_biometry_title">Переобучить биометрический контейнер</string>
+    <string name="info_biometry_title">Информация о стойкости нейросетевого биометрического контейнера</string>
+    <string name="export_biometry_title">Экспорт биометрического контейнера</string>
+    <string name="import_biometry_title">Импорт биометрического контейнера</string>
+    <string name="info_create_biometry">Будет создан биометрический контейнер, обученный формированию из лица пользователя пароля доступа.\nДля более качественного обучения рекомендуется снимать лицо под разными углами</string>
+    <string name="info_update_biometry">Биометрический контейнер будет переобучен.\nДля более качественного обучения рекомендуется снимать лицо под разными углами</string>
+    <string name="info_export_biometry">Биометрический контейнер будет зашифрован на пароле аутентификации и записан в файл \"ImpulseBiom.bc\" в указанный каталог </string>
+    <string name="info_import_biometry">Выберите файл биометрического контейнера и введите пароль на котором он был зашифрован</string>
+    <string name="info_biometry">Информация о стойкости нейросетевого биометрического контейнера</string>
+    <string name="error_biometry_timeout">Превышено время распознования лица пользователя</string>
+    <string name="error_biometry">Ошибка распознавания</string>
+    <string name="error_biometry_data">Получены некорректные данные</string>
+    <string name="biometry_result_ok">Биометрический контейнер создан</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
         <!-- Медиа -->
     <string name="pref_media_title">Медиа</string>
             <!-- Аудио -->
     <string name="pref_audio_title">Аудио</string>
     <string name="pref_echo_cancellation">Эхоподавление</string>
     <string name="pref_echo_cancellation_summary">Устраняет эхо, слышимое другой стороной</string>
+<<<<<<< HEAD
     <string name="failed">не удалось</string>
             <!-- Видео -->
+=======
+    <string name="pref_echo_canceller_calibration">Калибровка эхоподавления</string>
+    <string name="pref_echo_tester">Тест эхо</string>
+    <string name="ec_calibrating">Калибровка…</string>
+    <string name="ec_calibrated">Откалибровано в %s мс</string>
+    <string name="no_echo">Нет эха</string>
+    <string name="failed">не удалось</string>
+            <!-- Видео -->
+    <string name="pref_video_title">Видео</string>
+    <string name="pref_preferred_video_size">Предпочитаемый размер видео</string>
+    <string name="pref_overlay">Наложение видео</string>
+    <string name="pref_overlay_summary">Отображать видеовызов наложением на стороннем приложении</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
         <!-- Дополнительно -->
     <string name="pref_advanced_title">Дополнительно</string>
@@ -160,6 +228,11 @@
     <string name="pref_update_po_title">Обновление ПО</string>
     <string name="pref_reset_config_title">Сброс приложения</string>
     <string name="reset_config_info">"Сброс приложения приведет к удалению конфигурационной и ключевой информации. Приложение будет закрыто"</string>
+<<<<<<< HEAD
+=======
+    <string name="pref_change_regime_title">Смена режима работы</string>
+    <string name="change_regime_info">Работа текущего режима работы будет завершена. Будет необходимо повторно пройти аутентификацию</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="pref_background_work_title">Контроль фоновой активности</string>
     <string name="pref_export_settings_title">Экспорт настроек</string>
     <string name="info_export_settings">Настройки будут записаны в файл \"Impulse.prefs\" в указанном каталоге</string>
@@ -175,6 +248,17 @@
 
     <!--Advanced settings-->
 
+<<<<<<< HEAD
+=======
+    <string name="vpn_not_connecting">Соединение не установлено</string>
+    <string name="vpn_connecting">Установка соединения...</string>
+    <string name="vpn_connected">Соединение установлено</string>
+    <string name="vpn_disconnected">Соединение разорвано!</string>
+    <string name="vpn_server_disconnected">Сервер разорвал соединение</string>
+    <string name="vpn_server_not_available">Сервер недоступен</string>
+    <string name="vpn_faild_connect_to_server">Ошибка подключения к серверу</string>
+    <string name="vpn_wifi_mobdata_not_active">Wi-Fi или Мобильные данные отключены</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="start_connecting">Запустить</string>
     <string name="stop_connecting">Остановить</string>
     <string name="start_time_dif_info">Рассинхронизация времени\nВремя сервера</string>
@@ -187,18 +271,36 @@
     <string name="speed_out">Передача (kB/s):</string>
 
     <string name="network_address">Сетевые адреса</string>
+<<<<<<< HEAD
+=======
+    <string name="address_VPN">IP адрес СКЗИ</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="address_DNS">IP адрес DNS</string>
     <string name="address_KEY">IP адрес сервера мониторинга</string>
     <string name="user_password">Пароль</string>
     <string name="user_address">Адрес ресурса</string>
     <string name="other_settings">Общее</string>
     <string name="show_ip">Показывать параметры подключения</string>
+<<<<<<< HEAD
+=======
+    <string name="auto_start_VPN">Соединение при запуске</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="battery_saving">Энергосбережение</string>
 
     <string name="keys_settings">Комплекты ключей</string>
     <string name="delete_keys">Стереть ключи</string>
 
+<<<<<<< HEAD
 
+=======
+    <string name="content_title_notification_vpn_service">Служба VPN соединения</string>
+    <string name="content_title_notification_vpn_service2">Служба VPN соединения2</string>
+    <string name="notification_service_channel_vpn_id">ikev2_vpn_notification_service_id</string>
+    <string name="vpn_service_name">Служба VPN соединения</string>
+
+    <!-- VPN info -->
+    <string name="vpn_configuration_error_info">"Ошибка установки соединения. Проверьте настройки соединения"</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="connection_quality">Качество:</string>
     <string name="connection_quality_non"> </string>
     <string name="connection_quality_high">Высокое</string>
@@ -270,17 +372,32 @@
     <!--Call-->
     <string name="incoming_call">входящий вызов</string>
     <string name="outgoing_call">исходящий вызов</string>
+<<<<<<< HEAD
+=======
+    <string name="add_video_dialog">Ваш собеседник хотел бы включить видео</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="no_current_call">Нет активного вызова</string>
     <string name="call_paused_by_remote">Ваш собеседник поставил вызов на удержание</string>
     <string name="couldnt_accept_call">Произошла ошибка во время принятия вызова</string>
 
     <string name="call_stats_audio">Аудио</string>
+<<<<<<< HEAD
+=======
+    <string name="call_stats_video">Видео</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="call_stats_codec">Кодек:</string>
     <string name="call_stats_ip">Семейство IP:</string>
     <string name="call_stats_upload">Пропускная способность передачи:</string>
     <string name="call_stats_download">Пропускная способность приема:</string>
     <string name="call_stats_estimated_download">Предполагаемая пропускная способность на прием:</string>
     <string name="call_stats_ice">ICE-соединение:</string>
+<<<<<<< HEAD
+=======
+    <string name="call_stats_video_resolution_sent">Разрешение передаваемого видео:</string>
+    <string name="call_stats_video_resolution_received">Разрешение принимаемого видео:</string>
+    <string name="call_stats_video_fps_sent">fps передаваемого видео:</string>
+    <string name="call_stats_video_fps_received">fps принимаемого видео:</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="call_stats_sender_loss_rate">Коэффициент потерь отправителя:</string>
     <string name="call_stats_receiver_loss_rate">Коэффициент потерь приемника:</string>
     <string name="call_stats_jitter_buffer">Буфер джиттера:</string>
@@ -293,6 +410,10 @@
     <!--Service-->
     <string name="incall_notif_active">Установлено аудиосоединение</string>
     <string name="incall_notif_paused">Вызов на удержании</string>
+<<<<<<< HEAD
+=======
+    <string name="incall_notif_video">Установлено видеосоединение</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="notification_started">Запущен</string>
     <string name="unread_messages">%i непрочитанных сообщений</string>
     <string name="missed_calls_notif_title">Пропущенный вызов</string>
@@ -306,6 +427,10 @@
     <string name="error_user_busy">Абонент занят</string>
     <string name="error_user_not_found">Абонент не найден</string>
     <string name="error_incompatible_media">Несовместимые параметры потока</string>
+<<<<<<< HEAD
+=======
+    <string name="error_low_bandwidth">У вашего собеседника низкая пропускная способность, видео не может быть запущено</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="error_network_unreachable">Сеть недоступна</string>
     <string name="error_bad_credentials">Неверные учетные данные</string>
     <string name="error_unauthorized">Неавторизован</string>
@@ -340,6 +465,10 @@
     <string name="pref_prefix">Префикс</string>
     <string name="pref_transport">Транспорт</string>
 
+<<<<<<< HEAD
+=======
+    <string name="pref_vpnAccount_disable">Обычный Аккаунт</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
     <string name="pref_transport_udp">UDP</string>
     <string name="pref_transport_tcp">TCP</string>
@@ -365,15 +494,30 @@
     </string-array>
     <string name="pref_none">Нет</string>
     <string name="pref_preferences_title">Настройки</string>
+<<<<<<< HEAD
+=======
+    <string name="pref_video_enable_title">Включить видео</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
     <!--Audio settings-->
 
     <string name="pref_codecs_title">Кодеки</string>
     <string name="pref_audio_codecs">Аудио кодеки</string>
+<<<<<<< HEAD
 
 
 
 
+=======
+    <string name="pref_video_codecs">Видео кодеки</string>
+
+
+    <!--SKZI settings-->
+
+
+    <string name="pref_send_gps_title">Отправлять координаты</string>
+    <string name="pref_gps_time_title">Частота отправки координат (c)</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="pref_ip_db_title">СУБД для записи координат</string>
     <string name="pref_sip_num_title">SIP-номер</string>
     <string name="pref_pass_title">Пароль</string>
@@ -418,6 +562,10 @@
     <string name="content_description_call_direction">Направление вызова</string>
     <string name="content_description_all_calls">Все вызовы</string>
     <string name="content_description_missed_calls">Пропущенные вызовы</string>
+<<<<<<< HEAD
+=======
+    <string name="content_description_switch_video">Переключить видео</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="content_description_add_call">Добавить вызов</string>
     <string name="content_description_pause">Пауза</string>
     <string name="content_description_numpad">Цифровая клавиатура</string>
@@ -425,6 +573,12 @@
     <string name="content_description_chat_button">Кнопка чата</string>
     <string name="content_description_contacts">Кнопка контактов</string>
     <string name="content_description_call_quality">Качество вызова</string>
+<<<<<<< HEAD
+=======
+    <string name="content_description_encryption">Шифрование</string>
+    <string name="content_description_vpn_status">VPN статус</string>
+    <string name="content_description_switch_camera">Переключить камеру</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="content_description_cancel_button">Кнопка отмены</string>
     <string name="content_description_message_status">Статус сообщения</string>
     <string name="content_description_conference">Конференция</string>
@@ -459,6 +613,10 @@
     <string name="content_title_notification_call">Звонки</string>
     <string name="content_title_notification">Уведомления</string>
     <string name="content_title_notification_spo_message">Сообщения</string>
+<<<<<<< HEAD
+=======
+    <string name="content_title_notification_vpn">VPN Соединение</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
     <string name="error_opening_file">Ошибка открытия файла.</string>
     <string name="title_side_menu_settings">Настройки</string>
@@ -489,10 +647,20 @@
     <string name="sort_history_by_made">Исходящие</string>
     <string name="sort_history_by_all">Все</string>
     <string name="image_picker_title">Выбрать источник</string>
+<<<<<<< HEAD
+=======
+    <string name="pref_gps_title">GPS</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="error_not_enter_web_domain">Не настроен адрес</string>
     <string name="error_no_activity_found">Нет приложения для открытия этого файла</string>
     <string name="file_not_found">Файл не найден</string>
     <string name="registration_info">Укажите пароль доступа</string>
+<<<<<<< HEAD
+=======
+    <string name="select_regime">Выберите режим работы</string>
+    <string name="name_regime_1">Портал</string>
+    <string name="name_regime_2">Точка-Точка</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
     <string name="enter_config">Ввод конфигурации</string>
     <string name="select_key_dir">Укажате каталог с ключом</string>
     <string name="select_config_info">Введите конфигурационные данные</string>
@@ -509,6 +677,10 @@
     <string name="notification_mark_as_read_label">Пометить как прочитанное</string>
 
     <string name="my_number">Мой номер: %1$s</string>
+<<<<<<< HEAD
+=======
+    <string name="biometry_train_info">Привязать биометрические данные ?</string>
+>>>>>>> f1f0ba4992deebceefcbec824421c405340748db
 
     <string name="err_file_key_not_found">Ключевой файл не найден</string>
     <string name="file_version_po_title">Версия скаченного ПО:</string>
